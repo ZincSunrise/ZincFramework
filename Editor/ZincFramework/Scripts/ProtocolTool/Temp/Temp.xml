@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--请将配置文件放在ArtRes/XmlProtocols文件夹下（没有就创建一个）-->
+<!--Please put the configuration file in the ArtRes/XmlProtocols folder (create one if you don't have one)-->
+
+<Protocols>
+	<!--枚举配置规则-->
+	<!--首先写名字，再写其命名空间，如果没有就不写，以字段代替名字-->
+	<!-- Enumeration Configuration Rules-->
+	<!--Write the name first, then its namespace, or leave it out if it's not there and replace the name with a field-->
+	<enum name="E_SeasonType" namespace="GameSystem">
+		<field name="Spring" value = "1"/>
+		<field name="Summer" value = "2"/>
+		<field name="Autumn"/>
+		<field name="Winter"/>
+	</enum>
+
+	<!--集合类配置规则-->
+	<!--只需要指定type类型泛型变量即可,普通集合类用T来指代，字典则用T1和T2来指代-->
+	<!--Collection Class Configuration Rules-->
+	<!--Just specify the type generic variable, which is referred to as T for normal collection classes and T1 and T2 for Dictionary-->
+	<collection type="Queue" T="int"/>
+	<collection type="Dictionary" T1="int" T2="string"/>
+
+	<!--数据结构类配置规则-->
+	<!--Data structure class configuration rules-->
+	<data name="Player" namespace="GameData" dataId="191919">
+		<field type="int" name="attackPoint" ordinalNumber="1"/>
+		<field type="int" name="defensePoint" ordinalNumber="2"/>
+		<field type="float" name="moveSpeed" ordinalNumber="3"/>
+		<field type="string" name="name" ordinalNumber="4"/>
+		<field type="bool" name="isNew" ordinalNumber="5"/>
+	</data>
+
+	<!--消息类配置规则-->
+	<!--Message class configuration rules-->
+	<massage name="PlayerMessage" namespace="GameData" messageId="114514">
+		<field type="int" name="attackPoint" ordinalNumber="1"/>
+		<field type="int" name="defensePoint" ordinalNumber="2"/>
+		<field type="float" name="moveSpeed" ordinalNumber="3"/>
+		<field type="ItemMessage" name="weapon" ordinalNumber="4"/>
+		<field type="string" name="name" ordinalNumber="5"/>
+		<field type="bool" name="isNew" ordinalNumber="6"/>
+		<field type="queue" T="int" name="queueInts" ordinalNumber="7"/>
+		<field type="hashSet" T="int" name="setInts" ordinalNumber="11"/>
+		<field type="list" T= "ItemMessage" name="itemList" ordinalNumber="23"/>
+		<field type="array" T= "ItemMessage" name="strings" ordinalNumber="32"/>
+		<field type="dictionary" T1="ItemMessage" T2="ItemMessage" name="listDic" ordinalNumber="112"/>
+	</massage>
+
+	<!--消息类配置规则-->
+	<!--Message class configuration rules-->
+	<massage name="ItemMessage" namespace="GameData" messageId="1919810">
+		<field type="int" name="ID" ordinalNumber="1"/>
+		<field type="string" name="name" ordinalNumber="4"/>
+		<field type="bool" name="isNew" ordinalNumber="23"/>
+	</massage>
+</Protocols>
+
