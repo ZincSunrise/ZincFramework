@@ -1,0 +1,18 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Editor/ZincFramework/Scripts/Extension/TreeGraph/TreeGraphView/TreeGraphView.uss?fileID=7433441132597879392&amp;guid=82470effbd624904abc4c894779bf357&amp;type=3#TreeGraphView" />
+    <ui:VisualElement name="WindowContainer" style="flex-grow: 1;">
+        <uie:Toolbar>
+            <uie:ToolbarMenu tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" text="Asset" />
+        </uie:Toolbar>
+        <ZincFramework.UI.TreeExtension.SplitView orientation="Horizontal" fixed-pane-initial-dimension="146" class="splitView">
+            <ui:VisualElement name="LeftContainer" style="flex-grow: 1; background-color: rgb(60, 60, 60);">
+                <ui:Label tabindex="-1" text="Inspector" parse-escape-sequences="true" display-tooltip-when-elided="true" />
+                <ZincFramework.UI.TreeExtension.InspectorView />
+            </ui:VisualElement>
+            <ui:VisualElement name="RightContainer" style="flex-grow: 1;">
+                <ui:Label tabindex="-1" text="TreeView" parse-escape-sequences="true" display-tooltip-when-elided="true" />
+                <ZincFramework.UI.TreeExtension.TreeGraphView />
+            </ui:VisualElement>
+        </ZincFramework.UI.TreeExtension.SplitView>
+    </ui:VisualElement>
+</ui:UXML>
