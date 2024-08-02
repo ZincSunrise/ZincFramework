@@ -10,6 +10,8 @@ namespace ZincFramework
             Field = 2,
             Property = 4,
             NonPublic = 8,
+
+            AllProperty = Property | NonPublic,
         }
 
 

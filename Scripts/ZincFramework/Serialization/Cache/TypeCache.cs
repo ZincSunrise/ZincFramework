@@ -22,7 +22,7 @@ namespace ZincFramework
 
                 public MemberConfig[] MemberConfigs { get; }
 
-
+                public SerializeConfig SerializeConfig { get; }
 
                 internal TypeCache(Type type, SerializeConfig serializeConfig)
                 {
@@ -33,6 +33,7 @@ namespace ZincFramework
                         SerializableCode = zincSerializable.SerializableCode;
                     }
 
+                    SerializeConfig = serializeConfig;
                     Constructor = ExpressionTool.GetConstructor(type);
 
                     List<MemberConfig> memberConfigs = new List<MemberConfig>();
@@ -42,7 +43,7 @@ namespace ZincFramework
                         FieldInfo[] fieldInfos = type.GetFields(BindingFlags.Public | BindingFlags.Instance);
                         for (int i = 0; i < fieldInfos.Length; i++) 
                         {
-                            if (ConfigFactory.TryGetMemberConfig(fieldInfos[i], out MemberConfig memberConfig))
+                            if (ConfigurationFactory.TryGetMemberConfig(fieldInfos[i], out MemberConfig memberConfig))
                             {
                                 memberConfigs.Add(memberConfig);
                             }
@@ -53,7 +54,7 @@ namespace ZincFramework
                             fieldInfos = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
                             for (int i = 0; i < fieldInfos.Length; i++)
                             {
-                                if (ConfigFactory.TryGetPrivateMemberConfig(fieldInfos[i], out MemberConfig memberConfig))
+                                if (ConfigurationFactory.TryGetPrivateMemberConfig(fieldInfos[i], out MemberConfig memberConfig))
                                 {
                                     memberConfigs.Add(memberConfig);
                                 }
@@ -67,7 +68,7 @@ namespace ZincFramework
 
                         for (int i = 0; i < propertyInfos.Length; i++)
                         {
-                            if (ConfigFactory.TryGetMemberConfig(propertyInfos[i], out MemberConfig memberConfig))
+                            if (ConfigurationFactory.TryGetMemberConfig(propertyInfos[i], out MemberConfig memberConfig))
                             {
                                 memberConfigs.Add(memberConfig);
                             }
@@ -79,7 +80,7 @@ namespace ZincFramework
                             propertyInfos = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Instance);
                             for (int i = 0; i < propertyInfos.Length; i++)
                             {
-                                if (ConfigFactory.TryGetMemberConfig(propertyInfos[i], out MemberConfig memberConfig))
+                                if (ConfigurationFactory.TryGetMemberConfig(propertyInfos[i], out MemberConfig memberConfig))
                                 {
                                     memberConfigs.Add(memberConfig);
                                 }

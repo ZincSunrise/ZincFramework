@@ -20,7 +20,6 @@ namespace ZincFramework
 
                 public int OrdinalNumber { get; }
 
-
                 public abstract object GetValue(object obj);
 
                 public abstract void SetValue(object obj, object value);
@@ -50,4 +49,4 @@ namespace ZincFramework
             }
         }
     }
-}
+} 

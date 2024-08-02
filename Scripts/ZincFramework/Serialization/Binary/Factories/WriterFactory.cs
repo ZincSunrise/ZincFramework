@@ -14,7 +14,7 @@ namespace ZincFramework
 
                 public static WriterFactory Shared => _shared.Value;
 
-                private static Lazy<WriterFactory> _shared = new Lazy<WriterFactory>(() => new WriterFactory());
+                private readonly static Lazy<WriterFactory> _shared = new Lazy<WriterFactory>(() => new WriterFactory());
 
                 static WriterFactory()
                 {

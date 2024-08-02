@@ -15,6 +15,30 @@ namespace ZincFramework
             //使用IL2CPP将无法使用该类
             public static class EmitTool
             {
+                public static Func<object, T> GetPropertyGetMethod<T>(PropertyInfo propertyInfo)
+                {
+#if UNITY_EDITOR
+
+                    if (PlayerSettings.GetScriptingBackend(BuildTargetGroup.Standalone) == ScriptingImplementation.IL2CPP)
+                    {
+                        throw new NotSupportedException("IL2CPP编译不支持任何有关Emit的方法");
+                    }
+#endif
+                    Type type = typeof(T);
+                    Type objType = typeof(object);
+                    Type declaringType = propertyInfo.DeclaringType;
+
+                    var method = new DynamicMethod($"<{declaringType.Name}Set_Method>", type, new Type[] { objType });
+                    var generator = method.GetILGenerator();
+
+                    generator.Emit(OpCodes.Ldarg_0);
+                    generator.Emit(OpCodes.Castclass, declaringType);
+                    generator.Emit(OpCodes.Callvirt, propertyInfo.GetGetMethod());
+                    generator.Emit(OpCodes.Ret);
+
+                    return (Func<object, T>)method.CreateDelegate(typeof(Func<object, T>));
+                }
+
                 public static Func<object, object> GetPropertyGetMethod(PropertyInfo propertyInfo)
                 {
 #if UNITY_EDITOR
@@ -51,6 +75,37 @@ namespace ZincFramework
 
                     il.Emit(OpCodes.Ret);
                     return (Func<object, object>)dynamicMethod.CreateDelegate(typeof(Func<object, object>));
+                }
+
+
+                public static Action<object, T> GetPropertySetMethod<T>(PropertyInfo propertyInfo)
+                {
+#if UNITY_EDITOR
+                    if (PlayerSettings.GetScriptingBackend(BuildTargetGroup.Standalone) == ScriptingImplementation.IL2CPP)
+                    {
+                        throw new NotSupportedException("IL2CPP编译不支持任何有关Emit的方法");
+                    }
+#endif
+
+                    Type declearingType = propertyInfo.DeclaringType;
+                    Type valueType = typeof(T);
+
+                    DynamicMethod dynamicMethod = new DynamicMethod("<set_SetProperty>", typeof(void), new Type[] { typeof(object), valueType });
+                    ILGenerator generator = dynamicMethod.GetILGenerator();
+
+                    dynamicMethod.DefineParameter(1, ParameterAttributes.None, "this");
+                    dynamicMethod.DefineParameter(2, ParameterAttributes.None, "value");
+
+                    generator.Emit(OpCodes.Nop);
+                    generator.Emit(OpCodes.Ldarg_0);
+                    generator.Emit(OpCodes.Castclass, declearingType);
+                    generator.Emit(OpCodes.Ldarg_1);
+                    generator.Emit(OpCodes.Callvirt, propertyInfo.GetSetMethod());
+                    generator.Emit(OpCodes.Nop);
+                    generator.Emit(OpCodes.Ret);
+
+
+                    return (Action<object, T>)dynamicMethod.CreateDelegate(typeof(Action<object, T>));
                 }
 
                 public static Action<object, object> GetPropertySetMethod(PropertyInfo propertyInfo)
@@ -133,7 +188,6 @@ namespace ZincFramework
                     generator.Emit(OpCodes.Ret);
                     return (Action<object, object>)dynamicMethod.CreateDelegate(typeof(Action<object, object>));
                 }
-
 
                 private static Action<object, object> WriteOtherSet(PropertyInfo propertyInfo, Type propertyType)
                 {
