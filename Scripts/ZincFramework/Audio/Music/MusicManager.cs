@@ -25,7 +25,7 @@ namespace ZincFramework
 
         public bool IsHiding { get; private set; }
 
-        private float FadePersent => FrameworkData.Shared.fadePersent;
+        private float FadePersent => FrameworkConsole.Instance.SharedData.fadePersent;
 
         private float _musicVolume = 0.5f;
         private string _loadName = "Music";
@@ -112,10 +112,7 @@ namespace ZincFramework
         {
             if (isFade && !IsHiding)
             {
-                StartCoroutine(FadeMusic((audio) =>
-                {
-                    audio.Pause();
-                }));
+                StartCoroutine(FadeMusic((audio) => audio.Pause()));
             }
             else if (isFade)
             {

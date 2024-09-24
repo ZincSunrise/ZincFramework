@@ -4,11 +4,9 @@ namespace ZincFramework
 {
     namespace DataPool
     {
-        public abstract class BasePool : IDisposable
+        public interface IDataPool<in T> : IDisposable
         {
-            public int MaxCount { get; set; } = -1;
-
-            public abstract void Dispose();
+            int MaxCount { get; set; }
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ZincFramework
         private SceneLoadManager() { }
 
 
-        public void LoadScene(string name, UnityAction callback = null)
+        public void LoadScene(string name, ZincAction callback = null)
         {
             if (!_isLoading)
             {
@@ -27,20 +27,24 @@ namespace ZincFramework
             }
         }
 
-        public void LoadSceneAsync(string name, UnityAction callback = null)
+        public void LoadScene(int sceneIndex, ZincAction callback = null)
         {
-            MonoManager.Instance.StartCoroutine(R_LoadSceneAsync(name, callback));
+            if (!_isLoading)
+            {
+                SceneManager.LoadScene(sceneIndex);
+                callback?.Invoke();
+            }
         }
 
-        private IEnumerator R_LoadSceneAsync(string name, UnityAction callback)
+        public IEnumerator LoadSceneAsync(int sceneIndex, ZincAction callback)
         {
             _isLoading = true;
-            AsyncOperation operation = SceneManager.LoadSceneAsync(name);
+            AsyncOperation operation = SceneManager.LoadSceneAsync(sceneIndex);
             operation.allowSceneActivation = false;
 
             while (!operation.isDone)
             {
-                EventCenter.Boardcast<float>(E_Event_Type.E_SceneLoading, operation.progress);
+                EventCenter.Boardcast<float>(Events.EventType.SceneLoading, operation.progress);
                 _progress = operation.progress;
                 if (operation.progress >= 0.9f)
                 {
@@ -49,7 +53,29 @@ namespace ZincFramework
                 yield return 1;
             }
 
-            EventCenter.Boardcast<float>(E_Event_Type.E_SceneLoading, 1);
+            EventCenter.Boardcast<float>(Events.EventType.SceneLoading, 1);
+            callback?.Invoke();
+            _isLoading = false;
+        }
+
+        public IEnumerator LoadSceneAsync(string name, ZincAction callback)
+        {
+            _isLoading = true;
+            AsyncOperation operation = SceneManager.LoadSceneAsync(name);
+            operation.allowSceneActivation = false;
+
+            while (!operation.isDone)
+            {
+                EventCenter.Boardcast<float>(Events.EventType.SceneLoading, operation.progress);
+                _progress = operation.progress;
+                if (operation.progress >= 0.9f)
+                {
+                    operation.allowSceneActivation = true;
+                }
+                yield return 1;
+            }
+
+            EventCenter.Boardcast<float>(Events.EventType.SceneLoading, 1);
             callback?.Invoke();
             _isLoading = false;
         }

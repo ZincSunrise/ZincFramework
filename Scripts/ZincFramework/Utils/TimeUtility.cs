@@ -9,7 +9,15 @@ namespace ZincFramework
     /// </summary>
     public class TimeUtility
     {
-        public static readonly DateTime UTCFirstYear = new DateTime(1970, 1, 1);
+        public static DateTime UTCFirstYear { get; } = new DateTime(1970, 1, 1);
+
+        /// <summary>
+        /// 得到现在时间的时间戳
+        /// </summary>
+        /// <param name="day">距离现在多少日</param>
+        /// <returns></returns>
+        public static TimeSpan NowTimeSpan => DateTime.Now - UTCFirstYear;
+
 
         /// <summary>
         /// 存储时间间隔之前进行的转换函数,得到的是一个时间戳
@@ -42,6 +50,7 @@ namespace ZincFramework
             int timeStamp = (int)(achievementDate.Ticks / TimeSpan.TicksPerSecond);
             return timeStamp;
         }
+
 
         /// <summary>
         /// 存储时间间隔之前进行的转换函数,得到的是一个时间戳

@@ -6,45 +6,52 @@ namespace ZincFramework
 {
     namespace DataPool
     {
-        public class ObjectPool<TValue> : BasePool
+        public class ObjectPool<TValue> : IDataPool<TValue>
         {
-            protected Queue<TValue> _cacheValues;
+            protected Queue<TValue> _unuseValues;
 
             protected Func<TValue> _createFunction;
 
-            public int CacheCount => _cacheValues.Count;
+            public int CacheCount => _unuseValues.Count;
+
+            public int MaxCount { get ; set; }
+
+            public ObjectPool()
+            {
+                _unuseValues = new Queue<TValue>(16);
+            }
 
             public ObjectPool(Func<TValue> createAction)
             {
                 _createFunction = createAction;
-                _cacheValues = new Queue<TValue>(16);
+                _unuseValues = new Queue<TValue>(16);
             }
 
             public ObjectPool(Func<TValue> createAction, int maxCount)
             {
                 MaxCount = maxCount;
                 _createFunction = createAction;
-                _cacheValues = new Queue<TValue>(MaxCount);
+                _unuseValues = new Queue<TValue>(MaxCount);
             }
 
 
             public virtual void Clear()
             {
-                _cacheValues.Clear();
+                _unuseValues.Clear();
             }
 
-            public override void Dispose()
+            public virtual void Dispose()
             {
                 Clear();
-                _cacheValues = null;
+                _unuseValues = null;
                 _createFunction = null;
             }
 
             public virtual TValue RentValue()
             {
-                if (_cacheValues.Count > 0)
+                if (_unuseValues.Count > 0)
                 {
-                    return _cacheValues.Dequeue();
+                    return _unuseValues.Dequeue();
                 }
 
                 return _createFunction.Invoke();
@@ -52,9 +59,9 @@ namespace ZincFramework
 
             public virtual void ReturnValue(TValue value)
             {
-                if (MaxCount != -1 && _cacheValues.Count < MaxCount)
+                if (MaxCount != -1 && _unuseValues.Count < MaxCount)
                 {
-                    _cacheValues.Enqueue(value);
+                    _unuseValues.Enqueue(value);
                 }
             }
         }

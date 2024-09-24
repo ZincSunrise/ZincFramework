@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
 using UnityEngine.UI;
+using ZincFramework.Load.Editor;
 using ZincFramework.UI.EditorUI;
 using SystemAssembly = System.Reflection.Assembly;
 
@@ -17,15 +18,23 @@ namespace ZincFramework
         public class UIClassWindow : EditorWindow
         {
             [MenuItem("GameObject/UI/CreateUIScript")]
+            [MenuItem("GameTool/UI/OpenUICreateWindow")]
             private static void OpenWindow()
             {
                 EditorWindow.GetWindow(typeof(UIClassWindow)).Show();
             }
 
+            [MenuItem("GameTool/UI/CloseUIScript")]
+            private static void CloseWindow()
+            {
+                DestroyImmediate(EditorWindow.GetWindow(typeof(UIClassWindow)));
+            }
+
+
             private readonly EditorScrollView _baseScrollView = new EditorScrollView();
             private readonly EditorLabel _baseLabel = new EditorLabel();
 
-            private readonly ObjectField<UIConfig> _uiConfig = new ObjectField<UIConfig>(UIConfig.Default, "配置文件种类", false);
+            private readonly ObjectField<UIConfig> _uiConfig = new ObjectField<UIConfig>(null, "配置文件种类", false);
             private readonly EditorButton _buttonOpenSavePanel = new EditorButton("保存面板");
 
             private readonly EditorCollection _editorUIBases;
@@ -47,7 +56,7 @@ namespace ZincFramework
 
             private void OnEnable()
             {
-                _uiConfig.Value = _uiConfig.Value == null ? UIConfig.Default : _uiConfig.Value;
+                _uiConfig.Value = AssetDataManager.LoadAssetAtPath<UIConfig>(UIConfig.DefaultLoadPath);
                 OnSelectionChange();
             }
 
@@ -80,9 +89,14 @@ namespace ZincFramework
                     {
                         typeString = _uiConfig.Value.ClassNamespaces + '.' + _selectingName;
                     }
-                     
+
+                    GameObject gameObject = Selection.activeGameObject;
                     Type type = assembly.GetType(typeString, false, true);
-                    Selection.activeGameObject.AddComponent(type);
+
+                    if (type != null && !gameObject.GetComponent(type))
+                    {
+                        gameObject.AddComponent(type);
+                    }
 
                     CompilationPipeline.assemblyCompilationFinished -= AssemblyCompilationFinished;
                 }
@@ -90,7 +104,7 @@ namespace ZincFramework
 
             private void OnGUI()
             {
-                _editorUIBases.Foreach(ExcuteGUI);
+                _editorUIBases.ForEach(ExcuteGUI);
             }
 
             private void ExcuteGUI(IEditorUI editorUI)

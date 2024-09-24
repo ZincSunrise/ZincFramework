@@ -9,7 +9,7 @@ namespace ZincFramework
     /// <summary>
     ///计量单位为毫秒
     /// </summary>
-    internal class TimerItem : IResetInfo
+    internal class TimerItem : IResumable
     {
         public TimeEvent OverEvent { get; private set; }
         public TimeEvent IntervalEvent { get; private set; }
@@ -20,7 +20,7 @@ namespace ZincFramework
 
         public bool IsRunning { get; private set; }
 
-        public bool IsInterval => IntervalEvent != null || IntervalEvent.EventCount != 0;
+        public bool IsInterval => IntervalEvent != null && IntervalEvent.EventCount != 0;
 
         private float _nowTime;
 
@@ -62,10 +62,15 @@ namespace ZincFramework
             OverEvent?.RemoveAllListeners();
         }
 
-        public void ResetInfo()
+        public void OnReturn()
         {
             OverEvent.RemoveAllListeners();
-            IntervalEvent.RemoveAllListeners();
+            IntervalEvent?.RemoveAllListeners();
+        }
+
+        public void OnRent()
+        {
+
         }
 
         public void SubTime(float intervalTime)

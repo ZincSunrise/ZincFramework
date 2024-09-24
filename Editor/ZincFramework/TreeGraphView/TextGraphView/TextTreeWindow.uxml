@@ -1,0 +1,26 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Editor/ZincFramework/TreeGraphView/TextGraphView/TextTreeWindow.uss?fileID=7433441132597879392&amp;guid=ac703acd0d2235243852a173ca7dedc1&amp;type=3#TextTreeWindow" />
+    <Style src="project://database/Assets/Editor/ZincFramework/TreeGraphView/VisualElements/TreeGraphView.uss?fileID=7433441132597879392&amp;guid=274f45f816eb40e4cadffb8b3b5b043b&amp;type=3#TreeGraphView" />
+    <ui:VisualElement name="TreeContainer" style="flex-grow: 1;">
+        <uie:Toolbar focusable="true">
+            <ZincFramework.TreeGraphView.TextTree.TextToolContainer style="flex-direction: row;">
+                <uie:ToolbarMenu tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" text="选择显示内容" />
+                <uie:ToolbarButton text="创建新树" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonCreateNewTree" />
+                <uie:ToolbarButton text="从Excel导入" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonExcelToTree" />
+                <uie:ToolbarButton text="转换为Excel表格" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonTreeToExcel" />
+                <uie:ToolbarButton text="保存所有文本" parse-escape-sequences="true" display-tooltip-when-elided="true" focusable="true" name="ButtonSave" />
+            </ZincFramework.TreeGraphView.TextTree.TextToolContainer>
+        </uie:Toolbar>
+        <ui:VisualElement name="SplitWindowContainer" style="flex-grow: 1;">
+            <ZincFramework.TreeGraphView.Devider fixed-pane-index="0" fixed-pane-initial-dimension="290" style="background-color: rgb(47, 47, 47);">
+                <ui:VisualElement name="LeftContainer">
+                    <ui:Label tabindex="-1" text="Inspector" parse-escape-sequences="true" display-tooltip-when-elided="true" style="background-color: rgb(60, 60, 60); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(188, 188, 188); border-right-color: rgb(188, 188, 188); border-top-color: rgb(188, 188, 188); border-bottom-color: rgb(188, 188, 188); padding-left: 5px; font-size: 20px; flex-grow: 0;" />
+                    <ZincFramework.TreeGraphView.TextTree.TextInspector name="TextInspector" style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="RightContainer" style="flex-grow: 1;">
+                    <ZincFramework.TreeGraphView.TextTree.TextGraphView style="flex-grow: 1; flex-basis: auto;" />
+                </ui:VisualElement>
+            </ZincFramework.TreeGraphView.Devider>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

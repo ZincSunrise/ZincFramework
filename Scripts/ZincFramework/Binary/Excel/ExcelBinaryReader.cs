@@ -1,7 +1,9 @@
+using System;
 using System.IO;
 using System.Text;
 using UnityEngine;
 using ZincFramework.Binary;
+using ZincFramework.Serialization;
 using ZincFramework.Serialization.Excel;
 
 
@@ -15,29 +17,102 @@ namespace ZincFramework
             private readonly static StringBuilder _filePath = new StringBuilder();
 
 
-            ///<typeparam name = "T">容器类名</typeparam>
-            public static T LoadData<T>(string name) where T : class
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <typeparam name="TData">容器类名</typeparam>
+            /// <typeparam name="TInfo">数据类名</typeparam>
+            /// <param name="name"></param>
+            /// <param name="dataFactory"></param>
+            /// <param name="infoFactory"></param>
+            /// <returns></returns>
+            public static TData LoadListData<TData, TInfo>(string name, Func<TData> dataFactory, Func<TInfo> infoFactory) where TData : class, IExcelData where TInfo : IConvertable
             {
                 _filePath.Append(Path.Combine(FrameworkPaths.ProfilePath, name + BinaryDataManager.Extension));
 
-                T container;
+                TData container;
                 using (FileStream fs = File.Open(_filePath.ToString(), FileMode.Open, FileAccess.Read))
                 {
                     byte[] buffer = new byte[fs.Length];
                     fs.Read(buffer, 0, buffer.Length);
                     fs.Close();
 
-                    container = ExcelDeserializer.Deserialize(typeof(T), buffer) as T;
+                    container = ExcelDeserializer.Deserialize(buffer, dataFactory, infoFactory);
                 }
 
                 _filePath.Clear();
                 return container;
             }
 
-
-            public static T ReadBytes<T>(TextAsset textAsset) where T : class
+            public static TData LoadListData<TData, TInfo>(string name) where TData : class, IExcelData, new() where TInfo : IConvertable, new()
             {
-                return ExcelDeserializer.Deserialize(typeof(T), textAsset.bytes) as T;
+                return LoadListData(name, () => new TData(), () => new TInfo());
+            }
+
+            public static TData LoadListData<TData, TInfo>(TextAsset textAsset, Func<TData> dataFactory, Func<TInfo> infoFactory) where TData : class, IExcelData where TInfo : IConvertable
+            {
+                return ExcelDeserializer.Deserialize(textAsset.bytes, dataFactory, infoFactory);
+            }
+
+            public static TData LoadListData<TData, TInfo>(TextAsset textAsset) where TData : class, IExcelData, new() where TInfo : IConvertable, new()
+            {
+                return LoadListData(textAsset, () => new TData(), () => new TInfo());
+            }
+
+            public static TData LoadListData<TData, TInfo>(byte[] bytes, Func<TData> dataFactory, Func<TInfo> infoFactory) where TData : class, IExcelData where TInfo : IConvertable
+            {
+                return ExcelDeserializer.Deserialize(bytes, dataFactory, infoFactory);
+            }
+
+            public static TData LoadListData<TData, TInfo>(byte[] bytes) where TData : class, IExcelData, new() where TInfo : IConvertable, new()
+            {
+                return LoadListData(bytes, () => new TData(), () => new TInfo());
+            }
+
+
+            public static TData LoadDictionaryData<TData, TKey, TValue>(string name, Func<TData> dataFactory, Func<TValue> infoFactory) where TData : class, IExcelData where TValue : IConvertable
+            {
+                _filePath.Append(Path.Combine(FrameworkPaths.ProfilePath, name + BinaryDataManager.Extension));
+
+                TData container;
+                using (FileStream fs = File.Open(_filePath.ToString(), FileMode.Open, FileAccess.Read))
+                {
+                    byte[] buffer = new byte[fs.Length];
+                    fs.Read(buffer, 0, buffer.Length);
+                    fs.Close();
+
+                    container = ExcelDeserializer.Deserialize<TData, TKey, TValue>(buffer, dataFactory, infoFactory);
+                }
+
+                _filePath.Clear();
+                return container;
+            }
+
+            public static TData LoadDictionaryData<TData, TKey, TValue>(string name) where TData : class, IExcelData, new() where TValue : IConvertable, new()
+            {
+                return LoadDictionaryData<TData, TKey, TValue>(name, () => new TData(), () => new TValue());
+            }
+
+
+            public static TData LoadDictionaryData<TData, TKey, TValue>(TextAsset textAsset, Func<TData> dataFactory, Func<TValue> infoFactory) where TData : class, IExcelData where TValue : IConvertable
+            {
+                return ExcelDeserializer.Deserialize<TData, TKey, TValue>(textAsset.bytes, dataFactory, infoFactory);
+            }
+
+            public static TData LoadDictionaryData<TData, TKey, TValue>(TextAsset textAsset) where TData : class, IExcelData, new() where TValue : IConvertable, new()
+            {
+                return LoadDictionaryData<TData, TKey, TValue>(textAsset, () => new TData(), () => new TValue());
+            }
+
+
+            public static TData LoadDictionaryData<TData, TKey, TValue>(byte[] bytes, Func<TData> dataFactory, Func<TValue> infoFactory) where TData : class, IExcelData where TValue : IConvertable
+            {
+                return ExcelDeserializer.Deserialize<TData, TKey, TValue>(bytes, dataFactory, infoFactory);
+            }
+
+            public static TData LoadDictionaryData<TData, TKey, TValue>(byte[] bytes) where TData : class, IExcelData, new() where TValue : IConvertable, new()
+            {
+                return LoadDictionaryData<TData, TKey, TValue>(bytes, () => new TData(), () => new TValue());
             }
         }
     }

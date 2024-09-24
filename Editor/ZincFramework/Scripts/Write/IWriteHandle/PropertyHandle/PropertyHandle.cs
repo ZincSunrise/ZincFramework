@@ -53,7 +53,7 @@ namespace ZincFramework
                     Setter = default;
                 }
 
-                public PropertyHandle(int indentSize, string access, string[] modifiers, string returnType, string propertyName, GetterHandle getterHandle, SetterHandle setterHandle)
+                public PropertyHandle(int indentSize, string access, string[] modifiers, string returnType, string propertyName, GetterHandle getterHandle, SetterHandle setterHandle, string defaultValue)
                 {
                     IndentSize = indentSize;
                     Access = access;
@@ -62,7 +62,7 @@ namespace ZincFramework
 
                     Modifiers = modifiers;
                     PropertyType = E_Property_Type.Auto;
-                    DefaultValue = string.Empty;
+                    DefaultValue = defaultValue;
 
                     Getter = getterHandle;
                     Setter = setterHandle;
@@ -101,9 +101,11 @@ namespace ZincFramework
                             streamWriter.WriteLine(WriteUtility.InsertTable($"{Access}{(Modifiers == null ? string.Empty : ' ' + string.Join(' ', Modifiers))} {ReturnType} {PropertyName} => {DefaultValue};", IndentSize));
                             break;
                         case E_Property_Type.Auto:
-                            streamWriter.WriteLine(WriteUtility.InsertTable($"{Access}" +
-                                $"{(Modifiers == null ? string.Empty : ' ' + string.Join(' ', Modifiers))}" +
-                                $" {ReturnType} {PropertyName} {{ {GetGetString()} {GetSetString()} }}", IndentSize));
+                            string modifiers = Modifiers == null ? string.Empty : ' ' + string.Join(' ', Modifiers);
+                            string body = $" {ReturnType} {PropertyName} {{ {GetGetString()} {GetSetString()} }}";
+                            string defaultValue = string.IsNullOrEmpty(DefaultValue) ? string.Empty : $" = {DefaultValue};";
+
+                            streamWriter.WriteLine(WriteUtility.InsertTable(Access + modifiers + body + defaultValue, IndentSize));
                             break;
                     }
                 }

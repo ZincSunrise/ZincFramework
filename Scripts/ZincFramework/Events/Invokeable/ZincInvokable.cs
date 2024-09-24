@@ -8,7 +8,7 @@ namespace ZincFramework
     {
         internal class ZincInvokable : ZincInvokableBase
         {
-            protected event ZincAction _myAction;
+            protected ZincAction _myAction;
 
             public ZincInvokable()
             {
@@ -40,7 +40,7 @@ namespace ZincFramework
 
         internal class ZincInvokable<T> : ZincInvokableBase
         {
-            protected event ZincAction<T> _myAction;
+            protected ZincAction<T> _myAction;
 
             public ZincInvokable()
             {
@@ -71,7 +71,7 @@ namespace ZincFramework
 
         internal class ZincInvokable<T, K> : ZincInvokableBase
         {
-            protected event ZincAction<T, K> _myAction;
+            protected ZincAction<T, K> _myAction;
 
             public ZincInvokable()
             {

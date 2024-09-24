@@ -7,7 +7,7 @@ namespace ZincFramework
 {
     namespace Audio
     {
-        internal class SoundObject : PooledObject , ISoundBase
+        internal class SoundObject : ResumableObject, ISoundBase
         {
             public AudioSource AudioSource => _audioSource;
             public bool IsLoop => _audioSource.loop;
@@ -71,19 +71,6 @@ namespace ZincFramework
                 }
             }
 
-            public void Refresh()
-            {
-                _audioSource.clip = null;
-                _lifeTime = -1;
-                _bornTime = -1;
-
-                GameObjectPoolManager.Instance.ReturnGameObject(this.gameObject);
-                if (_waitEnd != null)
-                {
-                    StopCoroutine(_waitEnd);
-                }
-            }
-
             private IEnumerator WaitMusicEnd(WaitForSecondsRealtime wait)
             {
                 yield return wait;
@@ -97,6 +84,28 @@ namespace ZincFramework
             public void ChangeVolume(float soundVolume)
             {
                 _audioSource.volume = soundVolume;
+            }
+
+            public override void OnRent()
+            {
+
+            }
+
+            public override void OnReturn()
+            {
+                Refresh();
+            }
+
+            public void Refresh()
+            {
+                _audioSource.clip = null;
+                _lifeTime = -1;
+                _bornTime = -1;
+
+                if (_waitEnd != null)
+                {
+                    StopCoroutine(_waitEnd);
+                }
             }
         }
     }

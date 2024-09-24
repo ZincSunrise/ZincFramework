@@ -11,8 +11,9 @@ namespace ZincFramework
         {
             private readonly Dictionary<string, GameObjectPool> _objectDic = new Dictionary<string, GameObjectPool>();
 
-            public bool IsOpenLayout => FrameworkData.Shared.isOpenLayout;
-            public int DefaultMaxCount => FrameworkData.Shared.maxPoolCount;
+            public bool IsOpenLayout => FrameworkConsole.Instance.SharedData.isOpenLayout;
+
+            public int DefaultMaxCount => FrameworkConsole.Instance.SharedData.maxPoolCount;
 
 
             private GameObject _poolObjectRoot;
@@ -36,13 +37,9 @@ namespace ZincFramework
                 if (!_objectDic.TryGetValue(name, out GameObjectPool gameObjectPool))
                 {
                     GameObject gameObject = Resources.Load<GameObject>(name);
-                    gameObjectPool = new GameObjectPool(() =>
-                    {
-                        GameObject returnObj = GameObject.Instantiate(gameObject);
-                        returnObj.name = name;
-                        return returnObj;
-                    }, name, _poolObjectRoot);
+                    gameObject.name = name;
 
+                    gameObjectPool = new GameObjectPool(gameObject, _poolObjectRoot);
                     _objectDic.Add(name, gameObjectPool);
                 }
 
@@ -50,6 +47,13 @@ namespace ZincFramework
                 return gameObjectPool.RentValue();
             }
 
+            public void ReturnAll()
+            {
+                foreach(var pool in _objectDic.Values)
+                {
+                    pool.ReturnAll();
+                }
+            }
 
             public void Clear()
             {

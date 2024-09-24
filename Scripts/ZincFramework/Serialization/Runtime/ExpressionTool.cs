@@ -10,7 +10,6 @@ namespace ZincFramework
     {
         namespace Runtime
         {
-
             public static class ExpressionTool
             {
                 internal static Dictionary<Type, MethodInfo> PrimitiveConvertMethods { get; } = new Dictionary<Type, MethodInfo>(12) 
@@ -26,12 +25,23 @@ namespace ZincFramework
 
                     var target = Expression.Parameter(typeof(object), "target");
 
-                    var callMethod = Expression.Call(Expression.Convert(target, declaringType), propertyInfo.GetGetMethod());
+                    var callMethod = Expression.Call(Expression.Convert(target, declaringType), propertyInfo.GetGetMethod() ?? propertyInfo.GetGetMethod(true));
                     var convert = Expression.Convert(callMethod, typeof(object));
 
                     return Expression.Lambda<Func<object, object>>(convert, target).Compile();
                 }
 
+                public static Func<object, T> GetPropertyGetMethod<T>(PropertyInfo propertyInfo)
+                {
+                    Type declaringType = propertyInfo.DeclaringType;
+
+                    var target = Expression.Parameter(typeof(object), "target");
+
+                    var callMethod = Expression.Call(Expression.Convert(target, declaringType), propertyInfo.GetGetMethod() ?? propertyInfo.GetGetMethod(true));
+                    var convert = Expression.Convert(callMethod, typeof(T));
+
+                    return Expression.Lambda<Func<object, T>>(convert, target).Compile();
+                }
 
                 public static Action<object, object> GetPropertySetMethod(PropertyInfo propertyInfo)
                 {
@@ -58,8 +68,19 @@ namespace ZincFramework
                     }
 
 
-                    var callExp = Expression.Call(Expression.Convert(target, declaringType), propertyInfo.GetSetMethod(), convertExp);
+                    var callExp = Expression.Call(Expression.Convert(target, declaringType), propertyInfo.GetSetMethod() ?? propertyInfo.GetGetMethod(true), convertExp);
                     return Expression.Lambda<Action<object, object>>(callExp, target, value).Compile();
+                }
+
+                public static Action<object, T> GetPropertySetMethod<T>(PropertyInfo propertyInfo)
+                {
+                    Type declaringType = propertyInfo.DeclaringType;
+
+                    var target = Expression.Parameter(typeof(object), "target");
+                    var value = Expression.Parameter(typeof(T), "value");
+
+                    var callExp = Expression.Call(Expression.Convert(target, declaringType), propertyInfo.GetSetMethod() ?? propertyInfo.GetGetMethod(true), value);
+                    return Expression.Lambda<Action<object, T>>(callExp, target, value).Compile();
                 }
 
 
@@ -113,7 +134,9 @@ namespace ZincFramework
 
                 public static Func<object> GetConstructor(Type type)
                 {
-                    ConstructorInfo constructorInfo = type.GetConstructor(Type.EmptyTypes);
+                    ConstructorInfo constructorInfo = type.GetConstructor(Type.EmptyTypes) ??
+                        throw new ArgumentNullException($"传入的{type.Name}类没有构造函数"); ;
+
                     return Expression.Lambda<Func<object>>(Expression.New(constructorInfo)).Compile();
                 }
 

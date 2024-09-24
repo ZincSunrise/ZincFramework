@@ -1,10 +1,6 @@
 using System;
-using System.Collections;
-using System.Reflection;
+using System.Collections.Generic;
 using ZincFramework.Binary;
-using ZincFramework.Serialization.Binary;
-using ZincFramework.Serialization.Cache;
-using ZincFramework.Serialization.Factory;
 
 
 namespace ZincFramework
@@ -15,44 +11,60 @@ namespace ZincFramework
         {
             public static class ExcelDeserializer
             {
-                public static object Deserialize(Type type, byte[] bytes)
+                public static TData Deserialize<TData, TKey, TValue>(byte[] bytes, Func<TData> dataFactory, Func<TValue> infoFactory) where TData : IExcelData where TValue : IConvertable
                 {
+                    TData container = dataFactory.Invoke();
                     int nowIndex = 0;
-                    object container = Activator.CreateInstance(type);
-                    string typeDicName = TextUtility.LowerFirstString(type.Name);
-
-                    typeDicName = typeDicName.Replace("Data", "Infos");
-                    FieldInfo fieldInfo = type.GetField(typeDicName);
-                    IDictionary dictionary = fieldInfo.GetValue(container) as IDictionary;
                     short count = ByteConverter.ToInt16(bytes, ref nowIndex);
 
-                    Type keyType = fieldInfo.FieldType.GenericTypeArguments[0];
-                    Type valueType = fieldInfo.FieldType.GenericTypeArguments[1];
+                    Type keyType = typeof(TKey);
 
-                    if (!SerializationCachePool.TryGetTypeCache(type, out var typeCache))
+                    Dictionary<TKey, TValue> values = container.Collection as Dictionary<TKey, TValue>;
+                    for (int i = 0; i < count; i++)
                     {
-                        typeCache = SerializationCachePool.CreateTypeCache(type, SerializeConfig.Property);
+                        TValue value = infoFactory.Invoke();
+                        if (keyType == typeof(int))
+                        {
+                            (values as Dictionary<int, TValue>).Add(ByteConverter.ToInt32(bytes, ref nowIndex), value);
+                        }
+
+                        value.Convert(bytes, ref nowIndex);
                     }
 
-                    ISerializeConvert valueStrategy = ConverterFactory.Shared.CreateBuilder(keyType);
-                    IConvert convert;
 
-                    object key;
-
-                    for (int i = 0;i < count; i++)
-                    {
-                        convert = typeCache.CreateInstance() as IConvert;
-
-                        key = valueStrategy.Convert(bytes, ref nowIndex, keyType);
-                        convert.Convert(bytes, ref nowIndex);
-                        dictionary.Add(key, convert);
-                    }
                     return container;
                 }
 
-                public static T Deserialize<T>(byte[] bytes)
+
+                public static TData Deserialize<TData, TInfo>(byte[] bytes, Func<TData> dataFactory, Func<TInfo> infoFactory) where TData : IExcelData where TInfo : IConvertable
                 {
-                    return (T)Deserialize(typeof(T), bytes);
+                    TData container = dataFactory.Invoke();
+                    List<TInfo> infos = container.Collection as List<TInfo>;
+
+                    int nowIndex = 0;
+                    short count = ByteConverter.ToInt16(bytes, ref nowIndex);
+                    TInfo convert;
+
+                    for (int i = 0; i < count; i++) 
+                    {
+                        convert = infoFactory.Invoke();
+                        convert.Convert(bytes, ref nowIndex);
+                        infos.Add(convert);
+                    }
+
+                    return container;
+                }
+
+
+                public static TData Deserialize<TData, TKey, TValue>(byte[] bytes) where TData : IExcelData, new() where TValue : IConvertable, new()
+                {
+                    return Deserialize<TData, TKey, TValue>(bytes, () => new TData(), () => new TValue());
+                }
+
+
+                public static TData Deserialize<TData, TInfo>(byte[] bytes) where TData : IExcelData, new() where TInfo : IConvertable, new()
+                {
+                    return Deserialize(bytes, () => new TData(), () => new TInfo());
                 }
             }
         }

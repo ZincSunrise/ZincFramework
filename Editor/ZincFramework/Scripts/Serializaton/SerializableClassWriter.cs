@@ -16,10 +16,11 @@ namespace ZincFramework
                 public static void CreateSerializeClass(CSharpWriter classWriter, string className, string serializableCode, MemberWriteInfo[] fieldWriteInfos, bool isWriteSerializableCode)
                 {
                     classWriter.WriteAttribute(1, "ZincSerializable", serializableCode);
-                    classWriter.BeginWriteClass(1, "", null, className, parents: new string[] { "ISerializable", "IConvert", "IAppend" });
+                    classWriter.BeginWriteClass(1, "", null, className, parents: new string[] { "ISerializable", "IConvertable", "IAppend" });
 
                     if (isWriteSerializableCode)
                     {
+                        classWriter.WriteAttribute(2, nameof(BinaryIgnore));
                         classWriter.WriteQuickProperty(2, "int", "SerializableCode", serializableCode);
                     }
 
@@ -42,10 +43,11 @@ namespace ZincFramework
                         code = fieldWriteInfos[i].OrdinalNumber;
                         if (_ordinals.Contains(code))
                         {
+                            _ordinals.Clear();
                             throw new System.ArgumentException("不能够填入相同的序列化序列号" + code);
                         }
-                        codeMap.Add(WriteUtility.InsertTable($"{{nameof({fieldWriteInfos[i].Name}), {code}}},", 1));
 
+                        codeMap.Add(WriteUtility.InsertTable($"{{nameof({fieldWriteInfos[i].Name}), {code}}},", 1));
                         _ordinals.Add(code);
                     }
 

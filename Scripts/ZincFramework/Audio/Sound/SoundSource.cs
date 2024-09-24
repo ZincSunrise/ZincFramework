@@ -1,13 +1,14 @@
 using System.Collections;
 using UnityEngine;
-using ZincFramework.CompnentPool;
 using ZincFramework.DataPool;
+
+
 
 namespace ZincFramework
 {
     namespace Audio
     {
-        internal class SoundSource : ISoundBase, IResetInfo
+        internal class SoundSource : ISoundBase, IResumable
         {
             public bool IsLoop => _audioSource.loop;
             public AudioSource AudioSource => _audioSource;
@@ -46,7 +47,6 @@ namespace ZincFramework
                 _waitEnd = MonoManager.Instance.StartCoroutine(WaitMusicEnd(_sleepTime));
             }
 
-
             public void Pause()
             {
                 _audioSource.Pause();
@@ -82,18 +82,11 @@ namespace ZincFramework
                 SoundEffectManager.Instance.RemoveSound(this);
             }
 
-            public void ResetInfo()
-            {
-                _audioSource = null;
-                _sleepTime = null;
-                _waitEnd = null;
-            }
-
             public void Refresh()
             {
                 _audioSource.clip = null;
                 ComponentPoolManager.Instance.ReturnComponent(_audioSource);
-                DataPoolManager.Instance.ReturnInfo(this);
+                DataPoolManager.ReturnInfo(this);
                 _lifeTime = -1;
                 _bornTime = -1;
                 MonoManager.Instance.StopCoroutine(_waitEnd);
@@ -102,6 +95,19 @@ namespace ZincFramework
             public void ChangeVolume(float soundVolume)
             {
                 _audioSource.volume = soundVolume;
+            }
+
+
+            public void OnReturn()
+            {
+                _audioSource = null;
+                _sleepTime = null;
+                _waitEnd = null;
+            }
+
+            public void OnRent()
+            {
+                throw new System.NotImplementedException();
             }
         }
     }

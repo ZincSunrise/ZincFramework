@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Text;
 
 
@@ -22,10 +23,48 @@ namespace ZincFramework
                 return value;
             }
 
+            public static int ToVarInt32(byte[] bytes, ref int startIndex)
+            {
+                int value = 0;
+                int shift = 0;
+
+                while (true)
+                {
+                    value |= (bytes[startIndex] & 0x7F) << shift;
+
+                    if ((bytes[startIndex++] & 0x80) == 0)
+                    {
+                        break;
+                    }
+
+                    shift += 7;
+                }
+                return value;
+            }
+
             public static long ToInt64(byte[] bytes, ref int startIndex)
             {
                 long value = BitConverter.ToInt64(bytes, startIndex);
                 startIndex += 8;
+                return value;
+            }
+
+            public static long ToVarInt64(byte[] bytes, ref int startIndex)
+            {
+                long value = 0;
+                int shift = 0;
+
+                while (true)
+                {
+                    value |= ((uint)bytes[startIndex] & 0x7F) << shift;
+
+                    if ((bytes[startIndex++] & 0x80) == 0)
+                    {
+                        break;
+                    }
+
+                    shift += 7;
+                }
                 return value;
             }
 
@@ -85,8 +124,13 @@ namespace ZincFramework
             /// 已经自动的将字符串长度读取出来了，无需多读取
             /// </summary>
 
-            public static string ToString(byte[] bytes, ref int startIndex)
+            public static string ToString(byte[] bytes, ref int startIndex, Encoding encoding = null)
             {
+                if (encoding == null || encoding == Encoding.Unicode)
+                {
+                    return ToStringCast(bytes, ref startIndex);
+                }
+
                 int length = ToInt32(bytes, ref startIndex);
                 string str = Encoding.UTF8.GetString(bytes, startIndex, length);
 
@@ -94,14 +138,40 @@ namespace ZincFramework
                 return str;
             }
 
+            public static string ToStringCast(byte[] bytes, ref int startIndex)
+            {
+                int length = ToInt32(bytes, ref startIndex);
+
+                ReadOnlySpan<char> chars = MemoryMarshal.Cast<byte, char>(bytes.AsSpan().Slice(startIndex, length));
+                startIndex += length;
+
+                return new string(chars);
+            }
+
+            /// <summary>
+            /// 注意，只可用于不含引用类型和不含含有引用类型结构体的结构体类型,例如基础类型
+            /// </summary>
+            /// <typeparam name="T"></typeparam>
+            /// <param name="bytes"></param>
+            /// <param name="size"></param>
+            /// <param name="startIndex"></param>
+            /// <returns></returns>
+            public static T[] ToArray<T>(byte[] bytes, int size, ref int startIndex) where T : struct
+            {
+                short count = ToInt16(bytes, ref startIndex);
+                size *= count;
+
+                int nowIndex = startIndex;
+                startIndex += size;
+                return MemoryMarshal.Cast<byte, T>(bytes.AsSpan()[nowIndex..startIndex]).ToArray();
+            }
+
+
             public static void SkipToString(byte[] bytes, ref int startIndex)
             {
                 int length = ToInt32(bytes, ref startIndex);
                 startIndex += length;
             }
-
-
-
 
             public static short ToInt16(ref ReadOnlySpan<byte> bytes)
             {
@@ -187,13 +257,46 @@ namespace ZincFramework
             /// <param name="startIndex"></param>
             /// <returns></returns>
 
-            public static string ToString(ref ReadOnlySpan<byte> bytes)
+            public static string ToString(ref ReadOnlySpan<byte> bytes, Encoding encoding = null)
             {
+                if (encoding == null || encoding == Encoding.Unicode)
+                {
+                    return ToStringCast(ref bytes);
+                }
+
                 int length = ToInt32(ref bytes);
                 string str = Encoding.UTF8.GetString(bytes[..length]);
 
                 bytes = bytes[length..];
                 return str;
+            }
+
+            public static string ToStringCast(ref ReadOnlySpan<byte> bytes)
+            {
+                int length = ToInt32(ref bytes);
+                ReadOnlySpan<char> chars = MemoryMarshal.Cast<byte, char>(bytes[..length]);
+                bytes = bytes[length..];
+
+                return new string(chars);
+            }
+
+
+            /// <summary>
+            /// 注意，只可用于不含引用类型和不含含有引用类型结构体的结构体类型,例如基础类型
+            /// </summary>
+            /// <typeparam name="T"></typeparam>
+            /// <param name="bytes"></param>
+            /// <param name="size"></param>
+            /// <returns></returns>
+            public static T[] ToArray<T>(ref ReadOnlySpan<byte> bytes, int size) where T : struct
+            {
+                short count = ToInt16(ref bytes);
+                size *= count;
+
+                ReadOnlySpan<T> result = MemoryMarshal.Cast<byte, T>(bytes[..size]);
+
+                bytes = bytes[size..];
+                return result.ToArray();
             }
         }
     }

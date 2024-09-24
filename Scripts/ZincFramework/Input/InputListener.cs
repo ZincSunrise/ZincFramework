@@ -24,7 +24,7 @@ namespace ZincFramework
 
             private void Awake()
             {
-                _isInputSystem = FrameworkData.Shared.isInputSystem;
+                _isInputSystem = FrameworkConsole.Instance.SharedData.isInputSystem;
                 if (_isInputSystem)
                 {
                     return;

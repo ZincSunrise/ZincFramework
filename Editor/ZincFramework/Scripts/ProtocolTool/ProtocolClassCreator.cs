@@ -74,14 +74,14 @@ namespace ZincFramework
 
                                 CSharpWriter classWriter = new CSharpWriter(streamWriter);
 
-                                classWriter.WriteNamespace(2, AutoWriteConfig.ProtocolDefault?.UsingNamespaces);
+                                classWriter.WriteNamespace(2, ConfigManager.Instance.ProtocolDefault.usingNamespaces);
 
                                 
-                                classWriter.BeginWriteClass(1, namespaces, null, classType, classType: "record", parents: new string[] { "BaseMessage" }, attributeHandle: new AttributeHandle(1, nameof(ZincSerializable), new string[] { messageId }));
+                                classWriter.BeginWriteClass(1, namespaces, null, classType, classType: "record", parents: new string[] { "BaseMessage" }, attributeHandle: new AttributeHandle(1, nameof(BinarySerializable), new string[] { messageId }));
                                 
                                 fieldNodeList = massageNode.SelectNodes("field");
 
-                                classWriter.WriteAttribute(2, nameof(DontSerialize));
+                                classWriter.WriteAttribute(2, nameof(BinaryIgnore));
                                 classWriter.WriteQuickProperty(2, "int", "SerializableCode", messageId, CSharpWriter.Modifiers.Override);
 
                                 MemberWriteInfo[] fieldWriteInfos = GetFieldWriteInfos(fieldNodeList);
@@ -125,7 +125,7 @@ namespace ZincFramework
 
                                 CSharpWriter classWriter = new CSharpWriter(streamWriter);
                                 //写入命名空间
-                                classWriter.WriteNamespace(2, AutoWriteConfig.ProtocolDefault?.UsingNamespaces);
+                                classWriter.WriteNamespace(2, ConfigManager.Instance.ProtocolDefault.usingNamespaces);
 
                                 //写入类名字
                                 classWriter.BeginWriteClass(1, namespaces, null, name + "Data");

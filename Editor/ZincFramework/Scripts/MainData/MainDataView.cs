@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 
@@ -16,10 +17,9 @@ namespace ZincFramework
                 public new class UxmlFactory : UxmlFactory<MainDataView> { }
 
                 private Editor _frameworkEditor;
-
                 public MainDataView() 
                 {
-                    _frameworkEditor = Editor.CreateEditor(FrameworkData.Shared);
+                    _frameworkEditor = Editor.CreateEditor(FrameworkConsole.Instance.SharedData);
                     Container = new IMGUIContainer(_frameworkEditor.OnInspectorGUI);
                     Container.style.flexGrow = 1;
                     this.Add(Container);

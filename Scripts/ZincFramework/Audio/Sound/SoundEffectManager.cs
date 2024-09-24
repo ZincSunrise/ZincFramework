@@ -19,11 +19,11 @@ namespace ZincFramework
 
             private float _soundEffectVolume = 0.5f;
 
-            private int MaxSoundCount => FrameworkData.Shared.maxSoundCount;
+            private int MaxSoundCount => FrameworkConsole.Instance.SharedData.maxSoundCount;
 
-            private float DisappearOffset => FrameworkData.Shared.disappearOffset;
+            private float DisappearOffset => FrameworkConsole.Instance.SharedData.disappearOffset;
 
-            private E_Sound_Mode _soundMode => FrameworkData.Shared.soundMode;
+            private E_Sound_Mode _soundMode => FrameworkConsole.Instance.SharedData.soundMode;
 
             private string _loadSoundName = "soundeffect";
 

@@ -72,7 +72,7 @@ namespace ZincFramework
                     foreach (XmlNode xmlNode in xmlFieldNodes)
                     {
                         string type = xmlNode.Attributes["type"].Value;
-                        string name = TextUtility.UpperFirstString(xmlNode.Attributes["name"].Value);
+                        string name = TextUtility.UpperFirstChar(xmlNode.Attributes["name"].Value);
 
                         ArraySegment<string> statement;
 
@@ -128,7 +128,7 @@ namespace ZincFramework
                     foreach (XmlNode xmlNode in xmlFieldNodes)
                     {
                         string type = xmlNode.Attributes["type"].Value;
-                        string name = TextUtility.UpperFirstString(xmlNode.Attributes["name"].Value);
+                        string name = TextUtility.UpperFirstChar(xmlNode.Attributes["name"].Value);
 
                         ISerializationWriter writer;
 
@@ -193,7 +193,7 @@ namespace ZincFramework
                     foreach (XmlNode xmlNode in xmlFieldNodes)
                     {
                         string type = xmlNode.Attributes["type"].Value;
-                        string name = TextUtility.UpperFirstString(xmlNode.Attributes["name"].Value);
+                        string name = TextUtility.UpperFirstChar(xmlNode.Attributes["name"].Value);
 
                         ISerializationWriter writer;
 

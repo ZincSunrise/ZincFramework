@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using UnityEngine.UIElements;
+using ZincFramework.TreeGraphView.TextTree;
+using UnityEditor.VersionControl;
 
 
 namespace ZincFramework
@@ -36,6 +38,62 @@ namespace ZincFramework
 #else
         return null;
 #endif
+                }
+
+                private static string _nowSavePath;
+
+                private static string _nowLoadPath;
+
+
+                public static bool SaveAssetsInPanel<T>(T[] assets, string title, string directory, string[] assetNames) where T : Object
+                {
+                    return SaveAssetsInPanel(assets, title, directory, assetNames, GetExtension<T>()[1..]);
+                }
+
+                public static bool SaveAssetsInPanel(Object[] assets, string title, string directory, string[] assetNames, string extension)
+                {
+                    if(assets.Length != assetNames.Length)
+                    {
+                        return false;
+                    }
+
+                    _nowSavePath = EditorUtility.SaveFilePanel(title, directory, assetNames[0], extension);
+                    bool canSave = !string.IsNullOrEmpty(_nowSavePath);
+
+                    if (canSave)
+                    {
+                        for(int i = 0; i < assetNames.Length; i++)
+                        {
+                            string relativePath = _nowSavePath.Substring(Application.dataPath.Length - "Assets".Length).Replace(assetNames[0], assetNames[i]);
+                            AssetDatabase.CreateAsset(assets[i], relativePath);             
+                        }
+
+                        AssetDatabase.SaveAssets();
+                    }
+
+                    _nowSavePath = null;
+                    return canSave;
+                }
+
+                public static bool SaveAssetInPanel<T>(T asset, string title, string directory, string defaultName) where T : Object
+                {
+                    return SaveAssetInPanel(asset, title, directory, defaultName, GetExtension<T>()[1..]);
+                }
+
+                public static bool SaveAssetInPanel(Object asset, string title, string directory, string defaultName, string extension)
+                {
+                    _nowSavePath = EditorUtility.SaveFilePanel(title, directory, defaultName, extension);
+                    bool canSave = !string.IsNullOrEmpty(_nowSavePath);
+
+                    if (canSave)
+                    {
+                        string relativePath = _nowSavePath.Substring(Application.dataPath.Length - "Assets".Length);
+                        AssetDatabase.CreateAsset(asset, relativePath);
+                        AssetDatabase.SaveAssets();
+                    }
+
+                    _nowSavePath = null;
+                    return canSave;
                 }
 
 

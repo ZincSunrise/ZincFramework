@@ -10,12 +10,12 @@ namespace ZincFramework
         /// </summary>
         public static class EventCenter
         {
-            private readonly static Dictionary<E_Event_Type, ZincEventBase> _eventDictionary = new Dictionary<E_Event_Type, ZincEventBase>();
+            private readonly static Dictionary<EventType, ZincEventBase> _eventDictionary = new Dictionary<EventType, ZincEventBase>();
 
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void Boardcast(E_Event_Type eventName)
+            public static void Boardcast(EventType eventName)
             {
                 if (_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {
@@ -29,7 +29,7 @@ namespace ZincFramework
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void Boardcast<T>(E_Event_Type eventName, T t)
+            public static void Boardcast<T>(EventType eventName, T t)
             {
                 if (_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {
@@ -43,7 +43,7 @@ namespace ZincFramework
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void Boardcast<T, K>(E_Event_Type eventName, T arg1, K arg2)
+            public static void Boardcast<T, K>(EventType eventName, T arg1, K arg2)
             {
                 if (_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {
@@ -58,7 +58,7 @@ namespace ZincFramework
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void Subscribe(E_Event_Type eventName, ZincAction action)
+            public static void Subscribe(EventType eventName, ZincAction action)
             {
                 if (!_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {
@@ -73,7 +73,7 @@ namespace ZincFramework
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void Subscribe<T>(E_Event_Type eventName, ZincAction<T> action)
+            public static void Subscribe<T>(EventType eventName, ZincAction<T> action)
             {
                 if (!_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {
@@ -88,7 +88,7 @@ namespace ZincFramework
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void Subscribe<T, K>(E_Event_Type eventName, ZincAction<T, K> action)
+            public static void Subscribe<T, K>(EventType eventName, ZincAction<T, K> action)
             {
                 if (!_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {
@@ -103,7 +103,7 @@ namespace ZincFramework
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void Unsubscribe(E_Event_Type eventName, ZincAction action)
+            public static void Unsubscribe(EventType eventName, ZincAction action)
             {
                 if (_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {
@@ -114,7 +114,7 @@ namespace ZincFramework
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void Unsubscribe<T>(E_Event_Type eventName, ZincAction<T> action)
+            public static void Unsubscribe<T>(EventType eventName, ZincAction<T> action)
             {
                 if (_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {
@@ -126,7 +126,7 @@ namespace ZincFramework
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void Unsubscribe<T, K>(E_Event_Type eventName, ZincAction<T, K> action)
+            public static void Unsubscribe<T, K>(EventType eventName, ZincAction<T, K> action)
             {
                 if (_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {
@@ -138,7 +138,7 @@ namespace ZincFramework
             /// <summary>
             /// 使用事件中心模块的对象必须在自己销毁时取消已经的注册事件
             /// </summary>
-            public static void RemoveSubscription(E_Event_Type eventName)
+            public static void RemoveSubscription(EventType eventName)
             {
                 if (_eventDictionary.TryGetValue(eventName, out ZincEventBase zincEventBase))
                 {

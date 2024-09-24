@@ -1,35 +1,31 @@
-using System.IO;
 using UnityEngine;
-using ZincFramework.Load.Editor;
 
 
 namespace ZincFramework
 {
     namespace Serialization
     {
-        [CreateAssetMenu(fileName = "AutoWriteConfig", menuName = "GameTool/AutoWriteConfig")]
         public class AutoWriteConfig : ScriptableObject
         {
-            public static AutoWriteConfig ExcelDefault { get; private set; }
-            public static AutoWriteConfig ProtocolDefault { get; private set; }
+            //名字行
+            public int nameLine = 0;
 
+            //类型行
+            public int typeLine = 1;
 
-            private void OnEnable()
-            {
-                ExcelDefault = ExcelDefault == null ? AssetDataManager.LoadAssetAtPath<AutoWriteConfig>(Path.Combine(AssetDataManager.ScriptLoadPath, "ExcelProfile", "Temp", "ExcelConfig")) : ExcelDefault;
-                ProtocolDefault = ProtocolDefault == null ? AssetDataManager.LoadAssetAtPath<AutoWriteConfig>(Path.Combine(AssetDataManager.ScriptLoadPath, "ProtocolTool", "Temp", "ProtocolConfig")) : ProtocolDefault;
-            }
+            //键行
+            public int keyLine = 2;
 
-            public string[] UsingNamespaces => _usingNamespaces;
+            //序列顺序码行
+            public int numberLine = 4;
 
-            [SerializeField]
-            private string[] _usingNamespaces;
+            //序列化开始行
+            public int startLine = 6;
 
+            public string[] usingNamespaces;
 
-            public int StartLine => _startLine;
-
-            [SerializeField]
-            private int _startLine = 6;
+            public string[] savePath;
+ 
         }
     }
 }

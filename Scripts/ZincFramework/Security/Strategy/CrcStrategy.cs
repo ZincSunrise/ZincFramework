@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-using ZincFramework.Binary;
 using ZincFramework.Security.CheckCode;
 
 
@@ -28,7 +26,7 @@ namespace ZincFramework
 
                 public bool VerifyData(byte[] verifyingData, byte[] checkcode)
                 {
-                    return VariableUtility.CompareArray(_crc.GenerateCode(verifyingData), checkcode);
+                    return ArrayListUtility.Compare(_crc.GenerateCode(verifyingData), checkcode);
                 }
             }
         }

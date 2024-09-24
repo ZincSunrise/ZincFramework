@@ -28,7 +28,7 @@ namespace ZincFramework
 
                     return new string[] 
                     { 
-                        WriteUtility.InsertTable(Type == "string" ? $"ByteAppender.AppendString(bytes, ref nowIndex, {name});" : $"{name}.Append(bytes, ref nowIndex);", 1) 
+                        WriteUtility.InsertTable(Type == "string" ? $"ByteAppender.AppendString({name}, bytes, ref nowIndex);" : $"{name}.Append(bytes, ref nowIndex);", IndentSize) 
                     };
                 }
 
@@ -37,9 +37,9 @@ namespace ZincFramework
                 {
                     if (Type == "string")
                     {
-                        return new string[] 
+                        return new [] 
                         { 
-                            WriteUtility.InsertTable($"{name} = ByteConverter.ToString(bytes, ref nowIndex);", 1) 
+                            WriteUtility.InsertTable($"{name} = ByteConverter.ToString(bytes, ref nowIndex);", IndentSize) 
                         };
                     }
                     else if (SerializeWriteTool.IsCollection(Type))
@@ -48,7 +48,7 @@ namespace ZincFramework
                     }
                     else
                     {
-                        return new string[] 
+                        return new [] 
                         { 
                             WriteUtility.InsertTable($"{name} = new {Type}();", 1),
                             WriteUtility.InsertTable($"{name}.Convert(bytes, ref nowIndex);", 1)

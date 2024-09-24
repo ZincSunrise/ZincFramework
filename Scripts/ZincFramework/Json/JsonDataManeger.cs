@@ -1,7 +1,10 @@
-using UnityEngine;
 using System;
 using System.IO;
+using UnityEngine;
 using ZincFramework.Serialization.Json;
+using System.Text;
+
+
 
 namespace ZincFramework
 {
@@ -9,7 +12,8 @@ namespace ZincFramework
     {
         public enum JsonSerializeType
         {
-            LitJson,
+            JsonSerializer,
+            NewtonSoft,
             JsonUtility
         }
 
@@ -19,50 +23,85 @@ namespace ZincFramework
 
             private JsonDataManager() { }
 
-            public void SaveData(object data, string name, JsonSerializeType jsonType = JsonSerializeType.LitJson)
+            private readonly StringBuilder _pathBulider = new StringBuilder(FrameworkPaths.SavePath, FrameworkPaths.SavePath.Length * 2);
+
+            public void SaveData(object data, string saveName, Type type, JsonSerializeType jsonType = JsonSerializeType.JsonSerializer)
             {
-                string jsonStr = JsonSerializer.Serialize(data, jsonType);
-                File.WriteAllText(FrameworkPaths.SavePath + name + Extension, jsonStr);
+                AppendPath(saveName);
+                using (FileStream fileStream = File.Create(_pathBulider.ToString(), 1024))
+                {
+                    JsonSelector.Serialize(data, type, fileStream, jsonType);
+                }
+
+                RestorePath();
             }
 
-            public object LoadData(string name, Type type, JsonSerializeType jsonType = JsonSerializeType.LitJson)
+
+            public object LoadData(string saveName, Type type, JsonSerializeType jsonType = JsonSerializeType.JsonSerializer)
             {
                 string jsonStr;
-                if (!File.Exists(Path.Combine(FrameworkPaths.ProfilePath, name + Extension)))
+                AppendPath(saveName);
+
+                string pathStr = _pathBulider.ToString();
+                if (!File.Exists(pathStr))
                 {
-                    if (!File.Exists(Path.Combine(FrameworkPaths.SavePath, name + Extension)))
+                    if (!File.Exists(Path.Combine(FrameworkPaths.SavePath, saveName + Extension)))
                     {
                         return Activator.CreateInstance(type);
                     }
                 }
-                jsonStr = File.ReadAllText(FrameworkPaths.SavePath + name + Extension);
-                return JsonSerializer.Deserialize(jsonStr, type, jsonType);
+
+                jsonStr = File.ReadAllText(pathStr);
+                RestorePath();
+                return JsonSelector.Deserialize(jsonStr, type, jsonType);
             }
 
-            public T LoadData<T>(string name, JsonSerializeType jsonType = JsonSerializeType.LitJson) where T : class, new()
+            public T LoadData<T>(string saveName, JsonSerializeType jsonType = JsonSerializeType.JsonSerializer) where T : class, new()
             {
                 string jsonStr;
-                if (!File.Exists(Path.Combine(FrameworkPaths.ProfilePath, name + Extension)))
+                AppendPath(saveName);
+
+                string pathStr = _pathBulider.ToString();
+
+                if (!File.Exists(pathStr))
                 {
-                    if (!File.Exists(Path.Combine(FrameworkPaths.SavePath, name + Extension)))
+                    if (!File.Exists(Path.Combine(FrameworkPaths.SavePath, saveName + Extension)))
                     {
                         return new T();
                     }
                 }
-                jsonStr = File.ReadAllText(FrameworkPaths.SavePath + name + Extension);
-                return JsonSerializer.Deserialize(jsonStr, typeof(T), jsonType) as T;
+
+                jsonStr = File.ReadAllText(pathStr);
+                RestorePath();
+
+                return JsonSelector.Deserialize<T>(jsonStr, jsonType);
             }
 
-            public T LoadScriptableObjectData<T>(string name) where T : ScriptableObject
+
+            public T LoadScriptableObjectData<T>(string saveName) where T : ScriptableObject
             {
                 string jsonStr;
-                if (!File.Exists(Path.Combine(FrameworkPaths.SavePath, name + Extension)))
+                AppendPath(saveName);
+                string pathStr = _pathBulider.ToString();
+
+                if (!File.Exists(pathStr))
                 {
-                    return default;
+                    return ScriptableObject.CreateInstance<T>();
                 }
 
-                jsonStr = File.ReadAllText(FrameworkPaths.SavePath + name + Extension);
-                return JsonSerializer.DeserializeScriptableObject<T>(jsonStr);
+                jsonStr = File.ReadAllText(pathStr);
+                return JsonSelector.DeserializeScriptableObject<T>(jsonStr);
+            }
+
+            private void AppendPath(string saveName)
+            {
+                _pathBulider.Append(saveName);
+                _pathBulider.Append(Extension);
+            }
+
+            private void RestorePath()
+            {
+                _pathBulider.Remove(FrameworkPaths.SavePath.Length, _pathBulider.Length - FrameworkPaths.SavePath.Length);
             }
         }
     }   

@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine.Events;
 
 
@@ -5,46 +6,52 @@ namespace ZincFramework
 {
     public class MonoManager : BaseAutoMonoSingleton<MonoManager>
     {
-        public event UnityAction UpdateEvent;
-        public event UnityAction FixedUpdateEvent;
-        public event UnityAction LateUpdateEvent;
-        public event UnityAction OnApplicationQuitEvent;
+        public event UnityAction OnUpdate;
+        public event UnityAction OnFixedUpdate;
+        public event UnityAction OnLateUpdate;
+        public event UnityAction OnQuitApplication;
+        public event UnityAction OnGizmosDraw;
 
         public void ClearAllEvent()
         {
-            UpdateEvent = null; 
-            FixedUpdateEvent = null; 
-            LateUpdateEvent = null; 
-            OnApplicationQuitEvent = null;
+            OnGizmosDraw = null;
+            OnUpdate = null; 
+            OnFixedUpdate = null; 
+            OnLateUpdate = null; 
+            OnQuitApplication = null;
         }
 
         private void Update()
         {
-            UpdateEvent?.Invoke();
+            OnUpdate?.Invoke();
         }
 
         private void FixedUpdate()
         {
-            FixedUpdateEvent?.Invoke();
+            OnFixedUpdate?.Invoke();
         }
 
         private void LateUpdate()
         {
-            LateUpdateEvent?.Invoke();
+            OnLateUpdate?.Invoke();
         }
 
         private void OnApplicationQuit()
         {
-            OnApplicationQuitEvent?.Invoke();
+            OnQuitApplication?.Invoke();
         }
 
+        private void OnDrawGizmos()
+        {
+            OnGizmosDraw?.Invoke();
+        }
 
         /// <summary>
         /// 一定不要传lambda表达式除非你有特殊需求
         /// </summary>
         public void AddOnApplicationQuitListener(UnityAction quitAction)
         {
-            OnApplicationQuitEvent += quitAction;
+            OnQuitApplication += quitAction;
         }
 
         /// <summary>
@@ -52,7 +59,7 @@ namespace ZincFramework
         /// </summary>
         public void AddUpdateListener(UnityAction updateAction)
         {
-            UpdateEvent += updateAction;
+            OnUpdate += updateAction;
         }
 
         /// <summary>
@@ -60,7 +67,7 @@ namespace ZincFramework
         /// </summary>
         public void RemoveUpdateListener(UnityAction updateAction)
         {
-            UpdateEvent -= updateAction;
+            OnUpdate -= updateAction;
         }
 
         /// <summary>
@@ -68,28 +75,28 @@ namespace ZincFramework
         /// </summary>
         public void AddFixedUpdateListener(UnityAction fixedUpdateAction)
         {
-            FixedUpdateEvent += fixedUpdateAction;
+            OnFixedUpdate += fixedUpdateAction;
         }
 
         public void AddLateUpdateListener(UnityAction lateUpdateAction)
         {
-            LateUpdateEvent += lateUpdateAction;
+            OnLateUpdate += lateUpdateAction;
         }
 
 
         public void RemoveFixedUpdateListener(UnityAction fixedUpdateAction)
         {
-            FixedUpdateEvent -= fixedUpdateAction;
+            OnFixedUpdate -= fixedUpdateAction;
         }
 
         public void RemoveLateUpdateListener(UnityAction lateUpdateAction)
         {
-            LateUpdateEvent -= lateUpdateAction;
+            OnLateUpdate -= lateUpdateAction;
         }
 
         public void RemoveOnApplicationQuitListener(UnityAction quitAction)
         {
-            OnApplicationQuitEvent -= quitAction;
+            OnQuitApplication -= quitAction;
         }
 
     }

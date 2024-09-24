@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   extension: .bytes
   isDebug: 1
-  soundMode: 1
+  soundMode: 0
   fadePersent: 1
   maxSoundCount: 32
   disappearOffset: 0.05
   isOpenLayout: 0
-  maxPoolCount: 16
+  maxPoolCount: 1000
   isInputSystem: 0
   intervalCheckTime: 0.05
   saveOffset: 600

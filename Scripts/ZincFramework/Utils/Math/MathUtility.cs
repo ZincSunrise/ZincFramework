@@ -1,10 +1,12 @@
 using UnityEngine;
-
+using SystemRandom = System.Random;
 
 namespace ZincFramework
 {
     public static class MathUtility
     {
+        public static SystemRandom Shared { get; } = new SystemRandom();
+
         private readonly static int[] _primes = new int[] {
                                 3, 7, 11, 17, 23, 29, 37, 47, 59, 71,
                                 89, 107, 131, 163, 197, 239, 293, 353, 431, 521,
@@ -16,7 +18,26 @@ namespace ZincFramework
                                 5999471, 7199369
         };
 
-        #region Êı×Ö¼ÆËãÏà¹Ø
+        #region æ•°å­—è®¡ç®—ç›¸å…³
+        
+
+        /// <summary>
+        /// ç”¨æ¥ç®—ä¸€æ•´ä¸ªèŒƒå›´çš„æ¦‚ç‡çš„å‡½æ•°
+        /// <returns></returns>
+        public static bool RandomRange(double posibility)
+        {
+            return Shared.NextDouble() <= posibility;
+        }
+
+
+        /// <summary>
+        /// ç”¨æ¥ç®—ä¸€æ•´ä¸ªèŒƒå›´çš„æ¦‚ç‡çš„å‡½æ•°
+        /// <returns></returns>
+        public static bool RandomRange(float posibility)
+        {
+            return Shared.NextDouble() <= posibility;
+        }
+
         public static int GetGcd(int a, int b)
         {
             return b == 0 ? a : GetGcd(b, a % b);
@@ -141,7 +162,7 @@ namespace ZincFramework
         }
         #endregion
 
-        #region ¿Õ¼ä¼ÆËãÏà¹Ø
+        #region ç©ºé—´è®¡ç®—ç›¸å…³
         public static float RadianToDegree(float radian)
         {
             return radian * Mathf.Rad2Deg;
@@ -164,10 +185,10 @@ namespace ZincFramework
 
 
         /// <summary>
-        /// ¼ì²âÊÇ·ñÔÚÉãÏñ»ú·¶Î§ÄÚ
+        /// æ£€æµ‹æ˜¯å¦åœ¨æ‘„åƒæœºèŒƒå›´å†…
         /// </summary>
-        /// <param name="postion">ÎïÌåÎ»ÖÃ</param>
-        /// <param name="camera">ÉãÏñ»ú</param>
+        /// <param name="postion">ç‰©ä½“ä½ç½®</param>
+        /// <param name="camera">æ‘„åƒæœº</param>
         /// <returns></returns>
         public static bool CheckInScreen(Vector3 postion, Camera camera)
         {
@@ -176,9 +197,9 @@ namespace ZincFramework
         }
 
         /// <summary>
-        /// ¼ì²âÊÇ·ñÔÚÖ÷ÉãÏñ»ú·¶Î§ÄÚ
+        /// æ£€æµ‹æ˜¯å¦åœ¨ä¸»æ‘„åƒæœºèŒƒå›´å†…
         /// </summary>
-        /// <param name="postion">ÎïÌåÎ»ÖÃ</param>
+        /// <param name="postion">ç‰©ä½“ä½ç½®</param>
         /// <returns></returns>
         public static bool CheckInMainCameraScreen(Vector3 postion)
         {
@@ -186,13 +207,13 @@ namespace ZincFramework
         }
 
         /// <summary>
-        /// ¼ì²âXZÆ½ÃæÉÈĞÎ·¶Î§ÄÚÖĞÊÇ·ñ´æÔÚ¶ÔÓ¦ÎïÌå
+        /// æ£€æµ‹XZå¹³é¢æ‰‡å½¢èŒƒå›´å†…ä¸­æ˜¯å¦å­˜åœ¨å¯¹åº”ç‰©ä½“
         /// </summary>
-        /// <param name="position">ÎïÌåÎ»ÖÃ</param>
-        /// <param name="forward">ÎïÌåÃæ³¯Ïò</param>
-        /// <param name="targetPosition">Ä¿±êÎ»ÖÃ</param>
-        /// <param name="radius">°ë¾¶</param>
-        /// <param name="angle">½Ç¶È</param>
+        /// <param name="position">ç‰©ä½“ä½ç½®</param>
+        /// <param name="forward">ç‰©ä½“é¢æœå‘</param>
+        /// <param name="targetPosition">ç›®æ ‡ä½ç½®</param>
+        /// <param name="radius">åŠå¾„</param>
+        /// <param name="angle">è§’åº¦</param>
         /// <returns></returns>
         public static bool CheckInSectorRange(Vector3 position, Vector3 forward, Vector3 targetPosition, float radius, float angle)
         {
@@ -200,7 +221,7 @@ namespace ZincFramework
         }
 
         /// <summary>
-        /// ½«XYÆ½ÃæµÄÏòÁ¿×ª»»ÎªXZÆ½Ãæ
+        /// å°†XYå¹³é¢çš„å‘é‡è½¬æ¢ä¸ºXZå¹³é¢
         /// </summary>
         /// <returns></returns>
         public static Vector3 XYToXZVector(Vector2 XYVector)

@@ -34,7 +34,7 @@ namespace ZincFramework
                 }
                 else if(soundMode == E_Sound_Mode.ThreeD)
                 {
-                    return DataPoolManager.Instance.RentInfo<SoundSource>();
+                    return DataPoolManager.RentInfo<SoundSource>();
                 }
 
                 return null;

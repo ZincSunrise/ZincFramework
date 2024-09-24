@@ -1,7 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 using ZincFramework.Load.Editor;
+
 
 
 namespace ZincFramework
@@ -11,14 +11,7 @@ namespace ZincFramework
         [CreateAssetMenu(fileName = "UIConfig", menuName = "GameTool/UI/UIConfig")]
         public class UIConfig : ScriptableObject
         {
-            public static UIConfig Default { get; private set; }
-
-
-            private void OnEnable()
-            {
-                Default = Default != null ? Default : AssetDataManager.LoadAssetAtPath<UIConfig>("Editor/ZincFramework/Scripts/UITool/Configs/UIConfig");
-            }
-
+            public const string DefaultLoadPath = "Editor/Zincframework/Scripts/UITool/Configs/UIConfig";
             public List<string> Namespaces => _namespaces;
 
 

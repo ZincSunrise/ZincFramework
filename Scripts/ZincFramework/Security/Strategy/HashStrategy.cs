@@ -1,5 +1,4 @@
 using System.Security.Cryptography;
-using ZincFramework.Binary;
 
 
 
@@ -52,7 +51,7 @@ namespace ZincFramework
 
                 public bool VerifyData(byte[] verifyingData, byte[] checkcode)
                 {
-                    return VariableUtility.CompareArray(_algorithm.ComputeHash(verifyingData), checkcode);
+                    return ArrayListUtility.Compare(_algorithm.ComputeHash(verifyingData), checkcode);
                 }
             }
         }

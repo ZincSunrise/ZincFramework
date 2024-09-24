@@ -6,8 +6,6 @@ namespace ZincFramework
 {
     public class FrameworkData : ScriptableObject
     {
-        public static FrameworkData Shared { get; private set; } 
-
         [Header("-----------文件读取存储相关-----------")]
         [Header("保存文件的拓展名")]
         public string extension;
@@ -63,10 +61,6 @@ namespace ZincFramework
         [Header("本地链接协议")]
         public ProtocolType protocolType = ProtocolType.Tcp;
 
-        private void OnEnable()
-        {
-            Shared = Shared == null ? Resources.Load<FrameworkData>("FrameWork/FrameWorkData") : Shared;
-        }
 
         public void Deconstruct(out string extension) =>
             extension = this.extension;

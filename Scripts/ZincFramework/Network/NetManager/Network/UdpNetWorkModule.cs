@@ -30,8 +30,8 @@ namespace ZincFramework
                 public UdpNetWorkModule()
                 {
                     _receiveBytes = new byte[_buffeSize];
-                    string address = FrameworkData.Shared.remoteAddress;
-                    short port = FrameworkData.Shared.remotePort;
+                    string address = FrameworkConsole.Instance.SharedData.remoteAddress;
+                    short port = FrameworkConsole.Instance.SharedData.remotePort;
 
                     _serverEndpoint = new IPEndPoint(IPAddress.Parse(address), port);
                 }
@@ -40,8 +40,8 @@ namespace ZincFramework
                 public bool Connect(out SocketException socketException)
                 {
                     _localSocket ??= SocketUtility.GetUdpSocket();
-                    string address = FrameworkData.Shared.localAddress;
-                    short port = FrameworkData.Shared.localPort;
+                    string address = FrameworkConsole.Instance.SharedData.localAddress;
+                    short port = FrameworkConsole.Instance.SharedData.localPort;
                     _localSocket.Bind(new IPEndPoint(IPAddress.Parse(address), port));
                     socketException = null;
                     return true;

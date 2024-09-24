@@ -205,12 +205,12 @@ namespace ZincFramework
             }
 
 
-            public IWriteHandle WriteAutoProperty(int indentSize, string returnType, string propertyName, string getAccess, string setAccess, string[] modifiers = null, string access = Accessors.Public)
+            public IWriteHandle WriteAutoProperty(int indentSize, string returnType, string propertyName, string getAccess, string setAccess, string[] modifiers = null, string access = Accessors.Public, string defaultValue = null)
             {
                 GetterHandle getterHandle = new GetterHandle(indentSize, getAccess, access);
                 SetterHandle setterHandle = new SetterHandle(indentSize, setAccess, access);
 
-                PropertyHandle propertyHandle = new PropertyHandle(indentSize, access, modifiers, returnType, propertyName, getterHandle, setterHandle);
+                PropertyHandle propertyHandle = new PropertyHandle(indentSize, access, modifiers, returnType, propertyName, getterHandle, setterHandle, defaultValue);
                 propertyHandle.HandleWrite(StreamWriter);
 
                 return propertyHandle;

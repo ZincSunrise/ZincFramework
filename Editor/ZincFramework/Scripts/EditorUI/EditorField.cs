@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using ZincFramework.Events;
 
 
 
@@ -11,6 +12,8 @@ namespace ZincFramework
         {
             public abstract class EditorField<T> : IEditorUI
             {
+                public ZincEvent<T> OnValueChanged { get; } = new ZincEvent<T>();
+
                 public T Value { get; set; }
 
                 public string Title { get; }

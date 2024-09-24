@@ -1,9 +1,8 @@
-using Excel;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+
+
 
 namespace ZincFramework
 {
@@ -33,21 +32,9 @@ namespace ZincFramework
 
                     using (FileStream fileStream = fileInfo.OpenRead())
                     {
-                        IExcelDataReader reader = ExcelReaderFactory.CreateOpenXmlReader(fileStream);
-                        DataTableCollection dataTableCollection = reader.AsDataSet().Tables;
 
-                        foreach (DataTable dataTable in dataTableCollection)
-                        {
-                            ReadLocalizeTable(dataTable);
-                        }
                     }
                 }
-            }
-
-            private static void ReadLocalizeTable(DataTable dataTable)
-            {
-
-
             }
         }
     }

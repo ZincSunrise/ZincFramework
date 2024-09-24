@@ -41,7 +41,9 @@ namespace ZincFramework
             while (true)
             {
                 yield return new EditorWaitForSeconds(_saveOffset);
-                Debug.Log("×Ô¶¯±£´æÁË");
+                Debug.Log("è‡ªåŠ¨ä¿å­˜äº†");
+
+                AssetDatabase.SaveAssets();
 
                 EditorSceneManager.SaveOpenScenes();
                 _saveOffset = Resources.Load<FrameworkData>("Framework/FrameworkData").saveOffset;

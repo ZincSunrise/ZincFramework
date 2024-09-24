@@ -148,7 +148,7 @@ namespace ZincFramework
             public void LoadAssetAsync<T>(string assetBundleName, string resourceName, UnityAction<T> callback, bool isAnsyc = true) where T : Object
             {
 #if UNITY_EDITOR
-                if (FrameworkData.Shared.isDebug)
+                if (FrameworkConsole.Instance.SharedData.isDebug)
                 {
                     callback?.Invoke(AssetDataManager.LoadAssetAtPath<T>(Path.Combine(assetBundleName, resourceName)));
                     return;

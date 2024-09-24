@@ -35,7 +35,7 @@ namespace ZincFramework
                     statement[nowIndex++] = WriteUtility.InsertTable(SerializeWriteTool.GetAppendCode(name), RelativeIndentSize);
 
 
-                    if (Type == "string")
+                    if (string.Compare(nameof(String), Type, true) == 0)
                     {
                         statement[nowIndex++] = WriteUtility.InsertTable($"ByteAppender.AppendString({name}, bytes, ref nowIndex);", RelativeIndentSize);
                     }

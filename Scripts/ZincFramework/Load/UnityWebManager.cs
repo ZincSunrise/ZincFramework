@@ -5,8 +5,10 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.Networking;
 using ZincFramework.Events;
+using ZincFramework.Binary.Serialization;
 using ZincFramework.Serialization;
-using ZincFramework.Serialization.Network;
+
+
 
 
 namespace ZincFramework
@@ -85,7 +87,7 @@ namespace ZincFramework
 
                 DownloadHandler downloadHandler = unityWebRequest.downloadHandler;
 
-                callback?.Invoke((T)MessageSerializer.Deserialize(downloadHandler.data));
+                callback?.Invoke(BinarySerializer.Deserialize<T>(downloadHandler.data));
             }
 
             public void UploadDataAsync(Uri uri, ISerializable serializable ,ZincAction<UnityWebRequest.Result> zincAction = null)

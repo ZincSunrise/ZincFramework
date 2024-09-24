@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
-using ZincFramework.Serialization;
-using ZincFramework.Serialization.Cache;
+using System.Collections.Concurrent;
+using ZincFramework.Binary.Serialization;
+using ZincFramework.Binary.Serialization.Metadata;
 using ZincFramework.Serialization.Runtime;
 
 
@@ -12,22 +12,22 @@ namespace ZincFramework
     {
         namespace Protocol
         {
-            internal class MessageInfo
-            {
-                
-                public Func<object> MessageConstructor { get; private set; }
-                public Func<IHandleMessage> HandlderConstructor { get; private set; }
-
-                public MessageInfo(Func<object> messageConstructor, Func<IHandleMessage> handlderConstructor)
-                {
-                    MessageConstructor = messageConstructor;
-                    HandlderConstructor = handlderConstructor;
-                }
-            }
-
             public static class MessagePool
             {
-                private static readonly Dictionary<int, MessageInfo> _massageInfos = new Dictionary<int, MessageInfo>();
+                private static readonly ConcurrentDictionary<int, MessageInfo> _massageInfos = new ConcurrentDictionary<int, MessageInfo>();
+
+                internal class MessageInfo
+                {
+                    public Func<BaseMessage> MessageConstructor { get; private set; }
+
+                    public Func<IHandleMessage> HandlderConstructor { get; private set; }
+
+                    public MessageInfo(Func<BaseMessage> messageConstructor, Func<IHandleMessage> handlderConstructor)
+                    {
+                        MessageConstructor = messageConstructor;
+                        HandlderConstructor = handlderConstructor;
+                    }
+                }
 
                 static MessagePool()
                 {
@@ -38,7 +38,7 @@ namespace ZincFramework
                 {
                     if(_massageInfos.TryGetValue(id, out MessageInfo massageInfo))
                     {
-                        return massageInfo.MessageConstructor.Invoke() as BaseMessage;
+                        return massageInfo.MessageConstructor.Invoke();
                     }
                     return null;
                 }
@@ -54,34 +54,40 @@ namespace ZincFramework
                     return null;
                 }
 
-                public static void RegistMessage<T, K>() where T : BaseMessage where K : IHandleMessage
+                public static void RegistMessage(Type messageType, Type handlderType)
                 {
-                    Type type = typeof(T);
-                    if (!SerializationCachePool.TryGetTypeCache(type, out var typeCache))
-                    {
-                        typeCache = SerializationCachePool.CreateTypeCache(type, SerializeConfig.Property);
-                    }
+                    SerializerOption serializerOption = SerializerOption.Message;
+                    BinaryTypeInfo binaryTypeInfo = serializerOption.GetTypeInfo(messageType);
 
-                    if (!_massageInfos.ContainsKey(typeCache.SerializableCode))
+                    if (!_massageInfos.ContainsKey(binaryTypeInfo.SerializableCode))
                     {
-                        Func<IHandleMessage> handlerConstructor = ExpressionTool.GetConstructor<IHandleMessage>(typeof(K));
-                        _massageInfos.Add(typeCache.SerializableCode, new MessageInfo(typeCache.Constructor, handlerConstructor));
+                        var ctor = ExpressionTool.GetConstructor<IHandleMessage>(handlderType);
+                        _massageInfos.TryAdd(binaryTypeInfo.SerializableCode, new MessageInfo(() => binaryTypeInfo.CreateInstance() as BaseMessage, ctor));
+                    }
+                }
+
+                public static void RegistMessage<T, K>() where T : BaseMessage, new() where K : IHandleMessage, new()
+                {
+                    RegistMessage(() => new T(), () => new K());
+                }
+
+                public static void RegistMessage<T, K>(Func<T> messageFactory, Func<K> handlerFactory) where T : BaseMessage where K : IHandleMessage
+                {
+                    SerializerOption serializerOption = SerializerOption.Message;
+                    BinaryTypeInfo binaryTypeInfo = serializerOption.GetTypeInfo(messageFactory);
+
+                    if (!_massageInfos.ContainsKey(binaryTypeInfo.SerializableCode))
+                    {
+                        _massageInfos.TryAdd(binaryTypeInfo.SerializableCode, new MessageInfo(messageFactory, () => handlerFactory.Invoke()));
                     }
                 }
 
                 public static void UnRegist<T, K>() where T : BaseMessage where K : IHandleMessage
                 {
-                    Type type = typeof(T);
+                    SerializerOption serializerOption = SerializerOption.Message;
+                    BinaryTypeInfo binaryTypeInfo = serializerOption.GetTypeInfo<T>();
 
-                    if (!SerializationCachePool.TryGetTypeCache(type, out var typeCache))
-                    {
-                        typeCache = SerializationCachePool.CreateTypeCache(type, SerializeConfig.Property);
-                    }
-
-                    if (_massageInfos.ContainsKey(typeCache.SerializableCode))
-                    {
-                        _massageInfos.Remove(typeCache.SerializableCode);
-                    }
+                    _massageInfos.TryRemove(binaryTypeInfo.SerializableCode, out _);
                 }
             }
         }

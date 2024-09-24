@@ -28,7 +28,7 @@ namespace ZincFramework
                 {
                     string name = dataTable.Rows[0][dataColumn].ToString();
 
-                    Name = isProperty ? TextUtility.UpperFirstString(name) : name;
+                    Name = isProperty ? TextUtility.UpperFirstChar(name) : name;
                     Type = dataTable.Rows[1][dataColumn].ToString();
 
                     IsArray = Type.Contains("Array", StringComparison.OrdinalIgnoreCase);
@@ -43,16 +43,34 @@ namespace ZincFramework
                     GenericTypes = null;
                 }
 
+                public MemberWriteInfo(string name, string type, string ordinalNumber, bool isProperty)
+                {
+                    Name = isProperty ? TextUtility.UpperFirstChar(name) : name;
+                    Type = type;
+
+                    IsArray = Type.Contains("Array", StringComparison.OrdinalIgnoreCase);
+                    IsEnum = Type.Contains("E_");
+
+                    if (IsArray)
+                    {
+                        Type = Type.Replace("Array/", "", StringComparison.OrdinalIgnoreCase);
+                    }
+
+                    OrdinalNumber = ordinalNumber;
+                    GenericTypes = null;
+                }
+
+
                 public MemberWriteInfo(XmlNode fieldNode, bool isEnum, bool isProperty)
                 {
                     string name = fieldNode.Attributes["name"].Value;
-                    Name = isProperty ? TextUtility.UpperFirstString(name) : name;
+                    Name = isProperty ? TextUtility.UpperFirstChar(name) : name;
                     Type = fieldNode.Attributes["type"].Value;
 
 
                     if (!SingleTypeWriter.IsSingleValue(Type) && Type != "string")
                     {
-                        Type = TextUtility.UpperFirstString(Type);
+                        Type = TextUtility.UpperFirstChar(Type);
                     }
 
                     OrdinalNumber = fieldNode.Attributes["ordinalNumber"].Value;

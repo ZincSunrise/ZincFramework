@@ -17,10 +17,21 @@ namespace ZincFramework
 
                 public EditorCollection(EditorWindow editorWindow)
                 {
-                    FieldInfo[] fieldInfos = editorWindow.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    List<EditorScrollView> scrollViews = new List<EditorScrollView>(); 
+                    SetEditor(editorWindow);
+                }
 
-                    foreach (FieldInfo fieldInfo in fieldInfos) 
+                public EditorCollection()
+                {
+
+                }
+
+
+                public void SetEditor(EditorWindow editorWindow) 
+                {
+                    FieldInfo[] fieldInfos = editorWindow.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    List<EditorScrollView> scrollViews = new List<EditorScrollView>();
+
+                    foreach (FieldInfo fieldInfo in fieldInfos)
                     {
                         object value = fieldInfo.GetValue(editorWindow);
                         if (value is IEditorUI editorUI)
@@ -33,7 +44,7 @@ namespace ZincFramework
                         }
                     }
 
-                    for (int i = 0; i < scrollViews.Count; i++) 
+                    for (int i = 0; i < scrollViews.Count; i++)
                     {
                         EditorUIs.RemoveAll((x) =>
                         {
@@ -42,12 +53,7 @@ namespace ZincFramework
                     }
                 }
 
-                public EditorCollection()
-                {
-
-                }
-
-                public void Foreach(ZincAction<IEditorUI> callback)
+                public void ForEach(ZincAction<IEditorUI> callback)
                 {
                     for (int i = 0; i < EditorUIs.Count; i++)
                     {

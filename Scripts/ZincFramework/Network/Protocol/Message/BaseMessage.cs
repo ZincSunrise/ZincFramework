@@ -1,7 +1,6 @@
 using ZincFramework.Binary;
+using ZincFramework.Binary.Serialization;
 using ZincFramework.Serialization;
-using ZincFramework.Serialization.Network;
-
 
 
 namespace ZincFramework
@@ -14,14 +13,15 @@ namespace ZincFramework
             /// 序列化三步骤，先写当前编码，在写当前类的长度，最后写各个类
             /// 一旦继承了该类，就必须在这个类的静态构造函数中调用一次SerializationCache的注册方法
             /// </summary>
-            [ZincSerializable()]
-            public abstract record BaseMessage : ISerializable, IConvert, IAppend
+            [BinarySerializable()]
+            public abstract record BaseMessage : ISerializable, IConvertable, IAppend
             {
                 public abstract int SerializableCode { get; }
 
                 public virtual int TypeLength => _typeLength == 0 ? GetTypeLength() : _typeLength;
 
                 private int _typeLength = 0;
+
                 /// <summary>
                 /// 序列化三步骤，先写当前编码，在写当前类的长度，最后写各个类
                 /// 写类的长度的时候，需要使用GetLength方法
@@ -31,7 +31,7 @@ namespace ZincFramework
                 /// <returns></returns>
                 public virtual byte[] Serialize()
                 {
-                    return MessageSerializer.Serialize(this);
+                    return BinarySerializer.Serialize(this);
                 }
 
                 /// <summary>
@@ -42,7 +42,7 @@ namespace ZincFramework
                 /// <param name="bytes"></param>
                 public virtual void Deserialize(byte[] bytes)
                 {
-                    MessageSerializer.Deserialize(this, bytes);
+
                 }
 
                 /// <summary>
@@ -72,7 +72,7 @@ namespace ZincFramework
                 {
                     if(_typeLength == 0)
                     {
-                        _typeLength = TypeMeasurer.GetTypeLength(this, this.GetType(), SerializeConfig.Property);
+                        _typeLength = TypeMeasurer.GetTypeLength(this, this.GetType());
                     }
 
                     return _typeLength;
@@ -84,7 +84,7 @@ namespace ZincFramework
                 /// <returns></returns>
                 public virtual int GetBytesLength()
                 {
-                    return TypeMeasurer.GetTypeLength(this, this.GetType(), SerializeConfig.Property) + 8;
+                    return TypeMeasurer.GetTypeLength(this, GetType()) + HeadInfo.HeadLength;
                 }
             }
         }

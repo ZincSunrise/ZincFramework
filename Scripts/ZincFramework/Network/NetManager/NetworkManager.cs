@@ -35,7 +35,7 @@ namespace ZincFramework
             {
                 _heartMessage = new HeartMessage();
  
-                (_sendOffsetTime, _protocolType) = FrameworkData.Shared;
+                (_sendOffsetTime, _protocolType) = FrameworkConsole.Instance.SharedData;
 
                 _networkModule = INetworkModule.GetNetworkModule(_protocolType);
 
@@ -60,12 +60,12 @@ namespace ZincFramework
                     if (socketException.ErrorCode == 10061) 
                     {
                         LogUtility.LogError("服务器拒绝连接");
-                        EventCenter.Boardcast<int>(E_Event_Type.E_ServerReject, socketException.ErrorCode);
+                        EventCenter.Boardcast<int>(EventType.ServerReject, socketException.ErrorCode);
                     }
                     else
                     {
                         LogUtility.LogError("服务器连接失败");
-                        EventCenter.Boardcast<int>(E_Event_Type.E_ConnectFailed, socketException.ErrorCode);
+                        EventCenter.Boardcast<int>(EventType.ConnectFailed, socketException.ErrorCode);
                     }
                 }
             }
@@ -88,7 +88,7 @@ namespace ZincFramework
                 _networkModule.Disconnect();
                 if (!isSelf)
                 {
-                    EventCenter.Boardcast(E_Event_Type.E_IsReconnecting);
+                    EventCenter.Boardcast(EventType.IsReconnecting);
                     Reconnect();
                 }
             }
@@ -136,7 +136,7 @@ namespace ZincFramework
                 {
                     SendHeartMassageAsync();
                     ReceiveAsync();
-                    EventCenter.Boardcast(E_Event_Type.E_Reconnected);
+                    EventCenter.Boardcast(EventType.Reconnected);
                     IsReconnecting = false;
                 }
                 else
@@ -144,12 +144,12 @@ namespace ZincFramework
                     if (socketException.ErrorCode == 10061)
                     {
                         LogUtility.LogError("服务器拒绝连接");
-                        EventCenter.Boardcast<int>(E_Event_Type.E_ServerReject, socketException.ErrorCode);
+                        EventCenter.Boardcast<int>(EventType.ServerReject, socketException.ErrorCode);
                     }
                     else
                     {
                         LogUtility.LogError("服务器连接失败");
-                        EventCenter.Boardcast<int>(E_Event_Type.E_ConnectFailed, socketException.ErrorCode);
+                        EventCenter.Boardcast<int>(EventType.ConnectFailed, socketException.ErrorCode);
                     }
                 }
             }

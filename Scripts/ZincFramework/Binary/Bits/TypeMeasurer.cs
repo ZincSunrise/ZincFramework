@@ -1,7 +1,10 @@
 using System;
+using UnityEngine;
 using System.Collections;
-using ZincFramework.Serialization;
-using ZincFramework.Serialization.Cache;
+using ZincFramework.Binary.Serialization;
+using ZincFramework.Binary.Serialization.Metadata;
+
+
 
 namespace ZincFramework
 {
@@ -9,34 +12,29 @@ namespace ZincFramework
     {
         public static class TypeMeasurer
         {
-            public static int GetTypeLength(object obj, Type type, SerializeConfig serializeConfig = SerializeConfig.Property)
+            public static int GetTypeLength(object obj, Type type, SerializerOption serializerOption = null)
             {
-                if (!SerializationCachePool.TryGetTypeCache(type, out var typeCache))
-                {
-                    typeCache = SerializationCachePool.CreateTypeCache(type, serializeConfig);
-                }
+                serializerOption ??= SerializerOption.Default;
+                BinaryTypeInfo binaryTypeInfo = serializerOption.GetTypeInfo(type);
 
-                MemberConfig[] memberConfigs = typeCache.MemberConfigs;
-
-                MemberConfig memberConfig;
+                var binaryMemberInfos = binaryTypeInfo.MemberInfos;
                 int length = 0;
-                object memberObject;
 
-                for (int i = 0; i < memberConfigs.Length; i++)
+                foreach(var member in binaryMemberInfos.Values)
                 {
-                    memberConfig = memberConfigs[i];
-                    memberObject = memberConfig.GetValue(obj);
+                    object memberObject = member.GetAction.Invoke(obj);
 
                     length += 4;
                     if (memberObject != null)
                     {
-                        length += GetMemberLength(memberObject, memberConfig.ConfigType, serializeConfig);
+                        length += GetMemberLength(memberObject, member.MemberType, serializerOption);
                     }
                 }
+
                 return length;
             }
 
-            public static int GetMemberLength(object memberObject, Type type, SerializeConfig serializeConfig)
+            public static int GetMemberLength(object memberObject, Type type, SerializerOption serializerOption)
             {
                 if (type.IsPrimitive)
                 {
@@ -50,28 +48,32 @@ namespace ZincFramework
                 {
                     return 4;
                 }
+                else if (memberObject is Color)
+                {
+                    return 16;
+                }
                 //对字典进行长度测量
                 else if (memberObject is IDictionary dictionary)
                 {
-                    return GetDictionaryLength(dictionary, type, serializeConfig);
+                    return GetDictionaryLength(dictionary, type, serializerOption);
                 }
                 //对普通数据集合进行长度测量
                 else if (memberObject is ICollection collection)
                 {
-                    return GetCollectionLength(collection, type, serializeConfig);
+                    return GetCollectionLength(collection, type, serializerOption);
                 }
                 //对哈希集合进行长度测量
                 else if (type.IsGenericType && memberObject is IEnumerable set)
                 {
-                    return GetHashSetLength(set, type, serializeConfig);
+                    return GetHashSetLength(set, type, serializerOption);
                 }
                 else
                 {
-                    return GetTypeLength(memberObject, type, serializeConfig);
+                    return GetTypeLength(memberObject, type, serializerOption);
                 }
             }
 
-            private static int GetDictionaryLength(IDictionary dictionary, Type dictionaryType, SerializeConfig serializeConfig)
+            private static int GetDictionaryLength(IDictionary dictionary, Type dictionaryType, SerializerOption serializerOption)
             {
                 Type keyType = dictionaryType.GenericTypeArguments[0];
                 Type valueType = dictionaryType.GenericTypeArguments[1];
@@ -86,7 +88,7 @@ namespace ZincFramework
                 {
                     foreach (object key in dictionary.Keys)
                     {
-                        length += GetMemberLength(key, keyType, serializeConfig);
+                        length += GetMemberLength(key, keyType, serializerOption);
                     }
 
                     return ByteUtility.GetPrimitiveLength(valueType) * dictionary.Count + length;
@@ -96,7 +98,7 @@ namespace ZincFramework
                 {
                     foreach (object value in dictionary.Values)
                     {
-                        length += GetMemberLength(value, valueType, serializeConfig);
+                        length += GetMemberLength(value, valueType, serializerOption);
                     }
 
                     return ByteUtility.GetPrimitiveLength(keyType) * dictionary.Count + length;
@@ -104,13 +106,13 @@ namespace ZincFramework
 
                 foreach (object key in dictionary.Keys)
                 {
-                    length += GetMemberLength(dictionary[key], valueType, serializeConfig) + GetMemberLength(key, keyType, serializeConfig);
+                    length += GetMemberLength(dictionary[key], valueType, serializerOption) + GetMemberLength(key, keyType, serializerOption);
                 }
 
                 return length;
             }
 
-            private static int GetCollectionLength(ICollection collection, Type collectionType, SerializeConfig serializeConfig)
+            private static int GetCollectionLength(ICollection collection, Type collectionType, SerializerOption serializerOption)
             {
                 int length = 2;
                 Type genericType = collectionType.IsArray ? collectionType.GetElementType() : collectionType.GenericTypeArguments[0];
@@ -124,28 +126,29 @@ namespace ZincFramework
                 {
                     for (int i = 0;i < list.Count; i++)
                     {
-                        length += GetMemberLength(list[i], genericType, serializeConfig);
+                        length += GetMemberLength(list[i], genericType, serializerOption);
                     }
                 }
                 else
                 {
                     foreach (object obj in collection)
                     {
-                        length += GetMemberLength(obj, genericType, serializeConfig);
+                        length += GetMemberLength(obj, genericType, serializerOption);
                     }
                 }
                 return length;
             }
 
-            private static int GetHashSetLength(IEnumerable set, Type hashSetType, SerializeConfig serializeConfig)
+            private static int GetHashSetLength(IEnumerable set, Type hashSetType, SerializerOption serializerOption)
             {
                 int length = 2;
                 Type genericType = hashSetType.GenericTypeArguments[0];
 
                 foreach (object value in set)
                 {
-                    length += GetMemberLength(value, genericType, serializeConfig);
+                    length += GetMemberLength(value, genericType, serializerOption);
                 }
+
                 return length;
             }
         }

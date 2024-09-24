@@ -5,7 +5,7 @@ using ZincFramework.Events;
 
 namespace ZincFramework
 {
-    namespace CompnentPool
+    namespace DataPool
     {
         /// <summary>
         /// 组件池, 用来反复利用某一个组件
@@ -14,7 +14,7 @@ namespace ZincFramework
         {
             private readonly Dictionary<Type, ComponentPool> _componentPoolInfos = new Dictionary<Type, ComponentPool>();
 
-            private int _defaultMaxCount => FrameworkData.Shared.maxPoolCount;
+            private int _defaultMaxCount => FrameworkConsole.Instance.SharedData.maxPoolCount;
             private ComponentPoolManager() { }
 
             public T RentComponent<T>(int maxCount = -1) where T : Component

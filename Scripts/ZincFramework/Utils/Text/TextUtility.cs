@@ -1,5 +1,10 @@
 using System;
+using System.Collections;
 using System.Text;
+using System.Text.RegularExpressions;
+using UnityEngine;
+using ZincFramework.DataPool;
+using ZincFramework.Events;
 
 
 namespace ZincFramework
@@ -8,9 +13,65 @@ namespace ZincFramework
     {
         private static readonly StringBuilder _result = new StringBuilder(30);
 
-        public static string UpperFirstString(string value)
+        private static readonly StringBuilder _dialogueText = new StringBuilder(30);
+
+
+        //提取出字符串开头的数字部分
+        public static int SubHeadNumber(string str)
         {
-            if(_result.Length != 0)
+            int index = 0;
+            if (!char.IsNumber(str[index]) && str[index++] != '-')
+            {
+                return int.MinValue;
+            }
+
+            while (char.IsNumber(str[index]))
+            {
+                index++;
+            }
+
+            ReadOnlySpan<char> chars = str;
+            return int.TryParse(chars[..index], out var result) ? result : int.MaxValue;
+        }
+
+        public static Coroutine ShowTextStep(string showText, float offset, ZincAction<string> callback, ZincAction endCallback = null)
+        {
+            return MonoManager.Instance.StartCoroutine(ShowTextStep(showText, offset, callback, endCallback));
+
+            IEnumerator ShowTextStep(string showText, float offset, ZincAction<string> callback, ZincAction endCallback)
+            {
+                ReuseableWait reuseableWait = DataPoolManager.RentInfo(() => new ReuseableWait(offset));
+
+                for (int i = 0; i < showText.Length; i++)
+                {
+                    callback?.Invoke(showText[..i]);
+                    yield return reuseableWait.WaitForSeconds;
+                }
+
+                callback?.Invoke(showText);
+                DataPoolManager.ReturnInfo<ReuseableWait>(reuseableWait);
+                endCallback?.Invoke();
+            }
+        }
+
+
+        public static IEnumerator SliceTextStepRealTime(string showText, float offset, ZincAction<string> callback, ZincAction endCallback = null)
+        {
+            ReuseableRealWait reuseableRealWait = DataPoolManager.RentInfo(() => new ReuseableRealWait(offset));
+
+            for (int i = 0; i < showText.Length; i++)
+            {
+                callback?.Invoke(showText[..i]);
+                yield return reuseableRealWait.WaitForSecondsRealtime;
+            }
+
+            DataPoolManager.ReturnInfo<ReuseableRealWait>(reuseableRealWait);
+            endCallback?.Invoke();
+        }
+
+        public static string UpperFirstChar(string value)
+        {
+            if (_result.Length != 0)
             {
                 _result.Clear();
             }
@@ -21,7 +82,7 @@ namespace ZincFramework
             return _result.ToString();
         }
 
-        public static string LowerFirstString(string value)
+        public static string LowerFirstChar(string value)
         {
             if (_result.Length != 0)
             {
@@ -29,7 +90,7 @@ namespace ZincFramework
             }
 
             _result.Append(value);
-            char.ToLower(_result[0]);
+            _result[0] = char.ToLower(_result[0]);
 
             return _result.ToString();
         }
@@ -160,6 +221,7 @@ namespace ZincFramework
             {
                 _result.Clear();
             }
+
             _result.Append(str);
             switch (symbols)
             {

@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UI;
 using ZincFramework.Writer;
 
@@ -32,7 +31,7 @@ namespace ZincFramework
                             cSharpWriter.WriteNamespace(uIConfig.Namespaces.ToArray());
                             cSharpWriter.BeginWriteClass(count, uIConfig.ClassNamespaces, null, className.Replace("Base", string.Empty), parents: new string[] { className + "Base" });
 
-                            cSharpWriter.WriteMethod(count + 1, "Initialize", "void", CSharpWriter.Modifiers.Override, null, _baseStatement, access: "protected");
+                            cSharpWriter.WriteMethod(count + 1, "Initialize", "void", CSharpWriter.Modifiers.Override, null, _baseStatement);
 
                             cSharpWriter.WriteMethod(count + 1, "AddEvent", "void", CSharpWriter.Modifiers.Override, null, null, access: "protected");
                             cSharpWriter.EndWriteClass(count, count > 0);
@@ -56,7 +55,7 @@ namespace ZincFramework
                         cSharpWriter.BeginWriteClass(count, uIConfig.ClassNamespaces, CSharpWriter.Modifiers.Abstract, className + "Base", parents: uIConfig.Parents);
 
                         string[] statements = CreateFields(cSharpWriter, count + 1, allBehaviors);
-                        cSharpWriter.WriteMethod(count + 1, "Initialize", "void", CSharpWriter.Modifiers.Override, null, statements, access: "protected");
+                        cSharpWriter.WriteMethod(count + 1, "Initialize", "void", CSharpWriter.Modifiers.Override, null, statements);
 
                         cSharpWriter.EndWriteClass(count, count > 0);
                     }
@@ -87,12 +86,18 @@ namespace ZincFramework
 
                 for (int i = 0; i < selectables.Count; i++)
                 {
-                    fieldName = '_' + selectables[i].name;
+                    fieldName = TextUtility.UpperFirstChar(selectables[i].name);
+
+                    if(selectables[i] is Scrollbar)
+                    {
+                        continue;
+                    }
+
                     if (!fields.Contains(fieldName))
                     {
                         typeName = selectables[i].GetType().Name;
-                        cSharpWriter.WriteAttribute(count, nameof(SerializeField));
-                        cSharpWriter.WriteField(count, fieldName, typeName, "protected");
+                        cSharpWriter.WriteAutoProperty(count, typeName, fieldName, CSharpWriter.Accessors.Public, CSharpWriter.Accessors.Protected);
+                        cSharpWriter.WriteLine();
 
                         statements[i] = UIMethodWriter.GetMethodStatement(fieldName, typeName);
                         fields.Add(fieldName);

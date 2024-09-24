@@ -14,6 +14,8 @@ namespace ZincFramework
             {
                 public string Title { get; set; }
 
+                public float Width { get; set; }
+
                 public event ZincAction OnClick;
 
                 public EditorButton(string title)
@@ -21,10 +23,14 @@ namespace ZincFramework
                     Title = title;
                 }
 
-                public EditorButton(string title, ZincAction onclick)
+                public EditorButton(string title, ZincAction onclick) : this(title)
                 {
-                    Title = title;
                     OnClick += onclick;
+                }
+
+                public EditorButton(string title, float width, ZincAction onclick) : this(title, onclick)
+                {
+                    Width = width;
                 }
 
                 public void OnGUI()

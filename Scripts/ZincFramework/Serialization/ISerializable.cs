@@ -1,10 +1,8 @@
-using System;
-
 namespace ZincFramework
 {
     namespace Serialization
     {
-        [ZincSerializable()]
+        [BinarySerializable()]
         public interface ISerializable
         {
             byte[] Serialize();
@@ -13,7 +11,7 @@ namespace ZincFramework
         }
 
 
-        [ZincSerializable()]
+        [BinarySerializable()]
         public interface ISerializable<out T> : ISerializable
         {
 

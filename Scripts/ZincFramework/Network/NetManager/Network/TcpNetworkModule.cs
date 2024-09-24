@@ -30,8 +30,8 @@ namespace ZincFramework
                 public TcpNetworkModule()
                 {
                     _receiveBytes = new byte[_bufferSize];
-                    string address = FrameworkData.Shared.remoteAddress;
-                    short port = FrameworkData.Shared.remotePort;
+                    string address = FrameworkConsole.Instance.SharedData.remoteAddress;
+                    short port = FrameworkConsole.Instance.SharedData.remotePort;
 
                     _serverEndPoint = new IPEndPoint(IPAddress.Parse(address), port);
                 }

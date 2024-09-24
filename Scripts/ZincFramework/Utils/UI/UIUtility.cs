@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 namespace ZincFramework
@@ -7,6 +9,17 @@ namespace ZincFramework
     {
         public static class UIUtility
         {
+            public static IEnumerator FadeUI(Graphic graphicUI, int fadeTime)
+            {
+                for (float i = 0; i < 1 * fadeTime; i += Time.deltaTime) 
+                {
+                    float a = Mathf.Lerp(0, 1, i / fadeTime);
+                    Color c = graphicUI.color;
+                    graphicUI.color = new Color(c.r, c.g, c.b, a);
+                    yield return null;
+                }
+            }
+
             public static Vector2 WorldPointToScreen(Camera camera, RectTransform root, Transform point, float xOffset = 0, float yOffset = 0)
             {
                 Vector2 viewPoint = camera.WorldToViewportPoint(point.position);

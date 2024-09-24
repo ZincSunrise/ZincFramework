@@ -25,9 +25,9 @@ namespace ZincFramework
 
                 public static IEnumerableHandler GetEnumerableHandler(string classType, string type, int indentSize) => type switch
                 {
-                    "linkedList" or "list" or "queue" or "hashSet" or "stack" => new CollecionHandler(GetMethod(type), classType, TextUtility.UpperFirstString(type), indentSize),
-                    "array" => new ArrayHandler(GetMethod(type), classType, TextUtility.UpperFirstString(type), indentSize),
-                    "dictionary" => new DictionaryHandler(GetMethod(type), classType, TextUtility.UpperFirstString(type), indentSize),
+                    "linkedList" or "list" or "queue" or "hashSet" or "stack" => new CollecionHandler(GetMethod(type), classType, TextUtility.UpperFirstChar(type), indentSize),
+                    "array" => new ArrayHandler(GetMethod(type), classType, TextUtility.UpperFirstChar(type), indentSize),
+                    "dictionary" => new DictionaryHandler(GetMethod(type), classType, TextUtility.UpperFirstChar(type), indentSize),
                     _ => throw new NotSupportedException(type + "该类不受支持！")
                 };
 

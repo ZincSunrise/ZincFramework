@@ -26,7 +26,7 @@ namespace ZincFramework
         private readonly float _intervalCheckTime = 0.05f;
         private TimerManager()
         {
-            _intervalCheckTime = FrameworkData.Shared.intervalCheckTime;
+            _intervalCheckTime = FrameworkConsole.Instance.SharedData.intervalCheckTime;
             _gameWait = new WaitForSeconds(_intervalCheckTime);
             _realWait = new WaitForSecondsRealtime(_intervalCheckTime);
         }
@@ -82,7 +82,7 @@ namespace ZincFramework
             }
 
             _timerId++;
-            TimerItem item = DataPoolManager.Instance.RentInfo<TimerItem>();
+            TimerItem item = DataPoolManager.RentInfo<TimerItem>();
             item.Initialize((int)_timerId, offsetTime, isLoop, overAction, intervalTime, intervalAction);
 
             if (isRealTimer)
@@ -99,15 +99,16 @@ namespace ZincFramework
 
         public void RemoveTimer(int id)
         {
+            StopTimer(id);
             if (_gameTimerDic.TryGetValue(id, out TimerItem timerItem))
             {
                 _gameTimerDic.Remove(id);
-                DataPoolManager.Instance.ReturnInfo(timerItem);
+                DataPoolManager.ReturnInfo(timerItem);
             }
             else if (_realTimerDic.TryGetValue(id, out timerItem))
             {
                 _realTimerDic.Remove(id);
-                DataPoolManager.Instance.ReturnInfo(timerItem);
+                DataPoolManager.ReturnInfo(timerItem);
             }
         }
 

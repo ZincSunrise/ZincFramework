@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using ZincFramework.DataPool;
 
 
 namespace ZincFramework
 {
-    namespace CompnentPool
+    namespace DataPool
     {
         internal class ComponentPool : ObjectPool<Component>
         {
@@ -22,9 +21,9 @@ namespace ZincFramework
             public override Component RentValue()
             {
                 Component component;
-                if (_cacheValues.Count > 0)
+                if (_unuseValues.Count > 0)
                 {
-                    component = _cacheValues.Dequeue();
+                    component = _unuseValues.Dequeue();
                 }
                 else if (_usingComponent.Count >= MaxCount)
                 {
@@ -55,7 +54,7 @@ namespace ZincFramework
                     behaviour.enabled = false;
                 }
                 _usingComponent.Dequeue();
-                _cacheValues.Enqueue(component);
+                _unuseValues.Enqueue(component);
             }
 
             public override void Dispose()

@@ -56,7 +56,10 @@ namespace ZincFramework
 
             public override void Excute()
             {
-                _inputEvent.Invoke(KeyCode);
+                if (Input.GetKeyDown(KeyCode))
+                {
+                    _inputEvent.Invoke(KeyCode);
+                }
             }
         }
     }
