@@ -13,12 +13,6 @@ namespace ZincFramework.Binary.Serialization.Factory
             return _converterMaps[customType];
         }
 
-
-        internal override BinaryConverter<T> GetConverter<T>(SerializerOption serializerOption)
-        {
-            return _converterMaps[typeof(T)] as BinaryConverter<T>;
-        }
-
         public void AddConverter(Type customType, BinaryConverter converter) 
         {
             _converterMaps.Add(customType, converter);

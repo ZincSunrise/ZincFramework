@@ -9,6 +9,7 @@ namespace ZincFramework.Binary.Serialization.Metadata
     public abstract partial class BinaryTypeInfo
     {
         protected readonly SerializerOption _serializerOption;
+        public int MemberCount => _metaInfo.SerializableInfo.Count;
 
         //存储自身底下的所有字段和属性的类
         private class MetaInfo
@@ -22,6 +23,7 @@ namespace ZincFramework.Binary.Serialization.Metadata
             public MetaInfo(Type type)
             {
                 IsConstantStruct = type.IsDefined(typeof(SequentialStruct));
+
             }
 
             public void AddIgnore(BinaryMemberInfo binaryMemberInfo)

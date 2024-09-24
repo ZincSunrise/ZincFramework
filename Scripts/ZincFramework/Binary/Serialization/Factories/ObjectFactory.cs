@@ -15,11 +15,6 @@ namespace ZincFramework.Binary.Serialization.Factory
             return binaryConverter;
         }
 
-        internal override BinaryConverter<T> GetConverter<T>(SerializerOption serializerOption)
-        {
-            return new DefaultObjectConverter<T>();
-        }
-
         internal override ConvertStrategy GetStrategy() => ConvertStrategy.Object;
 
         internal override bool IsSerializable(Type type) => !typeof(IEnumerable).IsAssignableFrom(type);

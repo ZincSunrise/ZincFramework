@@ -7,10 +7,11 @@ namespace ZincFramework.Binary.Serialization.Converters
             int length = SimpleConverters.Int32Converter.Convert(ref byteReader, serializerOption);
             T[] array = new T[length];
 
-            BinaryConverter<T> binaryConverter = serializerOption.GetTypeInfo<T>().WrapperConverter;
+            _elementTypeInfo ??= GetElementTypeInfo(serializerOption);
+
             for (int i = 0; i < length; i++) 
             {
-                array[i] = binaryConverter.Convert(ref byteReader, serializerOption);
+                array[i] = _elementTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption);
             }
 
             return array;
@@ -19,11 +20,11 @@ namespace ZincFramework.Binary.Serialization.Converters
         public override void Write(T[] data, ByteWriter byteWriter, SerializerOption serializerOption)
         {
             SimpleConverters.Int32Converter.Write(data.Length, byteWriter, serializerOption);
-            BinaryConverter<T> binaryConverter = serializerOption.GetTypeInfo<T>().WrapperConverter;
+            _elementTypeInfo ??= GetElementTypeInfo(serializerOption);
 
             for (int i = 0; i < data.Length; i++) 
             {
-                binaryConverter.Write(data[i], byteWriter, serializerOption);
+                _elementTypeInfo.WrapperConverter.Write(data[i], byteWriter, serializerOption);
             }
         }
     }

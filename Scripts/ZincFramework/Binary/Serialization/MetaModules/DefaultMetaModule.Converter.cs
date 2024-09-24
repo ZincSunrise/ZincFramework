@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using ZincFramework.Binary.Serialization.Converters;
 using ZincFramework.Binary.Serialization.Factory;
 using ZincFramework.Binary.Serialization.Metadata;
@@ -33,6 +35,7 @@ namespace ZincFramework.Binary.Serialization.MetaModule
                         if (_factories[i].IsSerializable(type))
                         {
                             binaryConverter = _factories[i].GetConverter(type, serializerOption);
+                            break;
                         }
                     }
                 }
@@ -57,7 +60,8 @@ namespace ZincFramework.Binary.Serialization.MetaModule
                     {
                         if (_factories[i].IsSerializable(type))
                         {
-                            binaryConverter = _factories[i].GetConverter<T>(serializerOption);
+                            binaryConverter = _factories[i].GetConverter(typeof(T), serializerOption);
+                            break;
                         }
                     }
                 }

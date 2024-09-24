@@ -37,6 +37,14 @@ namespace ZincFramework.Binary.Serialization
 
             public TypeValueKind TypeValueKind { get; }
 
+
+            public BinaryTypeInfo KeyTypeInfo { get; set; }
+
+            public BinaryTypeInfo ValueTypeInfo { get; set; }
+
+            public BinaryTypeInfo ElementTypeInfo { get; set; }
+
+
             internal BinaryTypeInfo(Type cacheType, BinaryConverter binaryConverter, SerializerOption serializerOption)
             {
                 CacheType = cacheType;
@@ -57,6 +65,7 @@ namespace ZincFramework.Binary.Serialization
             {
                 UnTypedConstructor = factory;
             }
+
             public object CreateInstance()
             {
                 return UnTypedConstructor?.Invoke();

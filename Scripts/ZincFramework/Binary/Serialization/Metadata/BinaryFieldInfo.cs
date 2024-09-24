@@ -13,8 +13,9 @@ namespace ZincFramework.Binary.Serialization
 
             public new Action<object, T> SetAction { get; set; }
 
-            public BinaryFieldInfo(int ordinalNumber, BinaryTypeInfo onwerType, MemberInfo memberInfo, SerializerOption serializerOption) : base(ordinalNumber, onwerType, memberInfo, serializerOption)
+            public BinaryFieldInfo(BinaryTypeInfo onwerType, MemberInfo memberInfo, SerializerOption serializerOption) : base(onwerType, memberInfo, serializerOption)
             {
+
             }
 
             public FieldInfo FieldInfo => MemberInfo as FieldInfo;
@@ -29,9 +30,9 @@ namespace ZincFramework.Binary.Serialization
                 throw new NotImplementedException();
             }
 
-            internal override void ConfigureConverter()
+            internal override void ConfigureConverter(int ordinalNumber)
             {
-                throw new NotImplementedException();
+                OrdinalNumber = ordinalNumber;
             }
 
             internal override void GetAccessorDelegates()

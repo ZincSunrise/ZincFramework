@@ -8,8 +8,6 @@ namespace ZincFramework.Binary.Serialization.Factory
 
         internal abstract BinaryConverter GetConverter(Type customType, SerializerOption serializerOption);
 
-        internal abstract BinaryConverter<T> GetConverter<T>(SerializerOption serializerOption);
-
         internal abstract bool IsSerializable(Type type); 
     }
 }

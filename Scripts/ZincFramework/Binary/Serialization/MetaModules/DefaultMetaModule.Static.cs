@@ -34,12 +34,7 @@ namespace ZincFramework.Binary.Serialization.MetaModule
         {
             BinaryTypeInfo binaryTypeInfo = BinaryTypeInfo.CreateTypeInfo(type, binaryConverter, serializerOption);
 
-            if (binaryTypeInfo.TypeValueKind == TypeValueKind.Object)
-            {
-                binaryTypeInfo.SetConstructor(AccessorsProvider.GetConstructor(type));
-                PopulateProperty(binaryTypeInfo, serializerOption);
-            }
-
+            ConfigTypeInfo(binaryTypeInfo, serializerOption);
             return binaryTypeInfo;
         }
 
@@ -49,14 +44,29 @@ namespace ZincFramework.Binary.Serialization.MetaModule
                 BinaryTypeInfo.CreateTypeInfo<T>(factory, binaryConverter, serializerOption) : 
                 BinaryTypeInfo.CreateTypeInfo<T>(binaryConverter, serializerOption);
 
+            ConfigTypeInfo(binaryTypeInfo, serializerOption);
+            return binaryTypeInfo;
+        }
 
+        private static void ConfigTypeInfo(BinaryTypeInfo binaryTypeInfo, SerializerOption serializerOption)
+        {
+            Type type = binaryTypeInfo.CacheType;
             if (binaryTypeInfo.TypeValueKind == TypeValueKind.Object)
             {
-                binaryTypeInfo.SetConstructor(AccessorsProvider.GetConstructor(typeof(T)));
+                binaryTypeInfo.SetConstructor(AccessorsProvider.GetConstructor(type));
                 PopulateProperty(binaryTypeInfo, serializerOption);
             }
-
-            return binaryTypeInfo;
+            else if (binaryTypeInfo.TypeValueKind == TypeValueKind.Dictionary)
+            {
+                Type[] genericTypes = type.GetGenericArguments();
+                binaryTypeInfo.KeyTypeInfo = serializerOption.GetTypeInfo(genericTypes[0]);
+                binaryTypeInfo.ValueTypeInfo = serializerOption.GetTypeInfo(genericTypes[1]);
+            }
+            else if (binaryTypeInfo.TypeValueKind == TypeValueKind.Enumerable)
+            {
+                Type genericType = !type.IsArray ? type.GetGenericArguments()[0] : type.GetElementType();
+                binaryTypeInfo.ElementTypeInfo = serializerOption.GetTypeInfo(genericType);
+            }
         }
 
         private static void PopulateProperty(BinaryTypeInfo binaryTypeInfo, SerializerOption serializerOption)
@@ -75,7 +85,7 @@ namespace ZincFramework.Binary.Serialization.MetaModule
             {
                 if (propertyInfos[i].PropertyType.IsAbstract || propertyInfos[i].PropertyType.IsInterface)
                 {
-                    throw new NotSupportedException($"不支持对接口类型和抽象类型的序列化,类型为{type.Name}");
+                    throw new NotSupportedException($"不支持对接口类型和抽象类型的序列化,类型为{type.Name}的{propertyInfos[i].PropertyType.Name}");   
                 }
 
                 if (propertyInfos[i].GetMethod?.IsPublic == true ||
@@ -89,8 +99,9 @@ namespace ZincFramework.Binary.Serialization.MetaModule
                         //创建Get和Set函数
                         binaryMemberInfo.GetAccessorDelegates();
                         //创建自己的转换器
-                        binaryMemberInfo.ConfigureConverter();
 
+                        int ordinalNumber = serializerOption.IsGiveupOrdinal ? binaryTypeInfo.MemberCount : propertyInfos[i].GetCustomAttribute<BinaryOrdinal>().OrdinalNumber;
+                        binaryMemberInfo.ConfigureConverter(ordinalNumber);
                         binaryTypeInfo.AddUsingProperty(binaryMemberInfo);
                     }
                     else

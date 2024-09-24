@@ -14,9 +14,17 @@ namespace ZincFramework
         {
             public partial class SerializerOption
             {
-                public static SerializerOption Default { get; } = new SerializerOption() { IsGiveupOrdinal = true };
+                public static SerializerOption Default { get; } = new SerializerOption() 
+                { 
+                    IsGiveupOrdinal = true 
+                };
 
-                public static SerializerOption Message { get; } = new SerializerOption() { Encoding = Encoding.UTF8 };
+                public static SerializerOption Message { get; } = new SerializerOption()
+                { 
+                    Encoding = Encoding.UTF8,
+                    IsGiveupOrdinal = false,
+                    IsUsingVarint = true
+                };
 
                 
                 public IList<BinaryConverter> Converters 

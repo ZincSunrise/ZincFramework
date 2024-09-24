@@ -52,15 +52,13 @@ namespace ZincFramework.Binary.Serialization.Metadata
 
         private protected override BinaryMemberInfo CreatePropertyInfoInternal(MemberInfo memberInfo, Type memberType, SerializerOption serializerOption)
         {
-            int ordianalNumber = serializerOption.IsGiveupOrdinal ? memberInfo.GetCustomAttribute<BinaryOrdinal>().OrdinalNumber : MemberInfos.Count;
-
             if(memberInfo is PropertyInfo)
             {
-                return new BinaryPropertyInfo<T>(ordianalNumber, this, memberInfo, serializerOption);
+                return new BinaryPropertyInfo<T>(this, memberInfo, serializerOption);
             }
             else if (memberInfo is FieldInfo)
             {
-                return new BinaryFieldInfo<T>(ordianalNumber, this, memberInfo, serializerOption);
+                return new BinaryFieldInfo<T>(this, memberInfo, serializerOption);
             }
 
             return null;

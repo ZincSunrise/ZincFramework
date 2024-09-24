@@ -12,11 +12,6 @@ namespace ZincFramework.Binary.Serialization.Factory
             return Activator.CreateInstance(genericType) as BinaryConverter;
         }
 
-        internal override BinaryConverter<T> GetConverter<T>(SerializerOption serializerOption)
-        {
-            Type genericType = typeof(SubstantialConverter<>).MakeGenericType(typeof(T));
-            return Activator.CreateInstance(genericType) as BinaryConverter<T>;
-        }
 
         internal override ConvertStrategy GetStrategy() => ConvertStrategy.Substantial;
 

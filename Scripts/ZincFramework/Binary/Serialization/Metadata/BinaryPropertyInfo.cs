@@ -11,7 +11,7 @@ namespace ZincFramework.Binary.Serialization
     {
         public abstract class BinaryPropertyInfo : BinaryMemberInfo
         {
-            protected BinaryPropertyInfo(int ordinalNumber, BinaryTypeInfo onwerType, MemberInfo memberInfo, SerializerOption serializerOption) : base(ordinalNumber, onwerType, memberInfo, serializerOption)
+            protected BinaryPropertyInfo(BinaryTypeInfo onwerType, MemberInfo memberInfo, SerializerOption serializerOption) : base(onwerType, memberInfo, serializerOption)
             {
 
             }

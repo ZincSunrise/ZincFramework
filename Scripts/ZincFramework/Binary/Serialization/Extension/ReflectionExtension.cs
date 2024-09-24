@@ -1,38 +1,26 @@
 using System;
 using System.Reflection;
 using ZincFramework.Serialization;
+using static GameSystem.ThreePuzzle.GameTile.BaseTile;
 
 
 namespace ZincFramework.Binary.Serialization
 {
     public static class ReflectionExtension 
     {
-        public static bool TryGetConstructor(this Type type, out ConstructorInfo constructorInfo)
+        public static bool TryGetDefination(this Type type, Type targetType)
         {
-            ConstructorInfo[] constructorInfos = type.GetConstructors();
-
-
-            int nowWeight = int.MinValue;
-            constructorInfo = null;
-            for (int i = 0; i < constructorInfos.Length; i++) 
+            while (type != typeof(object) || type != null) 
             {
-                if (constructorInfos[i].IsDefined(typeof(BinaryConstructor)))
+                if (type.GetGenericTypeDefinition() == targetType)
                 {
-                    BinaryConstructor binaryConstructor = constructorInfos[i].GetCustomAttribute<BinaryConstructor>();
-                    if(constructorInfo == null)
-                    {
-                        constructorInfo = constructorInfos[i];
-                        nowWeight = binaryConstructor.Weight;
-                    }
-                    else
-                    {
-                        constructorInfo = nowWeight < binaryConstructor.Weight ? 
-                            constructorInfos[i] : constructorInfo;
-                    }
+                    return true;
                 }
+
+                type = type.BaseType;
             }
 
-            return constructorInfo == null;
+            return false;
         }
     }
 }

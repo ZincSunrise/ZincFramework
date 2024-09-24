@@ -18,7 +18,7 @@ namespace ZincFramework.Binary.Serialization
 
             public MemberInfo MemberInfo { get;  }
 
-            public int OrdinalNumber { get; }
+            public int OrdinalNumber { get; protected set; }
 
             public virtual Type MemberType { get; }
 
@@ -51,15 +51,14 @@ namespace ZincFramework.Binary.Serialization
 
             protected SerializerOption _serializeOption;
 
-            public BinaryMemberInfo(int ordinalNumber, BinaryTypeInfo onwerType, MemberInfo memberInfo, SerializerOption serializerOption)
+            public BinaryMemberInfo(BinaryTypeInfo onwerType, MemberInfo memberInfo, SerializerOption serializerOption)
             {
-                OrdinalNumber = ordinalNumber;
                 OnwerTypeInfo = onwerType;
                 MemberInfo = memberInfo;
                 _serializeOption = serializerOption;
             }
 
-            internal abstract void ConfigureConverter();
+            internal abstract void ConfigureConverter(int ordinalNumber);
 
             public abstract void GetAsObjectAndWrite(object obj, ByteWriter byteWriter, SerializerOption serializerOption);
 

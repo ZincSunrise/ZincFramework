@@ -38,7 +38,7 @@ namespace ZincFramework.Binary.Serialization
             private Action<object, T> _setAction;
 
 
-            public BinaryPropertyInfo(int ordinalNumber, BinaryTypeInfo onwerType, MemberInfo memberInfo, SerializerOption serializerOption) : base(ordinalNumber, onwerType, memberInfo, serializerOption)
+            public BinaryPropertyInfo(BinaryTypeInfo onwerType, MemberInfo memberInfo, SerializerOption serializerOption) : base(onwerType, memberInfo, serializerOption)
             {
                 _wrapperConverter = new WrapperConverter<T>(Converter);
             }
@@ -101,8 +101,9 @@ namespace ZincFramework.Binary.Serialization
                 }
             }
 
-            internal override void ConfigureConverter()
+            internal override void ConfigureConverter(int ordinalNumber)
             {
+                OrdinalNumber = ordinalNumber;
                 var typeInfo = _serializeOption.GetTypeInfo<T>();
                 _binaryTypeInfo = typeInfo;
 
