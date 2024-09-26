@@ -4,7 +4,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class BooleanConverter : SimpleValueConverter<bool>
     {
-        public override bool Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override bool Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return byteReader.ReadBoolean();
         }

@@ -1,7 +1,5 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using ZincFramework.Binary.Serialization.Converters;
 using ZincFramework.Binary.Serialization.Factory;
 using ZincFramework.Binary.Serialization.Metadata;
@@ -17,7 +15,7 @@ namespace ZincFramework.Binary.Serialization.MetaModule
 
         private static Dictionary<Type, BinaryConverter> _converterMaps;
 
-        internal static bool IsSubstantial(Type type) => type.IsValueType && (_converterMaps.ContainsKey(type) || typeof(IFormattable).IsAssignableFrom(type) || typeof(ISubstantiable).IsAssignableFrom(type));
+        internal static bool IsSubstantial(Type type) => type.IsValueType && (_converterMaps.ContainsKey(type) || typeof(ISubstantiable).IsAssignableFrom(type));
 
         public BinaryConverter GetConverterFromType(Type type, SerializerOption serializerOption)
         {

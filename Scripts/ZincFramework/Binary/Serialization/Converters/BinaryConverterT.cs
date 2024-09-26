@@ -16,9 +16,9 @@ namespace ZincFramework
 
                 public override void WriteAsObject(object data, ByteWriter byteWriter, SerializerOption serializerOption) => Write((T)data, byteWriter, serializerOption);
 
-                public override object ConvertAsObject(ref ByteReader byteReader, SerializerOption serializerOption) => Convert(ref byteReader, serializerOption);
+                public override object ConvertAsObject(ref ByteReader byteReader, SerializerOption serializerOption) => Read(ref byteReader, serializerOption);
 
-                public abstract T Convert(ref ByteReader byteReader, SerializerOption serializerOption);
+                public abstract T Read(ref ByteReader byteReader, SerializerOption serializerOption);
 
                 public abstract void Write(T data, ByteWriter byteWriter, SerializerOption serializerOption);
             }

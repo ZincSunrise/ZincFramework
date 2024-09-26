@@ -5,7 +5,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class ConcurrentDictionaryConverter<TKey, TValue> : IDictionaryConverter<ConcurrentDictionary<TKey, TValue>, TKey, TValue>
     {
-        public override ConcurrentDictionary<TKey, TValue> Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override ConcurrentDictionary<TKey, TValue> Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             int count = byteReader.ReadInt32();
             ConcurrentDictionary<TKey, TValue> dict = new ConcurrentDictionary<TKey, TValue>();
@@ -15,7 +15,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 
             for (int i = 0; i < count; i++)
             {
-                dict.TryAdd(_keyTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption), _valueTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption));
+                dict.TryAdd(_keyTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption), _valueTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption));
             }
 
             return dict;

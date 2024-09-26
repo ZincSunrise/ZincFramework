@@ -2,6 +2,9 @@ using System.Net.Sockets;
 using System.Net;
 using ZincFramework.Network.Protocol;
 using System.Threading.Tasks;
+using ZincFramework.Binary.Serialization;
+using System;
+using System.Runtime.InteropServices;
 
 
 namespace ZincFramework
@@ -27,8 +30,12 @@ namespace ZincFramework
 
                 private Socket _localSocket;
 
+                private ByteWriter _localWriter;
+                private PooledBufferWriter _poolBufferWriter;
+
                 public UdpNetWorkModule()
                 {
+                    _localWriter = ByteWriterPool.GetCachedWriter(SerializerOption.Message, out _poolBufferWriter);    
                     _receiveBytes = new byte[_buffeSize];
                     string address = FrameworkConsole.Instance.SharedData.remoteAddress;
                     short port = FrameworkConsole.Instance.SharedData.remotePort;
@@ -100,7 +107,13 @@ namespace ZincFramework
                 /// </summary>
                 public void SendQuitMassage()
                 {
-                    _localSocket.SendTo(new QuitMessage().Serialize(), _serverEndpoint);
+                    new QuitMessage().Write(_localWriter);
+                    if(MemoryMarshal.TryGetArray<byte>(_poolBufferWriter.WrittenMemory, out var segment))
+                    {
+                        _localSocket.SendTo(segment.Array, 0, 8, SocketFlags.None, _serverEndpoint);
+                    }
+
+                    _poolBufferWriter.Clear();
                 }
             }
         }

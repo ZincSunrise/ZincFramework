@@ -19,8 +19,6 @@ namespace ZincFramework
 
                 public static string FrameworkLoadPath { get; } = Path.Combine("Editor", "ZincFramework");
 
-                public static string ScriptLoadPath  { get; } = Path.Combine("Editor", "ZincFramework", "Scripts");
-
                 public static T LoadAssetAtPath<T>(string name) where T : Object
                 {
 #if UNITY_EDITOR

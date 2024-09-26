@@ -1,17 +1,19 @@
+using ZincFramework.Binary.Serialization;
+
 namespace ZincFramework
 {
     namespace Serialization
     {
-        [BinarySerializable()]
+        [ZincSerializable()]
         public interface ISerializable
         {
-            byte[] Serialize();
+            void Write(ByteWriter byteWriter);
 
-            void Deserialize(byte[] bytes);
+            void Read(ref ByteReader byteReader);
         }
 
 
-        [BinarySerializable()]
+        [ZincSerializable()]
         public interface ISerializable<out T> : ISerializable
         {
 

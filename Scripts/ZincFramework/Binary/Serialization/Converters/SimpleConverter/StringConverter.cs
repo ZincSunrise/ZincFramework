@@ -2,7 +2,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class StringConverter : SimpleValueConverter<string>
     {
-        public override string Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override string Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return byteReader.ReadString();
         }

@@ -52,5 +52,10 @@ namespace ZincFramework.Binary.Serialization.MetaModule
 
             return (getter, setter);
         }
+
+        public Action<TList, int> SetSizeField<TList>(FieldInfo fieldInfo)
+        {
+            return (list, size) => fieldInfo.SetValue(list, size);
+        }
     }
 }

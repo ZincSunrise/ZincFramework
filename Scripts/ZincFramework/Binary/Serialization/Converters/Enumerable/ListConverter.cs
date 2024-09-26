@@ -6,7 +6,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class ListConverter<T> : IListConverterOfT<List<T>, T>
     {
-        public override List<T> Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override List<T> Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             int count = byteReader.ReadInt32();
 
@@ -15,7 +15,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 
             for (int i = 0; i < count; i++) 
             {
-                list.Add(_elementTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption));
+                list.Add(_elementTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption));
             }
 
             return list;

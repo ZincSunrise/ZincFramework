@@ -2,7 +2,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class SByteConverter : SimpleValueConverter<sbyte>
     {
-        public override sbyte Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override sbyte Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return byteReader.ReadSByte();
         }

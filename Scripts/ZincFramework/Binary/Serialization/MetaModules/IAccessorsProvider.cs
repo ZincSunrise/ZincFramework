@@ -19,6 +19,8 @@ namespace ZincFramework.Binary.Serialization.MetaModule
 
         (Func<TOwner, TValue>, Action<TOwner, TValue>) GetField<TOwner, TValue>(FieldInfo fieldInfo);
 
+        Action<TList, int> SetSizeField<TList>(FieldInfo fieldInfo);
+
         Func<object> GetConstructor(Type type);
     }
 

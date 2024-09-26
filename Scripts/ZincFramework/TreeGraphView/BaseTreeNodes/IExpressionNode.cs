@@ -9,8 +9,6 @@ namespace ZincFramework
         {
             IList<IExpressionInfo<T>> Expressions { get; }
 
-            IExpressionParser<T> Parser { get; }
-
             void AddChild(T child, string expression);
         }
 

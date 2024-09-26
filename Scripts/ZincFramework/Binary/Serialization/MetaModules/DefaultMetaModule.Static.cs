@@ -1,8 +1,7 @@
 using System;
 using System.Reflection;
-using ZincFramework.Binary.Serialization.Metadata;
 using ZincFramework.Serialization;
-
+using ZincFramework.Binary.Serialization.Metadata;
 
 
 namespace ZincFramework.Binary.Serialization.MetaModule
@@ -14,10 +13,10 @@ namespace ZincFramework.Binary.Serialization.MetaModule
             get
             {
 
-                _accessorsProvider ??= Iniatilize();
+                _accessorsProvider ??= Initailize();
                 return _accessorsProvider;
 
-                IAccessorsProvider Iniatilize()
+                IAccessorsProvider Initailize()
                 {
 #if ENABLE_IL2CPP
                     return new ReflectionProvider();
@@ -53,7 +52,11 @@ namespace ZincFramework.Binary.Serialization.MetaModule
             Type type = binaryTypeInfo.CacheType;
             if (binaryTypeInfo.TypeValueKind == TypeValueKind.Object)
             {
-                binaryTypeInfo.SetConstructor(AccessorsProvider.GetConstructor(type));
+                if (binaryTypeInfo.UnTypedConstructor == null)
+                {
+                    binaryTypeInfo.SetConstructor(AccessorsProvider.GetConstructor(type));
+                }
+                
                 PopulateProperty(binaryTypeInfo, serializerOption);
             }
             else if (binaryTypeInfo.TypeValueKind == TypeValueKind.Dictionary)
@@ -83,16 +86,25 @@ namespace ZincFramework.Binary.Serialization.MetaModule
 
             for (int i = 0; i < propertyInfos.Length; i++) 
             {
+                bool isAccurate = false;
                 if (propertyInfos[i].PropertyType.IsAbstract || propertyInfos[i].PropertyType.IsInterface)
                 {
-                    throw new NotSupportedException($"不支持对接口类型和抽象类型的序列化,类型为{type.Name}的{propertyInfos[i].PropertyType.Name}");   
+                    if (propertyInfos[i].IsDefined(typeof(AccurateType)))
+                    {
+                        isAccurate = true;
+                    }
+                    else
+                    {
+                        throw new NotSupportedException($"不支持对未显式指定序列化类型的接口类型和抽象类型的序列化,类型为{type.Name}");
+                    }
                 }
 
                 if (propertyInfos[i].GetMethod?.IsPublic == true ||
                     propertyInfos[i].SetMethod?.IsPublic == true ||
                     propertyInfos[i].IsDefined(typeof(BinaryInclude)))
                 {
-                    BinaryMemberInfo binaryMemberInfo = CreatePropertyInfo(binaryTypeInfo, propertyInfos[i].PropertyType, propertyInfos[i], serializerOption);
+                    Type propertyType = isAccurate ? propertyInfos[i].GetCustomAttribute<AccurateType>().Type : propertyInfos[i].PropertyType;
+                    BinaryMemberInfo binaryMemberInfo = CreateMemberInfo(binaryTypeInfo, propertyType, propertyInfos[i], serializerOption);
 
                     if (!propertyInfos[i].IsDefined(typeof(BinaryIgnore)))
                     {
@@ -102,11 +114,11 @@ namespace ZincFramework.Binary.Serialization.MetaModule
 
                         int ordinalNumber = serializerOption.IsGiveupOrdinal ? binaryTypeInfo.MemberCount : propertyInfos[i].GetCustomAttribute<BinaryOrdinal>().OrdinalNumber;
                         binaryMemberInfo.ConfigureConverter(ordinalNumber);
-                        binaryTypeInfo.AddUsingProperty(binaryMemberInfo);
+                        binaryTypeInfo.AddUsingMember(binaryMemberInfo);
                     }
                     else
                     {
-                        binaryTypeInfo.AddIgnoreProperty(binaryMemberInfo);
+                        binaryTypeInfo.AddIgnoreMember(binaryMemberInfo);
                     }
                 }
             }
@@ -117,27 +129,42 @@ namespace ZincFramework.Binary.Serialization.MetaModule
                 FieldInfo[] fieldInfos = type.GetFields(allMemProperty);
                 for (int i = 0; i < fieldInfos.Length; i++) 
                 {
+                    bool isAccurate = false;
                     if (fieldInfos[i].FieldType.IsAbstract || fieldInfos[i].FieldType.IsInterface)
                     {
-                        throw new NotSupportedException($"不支持对接口类型和抽象类型的序列化,类型为{type.Name}");
+                        if (fieldInfos[i].IsDefined(typeof(AccurateType)))
+                        {
+                            isAccurate = true;
+                        }
+                        else
+                        {
+                            throw new NotSupportedException($"不支持对未显式指定序列化类型的接口类型和抽象类型的序列化,类型为{type.Name}");
+                        }                
                     }
 
-                    if (fieldInfos[i].IsDefined(typeof(BinaryIgnore)))
-                    {
-                        continue;
-                    }
+                    Type fieldType = isAccurate ? fieldInfos[i].GetCustomAttribute<AccurateType>().Type : fieldInfos[i].FieldType;
+                    BinaryMemberInfo binaryFieldInfo = CreateMemberInfo(binaryTypeInfo, fieldType, fieldInfos[i], serializerOption);
 
                     if (fieldInfos[i].IsPublic ||
                         fieldInfos[i].IsDefined(typeof(BinaryInclude)))
                     {
-                        BinaryMemberInfo fieldInfo = CreatePropertyInfo(binaryTypeInfo, propertyInfos[i].PropertyType, propertyInfos[i], serializerOption);
-                        binaryTypeInfo.AddUsingProperty(fieldInfo);
+                        if (!fieldInfos[i].IsDefined(typeof(BinaryIgnore)))
+                        {
+                            binaryFieldInfo.GetAccessorDelegates();
+                            int ordinalNumber = serializerOption.IsGiveupOrdinal ? binaryTypeInfo.MemberCount : fieldInfos[i].GetCustomAttribute<BinaryOrdinal>().OrdinalNumber;
+                            binaryFieldInfo.ConfigureConverter(ordinalNumber);
+                            binaryTypeInfo.AddUsingMember(binaryFieldInfo);
+                        }
+                        else
+                        {
+                            binaryTypeInfo.AddIgnoreMember(binaryFieldInfo);
+                        }
                     }
                 }
             }
         }
 
-        private static BinaryMemberInfo CreatePropertyInfo(BinaryTypeInfo binaryTypeInfo, Type convertType, MemberInfo memberInfo, SerializerOption serializerOption)
+        private static BinaryMemberInfo CreateMemberInfo(BinaryTypeInfo binaryTypeInfo, Type convertType, MemberInfo memberInfo, SerializerOption serializerOption)
         {
             BinaryMemberInfo binaryMemberInfo = binaryTypeInfo.GetMemberInfoReflection(memberInfo, convertType, serializerOption);
 

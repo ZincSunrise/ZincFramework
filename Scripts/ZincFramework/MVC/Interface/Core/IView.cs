@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-
-
-
 namespace ZincFramework
 {
     namespace MVC
@@ -25,7 +21,7 @@ namespace ZincFramework
 
                 void RemoveObserver(string name, object notifiyContext);
 
-                void NotifyObserver(INotification notification);
+                void NotifyObserver(in INotification notification);
             }
         }
     }

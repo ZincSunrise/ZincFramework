@@ -4,7 +4,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class DictionaryConverter<TKey, TValue> : IDictionaryConverter<Dictionary<TKey, TValue>, TKey, TValue>
     {
-        public override Dictionary<TKey, TValue> Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override Dictionary<TKey, TValue> Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             int count = byteReader.ReadInt32();
             Dictionary<TKey, TValue> dict = new Dictionary<TKey, TValue>();
@@ -14,7 +14,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 
             for (int i = 0; i < count; i++) 
             {
-                dict.Add(_keyTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption), _valueTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption));
+                dict.Add(_keyTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption), _valueTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption));
             }
 
             return dict;

@@ -20,7 +20,7 @@ namespace ZincFramework
                 View = viewBase;
             }
 
-            public virtual void HandleNotification(INotification notification)
+            public virtual void HandleNotification(in INotification notification)
             {
 
             }

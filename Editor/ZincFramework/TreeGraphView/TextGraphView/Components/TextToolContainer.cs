@@ -1,5 +1,6 @@
 using DocumentFormat.OpenXml.Packaging;
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
@@ -48,8 +49,21 @@ namespace ZincFramework
                     OnTreeValidate += onTreeValidate;
                     ButtonCreateNewTree.clicked += ShowCreatePanel;
                     ButtonExcelToTree.clicked += ShowExcelToTreePanel;
+                    ButtonTreeToExcel.clicked += TreeToExcel; ;
                 }
 
+                private void TreeToExcel()
+                {
+                    if(Selection.activeObject is TextTree)
+                    {
+                        TextTree[] textTrees = Array.ConvertAll(Selection.objects, x => x as TextTree);
+                        string savePath = EditorUtility.OpenFolderPanel("选择保存的文件夹", Application.dataPath, "DialogueExcel");
+                        if (!string.IsNullOrEmpty(savePath))
+                        {
+                            TreeToExcelConverter.WriteExcel(textTrees, savePath);
+                        }
+                    }
+                }
 
                 public void AddMenuListener(string actionName, Action<DropdownMenuAction> action, DropdownMenuAction.Status status = DropdownMenuAction.Status.Normal)
                 {
@@ -79,7 +93,7 @@ namespace ZincFramework
 
                         if (!string.IsNullOrEmpty(_nowSavePath))
                         {
-                            var textTrees = TreeExcelConverter.ExcelToTextTree(collection, _nowSavePath);
+                            var textTrees = ExcelToTreeConverter.ExcelToTextTree(collection, _nowSavePath);
                             AssetDatabase.SaveAssets();
                             OnTreeValidate.Invoke(textTrees);
                         }  

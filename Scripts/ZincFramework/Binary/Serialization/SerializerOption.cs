@@ -92,16 +92,15 @@ namespace ZincFramework
 
                 internal BinaryTypeInfo<T> GetTypeInfo<T>(Func<T> factory)
                 {
-                    if (_lastTypeInfo is BinaryTypeInfo<T> typeInfo)
-                    {
-                        return typeInfo;
-                    }
-
                     if (factory == null)
                     {
                         return GetTypeInfo<T>();
                     }
 
+                    if (_lastTypeInfo is BinaryTypeInfo<T> typeInfo)
+                    {
+                        return typeInfo;
+                    }
                     return (_lastTypeInfo = _serializeCacheInfo.GetOrAddCacheInfo(factory, this)) as BinaryTypeInfo<T>;
                 }
 

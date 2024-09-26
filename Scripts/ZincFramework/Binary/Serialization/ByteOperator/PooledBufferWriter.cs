@@ -1,8 +1,7 @@
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using System;
+using System.IO;
 using System.Buffers;
 using System.Diagnostics;
-using System.IO;
 using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;

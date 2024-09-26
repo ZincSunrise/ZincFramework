@@ -102,8 +102,10 @@ namespace ZincFramework
 
             private IEnumerator R_UploadDataAsync(Uri uri, ISerializable serializable, ZincAction<UnityWebRequest.Result> zincAction = null)
             {
-                byte[] buffer = serializable.Serialize();
-                List<IMultipartFormSection> multipartFormSections = new List<IMultipartFormSection>() { new MultipartFormDataSection(buffer) };
+                ByteWriter byteWriter = ByteWriterPool.GetCachedWriter(SerializerOption.Default, out var pooledBufferWriter);
+                serializable.Write(byteWriter);
+
+                List<IMultipartFormSection> multipartFormSections = new List<IMultipartFormSection>() { new MultipartFormDataSection(pooledBufferWriter.WrittenMemory.ToArray()) };
 
                 UnityWebRequest unityWebRequest = UnityWebRequest.Post(uri, multipartFormSections);
               

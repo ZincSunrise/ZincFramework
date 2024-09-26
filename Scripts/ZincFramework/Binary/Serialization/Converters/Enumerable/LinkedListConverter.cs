@@ -6,15 +6,15 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class LinkedListConverter<T> : IEnumerableConverter<LinkedList<T>, T>
     {
-        public override LinkedList<T> Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override LinkedList<T> Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
-            int count = SimpleConverters.Int32Converter.Convert(ref byteReader, serializerOption);
+            int count = SimpleConverters.Int32Converter.Read(ref byteReader, serializerOption);
             _elementTypeInfo ??= GetElementTypeInfo(serializerOption);
             LinkedList<T> values = new LinkedList<T>();
 
             for (int i = 0; i < count; i++)
             {
-                values.AddLast(_elementTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption));
+                values.AddLast(_elementTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption));
             }
 
             return values;

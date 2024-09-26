@@ -5,9 +5,9 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class SubstantialArrayConverter<T> : ArrayConverter<T> where T : struct
     {
-        public override T[] Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override T[] Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
-            int length = SimpleConverters.Int32Converter.Convert(ref byteReader, serializerOption);
+            int length = SimpleConverters.Int32Converter.Read(ref byteReader, serializerOption);
             ReadOnlySpan<byte> bytes = byteReader.ReadBytes(length);
             ReadOnlySpan<T> values = MemoryMarshal.Cast<byte, T>(bytes);
             return values.ToArray();

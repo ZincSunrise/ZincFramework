@@ -6,15 +6,15 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class IListConverterOfT<TList, TElement> : IEnumerableConverter<TList, TElement> where TList : IList<TElement>
     {
-        public override TList Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override TList Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             TList list = serializerOption.GetTypeInfo<TList>().CreateInstance();
-            int count = SimpleConverters.Int32Converter.Convert(ref  byteReader, serializerOption);
+            int count = SimpleConverters.Int32Converter.Read(ref  byteReader, serializerOption);
 
             _elementTypeInfo ??= GetElementTypeInfo(serializerOption);
             for (int i = 0; i < count; i++) 
             {
-                list.Add(_elementTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption));
+                list.Add(_elementTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption));
             }
 
             return list;

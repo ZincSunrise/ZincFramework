@@ -5,15 +5,15 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class StackConverter<T> : IEnumerableConverter<Stack<T>, T>
     {
-        public override Stack<T> Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override Stack<T> Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
-            int count = SimpleConverters.Int32Converter.Convert(ref byteReader, serializerOption);
+            int count = SimpleConverters.Int32Converter.Read(ref byteReader, serializerOption);
             _elementTypeInfo ??= GetElementTypeInfo(serializerOption);
             Stack<T> stack = new Stack<T>();
 
             for (int i = 0; i < count; i++) 
             {
-                T element = _elementTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption);
+                T element = _elementTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption);
                 if(stack.Count > 0)
                 {
                     T pop = stack.Pop();

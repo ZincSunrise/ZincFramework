@@ -15,7 +15,7 @@ namespace ZincFramework.Binary.Serialization.Metadata
             GetProperiesAndWrite(obj, byteWriter);
             pooledBufferWriter.WriteInStream(stream);
 
-            ByteWriterPool.ReturnWriter(byteWriter, pooledBufferWriter);
+            ByteWriterPool.ReturnWriterAndBuffer(byteWriter, pooledBufferWriter);
         }
 
         internal void Serialize(T obj, ByteWriter byteWriter)

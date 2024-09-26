@@ -1,7 +1,5 @@
 using System;
-using System.Diagnostics;
 using System.Reflection;
-using ZincFramework.Serialization.Runtime;
 
 
 
@@ -17,8 +15,6 @@ namespace ZincFramework.Binary.Serialization
             }
 
             public PropertyInfo PropertyInfo => MemberInfo as PropertyInfo;
-
-            public override Type MemberType => PropertyInfo.PropertyType;
         }
     }
 }

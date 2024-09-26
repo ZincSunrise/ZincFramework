@@ -1,8 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Reflection;
 using ZincFramework.Binary.Serialization.Converters;
-using ZincFramework.Serialization;
 
 
 
@@ -23,6 +21,7 @@ namespace ZincFramework.Binary.Serialization.Metadata
 
         public BinaryTypeInfo(Func<T> factory, BinaryConverter binaryConverter, SerializerOption serializerOption) : base(() => factory, typeof(T), binaryConverter, serializerOption)
         {
+            TypeConstructor = factory;
             WrapperConverter = new WrapperConverter<T>(binaryConverter);
         }
 
@@ -39,7 +38,7 @@ namespace ZincFramework.Binary.Serialization.Metadata
         {
             for (int i = 0; i < MemberInfos.Count; i++) 
             {
-                int oridinal = SimpleConverters.Int32Converter.Convert(ref byteReader, _serializerOption);
+                int oridinal = SimpleConverters.Int32Converter.Read(ref byteReader, _serializerOption);
 
                 if (!MemberInfos.TryGetValue(oridinal, out var member))
                 {
@@ -54,11 +53,11 @@ namespace ZincFramework.Binary.Serialization.Metadata
         {
             if(memberInfo is PropertyInfo)
             {
-                return new BinaryPropertyInfo<T>(this, memberInfo, serializerOption);
+                return new BinaryPropertyInfo<T>(this, memberType, memberInfo, serializerOption);
             }
             else if (memberInfo is FieldInfo)
             {
-                return new BinaryFieldInfo<T>(this, memberInfo, serializerOption);
+                return new BinaryFieldInfo<T>(this, memberType, memberInfo, serializerOption);
             }
 
             return null;

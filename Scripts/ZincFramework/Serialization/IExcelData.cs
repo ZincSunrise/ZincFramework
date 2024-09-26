@@ -3,7 +3,7 @@ using System.Collections;
 
 namespace ZincFramework
 {
-    namespace Serialization
+    namespace Binary
     {
         namespace Excel
         {

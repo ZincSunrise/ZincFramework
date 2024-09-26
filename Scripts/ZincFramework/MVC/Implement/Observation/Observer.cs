@@ -20,7 +20,7 @@ namespace ZincFramework
                     return context.Equals(NotifiyContext);
                 }
 
-                public void NotifiyObserver(INotification notification)
+                public void NotifiyObserver(in INotification notification)
                 {
                     NotifiyMethod.Invoke(notification);
                 }

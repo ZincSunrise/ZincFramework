@@ -4,7 +4,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class UriConverter : SimpleValueConverter<Uri>
     {
-        public override Uri Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override Uri Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return new Uri(byteReader.ReadString());
         }

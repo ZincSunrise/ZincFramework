@@ -2,16 +2,16 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class ArrayConverter<T> : IEnumerableConverter<T[], T>
     {
-        public override T[] Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override T[] Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
-            int length = SimpleConverters.Int32Converter.Convert(ref byteReader, serializerOption);
+            int length = SimpleConverters.Int32Converter.Read(ref byteReader, serializerOption);
             T[] array = new T[length];
 
             _elementTypeInfo ??= GetElementTypeInfo(serializerOption);
 
             for (int i = 0; i < length; i++) 
             {
-                array[i] = _elementTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption);
+                array[i] = _elementTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption);
             }
 
             return array;

@@ -2,7 +2,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class Int16Converter : SimpleValueConverter<short>
     {
-        public override short Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override short Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return byteReader.ReadInt16();
         }

@@ -16,7 +16,7 @@ namespace ZincFramework
 
                 string[] GetAttention();
 
-                void HandleNotification(INotification notification);
+                void HandleNotification(in INotification notification);
 
                 void OnRegist();
 

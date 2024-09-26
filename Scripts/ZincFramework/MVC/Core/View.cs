@@ -25,7 +25,7 @@ namespace ZincFramework
                 {
                     if (_mediatorMap.TryAdd(mediator.MediatorName, mediator))
                     {
-                        Observer observer = new Observer(mediator.HandleNotification, mediator);
+                        Observer observer = new Observer(x => mediator.HandleNotification(x), mediator);
                         var attentions = mediator.GetAttention();
 
                         for (int i = 0;i < attentions.Length; i++)
@@ -84,7 +84,7 @@ namespace ZincFramework
                     }
                 }
 
-                public void NotifyObserver(INotification notification)
+                public void NotifyObserver(in INotification notification)
                 {
                     if (_observerMap.TryGetValue(notification.Name, out var observers))
                     {

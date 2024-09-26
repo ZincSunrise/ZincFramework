@@ -171,7 +171,6 @@ namespace ZincFramework
                     while (queue.Count > 0)
                     {
                         var currentNodePair = queue.Dequeue();
-                        Debug.Log($"Visited: {currentNodePair.Value.Index}\ndepth: {currentNodePair.Key}");
 
                         // 在这个结构中，我们可以选择遍历子节点或父节点（或两者都遍历）  
                         // 这里我们遍历子节点来模拟传统的BFS  

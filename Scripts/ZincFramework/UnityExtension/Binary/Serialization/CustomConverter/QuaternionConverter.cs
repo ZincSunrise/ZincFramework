@@ -5,7 +5,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class QuaternionConverter : BinaryConverter<Quaternion>
     {
-        public override Quaternion Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override Quaternion Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             float x = byteReader.ReadSingle();
             float y = byteReader.ReadSingle();

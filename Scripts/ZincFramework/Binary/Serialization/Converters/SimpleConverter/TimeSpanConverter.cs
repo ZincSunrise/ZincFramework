@@ -4,7 +4,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class TimeSpanConverter : SimpleValueConverter<TimeSpan>
     {
-        public override TimeSpan Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override TimeSpan Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return byteReader.ReadTimeSpan();
         }

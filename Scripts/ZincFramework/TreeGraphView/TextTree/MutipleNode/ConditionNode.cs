@@ -11,19 +11,12 @@ namespace ZincFramework
         {
             public class ConditionNode : BaseTextNode, IMutipleNode<BaseTextNode>, IExpressionNode<BaseTextNode>
             {
-                public IExpressionParser<BaseTextNode> Parser { get; set; }
-
                 public int ChildCount => _expressions.Length;
 
                 public IList<IExpressionInfo<BaseTextNode>> Expressions => _expressions;
 
                 [SerializeField]
                 private TextExpression[] _expressions;
-
-                public override BaseTextNode Execute()
-                {
-                    return Parser.ParseExpression(_expressions);
-                }
 
                 public BaseTextNode[] GetChildren()
                 {
@@ -39,8 +32,6 @@ namespace ZincFramework
                 {
                     _expressions = null;
                 }
-
-
 #if UNITY_EDITOR
 
                 public override string InputHtmlColor => "#A755C2";
@@ -68,6 +59,20 @@ namespace ZincFramework
                     list.RemoveAll(x => x.ExpressionNode == baseTextNode);
 
                     _expressions = list.ToArray();
+                }
+
+                public override DialogueInfo GetDialogueInfo()
+                {
+                    DialogueInfo dialogueInfo = base.GetDialogueInfo();
+
+                    if(_expressions != null)
+                    {
+                        dialogueInfo.NextTextId = Array.ConvertAll(_expressions, x => x.ExpressionNode.Index);
+                        dialogueInfo.ConditionExpressions = Array.ConvertAll(_expressions, x => x.Expression);
+                    }
+                  
+                    return dialogueInfo;
+
                 }
 #endif
             }

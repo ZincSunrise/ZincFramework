@@ -7,9 +7,9 @@ using ZincFramework.Json;
 
 namespace ZincFramework
 {
-    namespace Serialization
+    namespace Json
     {
-        namespace Json
+        namespace Serialization
         {
             public static class JsonSelector
             {

@@ -26,7 +26,7 @@ namespace ZincFramework.Binary.Serialization.Converters
             return serializerOption.GetTypeInfo<T>();
         }
 
-        public override TDictionary Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override TDictionary Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             int count = byteReader.ReadInt32();
             TDictionary dict = serializerOption.GetTypeInfo<TDictionary>().CreateInstance();
@@ -36,7 +36,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 
             for (int i = 0; i < count; i++)
             {
-                dict.Add(_keyTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption), _valueTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption));
+                dict.Add(_keyTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption), _valueTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption));
             }
 
             return dict;

@@ -2,7 +2,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class SingleConverter : SimpleValueConverter<float>
     {
-        public override float Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override float Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return byteReader.ReadSingle();
         }

@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
+using ZincFramework.Binary.Serialization;
 using ZincFramework.Network.Protocol;
 
 
@@ -14,18 +15,26 @@ namespace ZincFramework
         {
             public class TcpNetworkModule : INetworkModule
             {
-                private Socket _serverSocket;
-
                 public IPEndPoint IPEndPoint => _serverEndPoint;
 
                 public byte[] ReceiveBytes => _receiveBytes;
 
+
+                private Socket _serverSocket;
+
+
                 private int _bufferSize = 1024 * 1024;
+
 
                 private byte[] _receiveBytes;
 
-                private readonly IPEndPoint _serverEndPoint;
 
+                private ByteWriter _byteWriter;
+
+                private PooledBufferWriter _pooledBufferWriter;
+
+
+                private readonly IPEndPoint _serverEndPoint;
 
                 public TcpNetworkModule()
                 {
@@ -33,6 +42,7 @@ namespace ZincFramework
                     string address = FrameworkConsole.Instance.SharedData.remoteAddress;
                     short port = FrameworkConsole.Instance.SharedData.remotePort;
 
+                    _byteWriter = ByteWriterPool.GetCachedWriter(SerializerOption.Message, out _pooledBufferWriter);
                     _serverEndPoint = new IPEndPoint(IPAddress.Parse(address), port);
                 }
 
@@ -118,7 +128,10 @@ namespace ZincFramework
 
                 public void SendQuitMassage()
                 {
-                    _serverSocket.Send(new QuitMessage().Serialize());
+                    new QuitMessage().Write(_byteWriter);
+                    _serverSocket.Send(_pooledBufferWriter.WrittenMemory.Span);
+
+                    _pooledBufferWriter.Clear();
                 }
             }
         }

@@ -5,15 +5,15 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class ConcurrentQueueConverter<T> : IEnumerableConverter<ConcurrentQueue<T>, T>
     {
-        public override ConcurrentQueue<T> Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override ConcurrentQueue<T> Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
-            int count = SimpleConverters.Int32Converter.Convert(ref byteReader, serializerOption);
+            int count = SimpleConverters.Int32Converter.Read(ref byteReader, serializerOption);
             _elementTypeInfo ??= GetElementTypeInfo(serializerOption);
             ConcurrentQueue<T> queue = new ConcurrentQueue<T>();
 
             for (int i = 0; i < count; i++) 
             {
-                queue.Enqueue(_elementTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption));
+                queue.Enqueue(_elementTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption));
             }
 
             return queue;

@@ -12,7 +12,7 @@ namespace ZincFramework
 
                 object NotifiyContext { get; }
 
-                void NotifiyObserver(INotification notification);
+                void NotifiyObserver(in INotification notification);
 
                 bool CompareContext(object context);
             }

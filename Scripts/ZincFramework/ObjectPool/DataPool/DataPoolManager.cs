@@ -11,7 +11,7 @@ namespace ZincFramework
 
             public static void ReturnInfo<T>(T data) where T : class, IResumable
             {
-                string name = typeof(T).Name;
+                string name = typeof(T).FullName;
 
                 if (_poolDic.TryGetValue(name, out var cachePool))
                 {
@@ -26,7 +26,7 @@ namespace ZincFramework
 
             public static T RentInfo<T>(Func<T> createFunc) where T : class, IResumable
             {
-                string name = typeof(T).Name;
+                string name = typeof(T).FullName;
 
                 if (!_poolDic.TryGetValue(name, out var cachePool))
                 {

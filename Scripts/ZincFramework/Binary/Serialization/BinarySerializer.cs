@@ -10,8 +10,6 @@ namespace ZincFramework
         {
             public static class BinarySerializer
             {
-                private static readonly MemoryStream _bufferStream = new MemoryStream(1024);
-
                 public static byte[] Serialize(object obj, SerializerOption serializerOption = null)
                 {
                     return SerializeInternal(obj, obj.GetType(), serializerOption);
@@ -96,23 +94,25 @@ namespace ZincFramework
                 private static byte[] SerializeInternal(object obj, Type type, SerializerOption serializerOption)
                 {
                     serializerOption ??= SerializerOption.Default;
+                    var byteWriter = ByteWriterPool.GetCachedWriter(serializerOption, out var pooledBufferWriter);
 
-                    _bufferStream.SetLength(0);
-                    _bufferStream.Position = 0;
+                    SerializeInternal(obj, byteWriter, type, serializerOption);
+                    byte[] bytes = pooledBufferWriter.GetSpan().ToArray();
+                    ByteWriterPool.ReturnWriterAndBuffer(byteWriter, pooledBufferWriter);
 
-                    SerializeInternal(obj, _bufferStream, type, serializerOption);
-                    return _bufferStream.ToArray();
+                    return bytes;
                 }
 
                 private static byte[] SerializeInternal<T>(T t, SerializerOption serializerOption, Func<T> factory = null)
                 {
                     serializerOption ??= SerializerOption.Default;
+                    var byteWriter = ByteWriterPool.GetCachedWriter(serializerOption, out var pooledBufferWriter);
 
-                    _bufferStream.SetLength(0);
-                    _bufferStream.Position = 0;
+                    serializerOption.GetTypeInfo(factory).Serialize(t, byteWriter);
+                    byte[] bytes = pooledBufferWriter.WrittenMemory.ToArray();
 
-                    SerializeInternal(t, _bufferStream, serializerOption, factory);
-                    return _bufferStream.ToArray();
+                    ByteWriterPool.ReturnWriterAndBuffer(byteWriter, pooledBufferWriter);
+                    return bytes;
                 }
 
 
@@ -126,6 +126,19 @@ namespace ZincFramework
                 {
                     serializerOption ??= SerializerOption.Default;
                     serializerOption.GetTypeInfo(factory).Serialize(t, stream);
+                }
+
+
+                private static void SerializeInternal(object obj, ByteWriter byteWriter, Type type, SerializerOption serializerOption)
+                {
+                    serializerOption ??= SerializerOption.Default;
+                    serializerOption.GetTypeInfo(type).SerializeAsObject(obj, byteWriter);
+                }
+
+                private static void SerializeInternal<T>(T t, ByteWriter byteWriter, SerializerOption serializerOption, Func<T> factory = null)
+                {
+                    serializerOption ??= SerializerOption.Default;
+                    serializerOption.GetTypeInfo(factory).Serialize(t, byteWriter);
                 }
 
 
@@ -156,6 +169,18 @@ namespace ZincFramework
                 {
                     serializerOption ??= SerializerOption.Default;
                     return serializerOption.GetTypeInfo(factory).Deserialize(stream);
+                }
+
+                private static object DeserializeInternal(ref ByteReader byteReader, Type type, SerializerOption serializerOption)
+                {
+                    serializerOption ??= SerializerOption.Default;
+                    return serializerOption.GetTypeInfo(type).DeserializeAsObject(ref byteReader);
+                }
+
+                private static T DeserializeInternal<T>(ref ByteReader byteReader, SerializerOption serializerOption, Func<T> factory = null)
+                {
+                    serializerOption ??= SerializerOption.Default;
+                    return serializerOption.GetTypeInfo(factory).Deserialize(ref byteReader);
                 }
             }
         }    

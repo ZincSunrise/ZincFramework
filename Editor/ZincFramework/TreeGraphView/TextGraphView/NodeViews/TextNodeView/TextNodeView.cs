@@ -42,7 +42,7 @@ namespace ZincFramework.TreeGraphView.TextTree
             DifferentialField = this.Q<IntegerField>(nameof(DifferentialField));
 
             this.Q<Label>("description").text = GetDescription();
-            DialogueField.value = baseTextNode.Statement;
+            DialogueField.value = baseTextNode.DialogueText;
             StaffField.value = baseTextNode.StaffName;
             DifferentialField.value = baseTextNode.Differential;
 
@@ -127,9 +127,8 @@ namespace ZincFramework.TreeGraphView.TextTree
 
         private string GetDescription() => BaseNode switch
         {
-            MusicNode => "音乐音效节点，节点开始时\n会播放音乐或者音效",
             EventNode => "事件节点,节点结束\n后会发生事件",
-            AnimationNode => "动画节点,节点开\n始时会触发动画",
+            EffectNode => "效果节点,节点开\n始时会触发一系列效果",
             ChoiceNode => "选择节点,节点结束后会出现选择分支",
             ConditionNode => "条件集合节点,节点结束后会根据\n现有的条件选择权重最高的节点",
             RootTextNode => "根节点,无法删除",

@@ -1,11 +1,12 @@
+using GameSystem;
+using System.Collections;
+using System.Reflection;
+using System.Collections.Generic;
 using ZincFramework.Binary;
 using ZincFramework.Serialization;
 using ZincFramework.Serialization.Events;
-using ZincFramework.Serialization.Excel;
-using System.Reflection;
-using System.Collections;
-using System.Collections.Generic;
-using GameSystem;
+using ZincFramework.Binary.Excel;
+using ZincFramework.Binary.Serialization;
 
 
 namespace ZincFramework.TreeGraphView.TextTree
@@ -18,14 +19,14 @@ namespace ZincFramework.TreeGraphView.TextTree
 
 
 
-	[BinarySerializable(140001)]
-	public class DialogueInfo : ISerializable, IConvertable, IAppend
+	[ZincSerializable(140001)]
+	public class DialogueInfo : ISerializable
 	{
 
 
 		static DialogueInfo()
 		{
-			_codeMap = new (13)
+			_codeMap = new (12)
 			{
 				{nameof(TextId), 1},
 				{nameof(CharacterName), 2},
@@ -33,20 +34,19 @@ namespace ZincFramework.TreeGraphView.TextTree
 				{nameof(DialogueText), 4},
 				{nameof(NextTextId), 5},
 				{nameof(ChoiceTexts), 6},
-				{nameof(ConditionExpressions), 7},
-				{nameof(EventExpression), 8},
-				{nameof(AnimationName), 9},
-				{nameof(SoundName), 10},
-				{nameof(MusicName), 11},
-				{nameof(XPosition), 12},
-				{nameof(Yposition), 13},
+				{nameof(NextTextTreeName), 7},
+				{nameof(ConditionExpressions), 8},
+				{nameof(EventExpression), 9},
+				{nameof(EffectName), 10},
+				{nameof(XPosition), 11},
+				{nameof(Yposition), 12},
 			};
 			
 			
 			PropertyInfo[] propertyInfos = typeof(DialogueInfo).GetProperties();
 			PropertyInfo propertyInfo;
 			int code;
-			_setMap = new (13);
+			_setMap = new (12);
 			
 			propertyInfo = propertyInfos[0];
 			code = _codeMap[propertyInfo.Name];
@@ -74,29 +74,25 @@ namespace ZincFramework.TreeGraphView.TextTree
 			
 			propertyInfo = propertyInfos[6];
 			code = _codeMap[propertyInfo.Name];
-			_setMap.Add(code, new SetAction<DialogueInfo, string[]>(SerializationUtility.GetSetAction<DialogueInfo, string[]>(propertyInfo)));
+			_setMap.Add(code, new SetAction<DialogueInfo, string>(SerializationUtility.GetSetAction<DialogueInfo, string>(propertyInfo)));
 			
 			propertyInfo = propertyInfos[7];
 			code = _codeMap[propertyInfo.Name];
-			_setMap.Add(code, new SetAction<DialogueInfo, string>(SerializationUtility.GetSetAction<DialogueInfo, string>(propertyInfo)));
+			_setMap.Add(code, new SetAction<DialogueInfo, string[]>(SerializationUtility.GetSetAction<DialogueInfo, string[]>(propertyInfo)));
 			
 			propertyInfo = propertyInfos[8];
 			code = _codeMap[propertyInfo.Name];
-			_setMap.Add(code, new SetAction<DialogueInfo, string>(SerializationUtility.GetSetAction<DialogueInfo, string>(propertyInfo)));
+			_setMap.Add(code, new SetAction<DialogueInfo, string[]>(SerializationUtility.GetSetAction<DialogueInfo, string[]>(propertyInfo)));
 			
 			propertyInfo = propertyInfos[9];
 			code = _codeMap[propertyInfo.Name];
-			_setMap.Add(code, new SetAction<DialogueInfo, string>(SerializationUtility.GetSetAction<DialogueInfo, string>(propertyInfo)));
+			_setMap.Add(code, new SetAction<DialogueInfo, string[]>(SerializationUtility.GetSetAction<DialogueInfo, string[]>(propertyInfo)));
 			
 			propertyInfo = propertyInfos[10];
 			code = _codeMap[propertyInfo.Name];
-			_setMap.Add(code, new SetAction<DialogueInfo, string>(SerializationUtility.GetSetAction<DialogueInfo, string>(propertyInfo)));
-			
-			propertyInfo = propertyInfos[11];
-			code = _codeMap[propertyInfo.Name];
 			_setMap.Add(code, new SetAction<DialogueInfo, float>(SerializationUtility.GetSetAction<DialogueInfo, float>(propertyInfo)));
 			
-			propertyInfo = propertyInfos[12];
+			propertyInfo = propertyInfos[11];
 			code = _codeMap[propertyInfo.Name];
 			_setMap.Add(code, new SetAction<DialogueInfo, float>(SerializationUtility.GetSetAction<DialogueInfo, float>(propertyInfo)));
 			
@@ -125,236 +121,232 @@ namespace ZincFramework.TreeGraphView.TextTree
 		public string[] ChoiceTexts { get; set; }
 
 		[BinaryOrdinal(7)]
-		public string[] ConditionExpressions { get; set; }
+		public string NextTextTreeName { get; set; }
 
 		[BinaryOrdinal(8)]
-		public string EventExpression { get; set; }
+		public string[] ConditionExpressions { get; set; }
 
 		[BinaryOrdinal(9)]
-		public string AnimationName { get; set; }
+		public string[] EventExpression { get; set; }
 
 		[BinaryOrdinal(10)]
-		public string SoundName { get; set; }
+		public string[] EffectName { get; set; }
 
 		[BinaryOrdinal(11)]
-		public string MusicName { get; set; }
-
-		[BinaryOrdinal(12)]
 		public float XPosition { get; set; }
 
-		[BinaryOrdinal(13)]
+		[BinaryOrdinal(12)]
 		public float Yposition { get; set; }
 
-		public byte[] Serialize()
+		public void Write(ByteWriter byteWriter)
 		{
-			byte[] bytes = new byte[GetBytesLength()];
-			int nowIndex = 0;
-
-			ByteAppender.AppendInt32(_codeMap[nameof(TextId)], bytes, ref nowIndex);
-			ByteAppender.AppendInt32(TextId, bytes, ref nowIndex);
+			byteWriter.WriteInt32(_codeMap[nameof(TextId)]);
+			byteWriter.WriteInt32(TextId);
 			
 			if(CharacterName != null)
 			{
-				ByteAppender.AppendInt32(_codeMap[nameof(CharacterName)], bytes, ref nowIndex);
-				ByteAppender.AppendString(CharacterName, bytes, ref nowIndex);
+				byteWriter.WriteInt32(_codeMap[nameof(CharacterName)]);
+				byteWriter.WriteString(CharacterName);
 			}
 			else
 			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
+				byteWriter.WriteInt32(int.MinValue);
 			}
 
-			ByteAppender.AppendInt32(_codeMap[nameof(Differential)], bytes, ref nowIndex);
-			ByteAppender.AppendInt32(Differential, bytes, ref nowIndex);
+			byteWriter.WriteInt32(_codeMap[nameof(Differential)]);
+			byteWriter.WriteInt32(Differential);
 			
 			if(DialogueText != null)
 			{
-				ByteAppender.AppendInt32(_codeMap[nameof(DialogueText)], bytes, ref nowIndex);
-				ByteAppender.AppendString(DialogueText, bytes, ref nowIndex);
+				byteWriter.WriteInt32(_codeMap[nameof(DialogueText)]);
+				byteWriter.WriteString(DialogueText);
 			}
 			else
 			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
+				byteWriter.WriteInt32(int.MinValue);
 			}
 
 			if(NextTextId != null)
 			{
-				ByteAppender.AppendInt32(_codeMap[nameof(NextTextId)], bytes, ref nowIndex);
-				ByteAppender.AppendInt16((short)NextTextId.Length, bytes, ref nowIndex);
+				byteWriter.WriteInt32(_codeMap[nameof(NextTextId)]);
+				byteWriter.WriteInt32(NextTextId.Length);
 				for(int i = 0;i < NextTextId.Length; i++)
 				{
-					ByteAppender.AppendInt32(NextTextId[i], bytes, ref nowIndex);
+					byteWriter.WriteInt32(NextTextId[i]);
 				}
 			}
 			else
 			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
+				byteWriter.WriteInt32(int.MinValue);
 			}
 
 			if(ChoiceTexts != null)
 			{
-				ByteAppender.AppendInt32(_codeMap[nameof(ChoiceTexts)], bytes, ref nowIndex);
-				ByteAppender.AppendInt16((short)ChoiceTexts.Length, bytes, ref nowIndex);
+				byteWriter.WriteInt32(_codeMap[nameof(ChoiceTexts)]);
+				byteWriter.WriteInt32(ChoiceTexts.Length);
 				for(int i = 0;i < ChoiceTexts.Length; i++)
 				{
-					ByteAppender.AppendString(ChoiceTexts[i], bytes, ref nowIndex);
+					byteWriter.WriteString(ChoiceTexts[i]);
 				}
 			}
 			else
 			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
+				byteWriter.WriteInt32(int.MinValue);
+			}
+
+			if(NextTextTreeName != null)
+			{
+				byteWriter.WriteInt32(_codeMap[nameof(NextTextTreeName)]);
+				byteWriter.WriteString(NextTextTreeName);
+			}
+			else
+			{
+				byteWriter.WriteInt32(int.MinValue);
 			}
 
 			if(ConditionExpressions != null)
 			{
-				ByteAppender.AppendInt32(_codeMap[nameof(ConditionExpressions)], bytes, ref nowIndex);
-				ByteAppender.AppendInt16((short)ConditionExpressions.Length, bytes, ref nowIndex);
+				byteWriter.WriteInt32(_codeMap[nameof(ConditionExpressions)]);
+				byteWriter.WriteInt32(ConditionExpressions.Length);
 				for(int i = 0;i < ConditionExpressions.Length; i++)
 				{
-					ByteAppender.AppendString(ConditionExpressions[i], bytes, ref nowIndex);
+					byteWriter.WriteString(ConditionExpressions[i]);
 				}
 			}
 			else
 			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
+				byteWriter.WriteInt32(int.MinValue);
 			}
 
 			if(EventExpression != null)
 			{
-				ByteAppender.AppendInt32(_codeMap[nameof(EventExpression)], bytes, ref nowIndex);
-				ByteAppender.AppendString(EventExpression, bytes, ref nowIndex);
+				byteWriter.WriteInt32(_codeMap[nameof(EventExpression)]);
+				byteWriter.WriteInt32(EventExpression.Length);
+				for(int i = 0;i < EventExpression.Length; i++)
+				{
+					byteWriter.WriteString(EventExpression[i]);
+				}
 			}
 			else
 			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
+				byteWriter.WriteInt32(int.MinValue);
 			}
 
-			if(AnimationName != null)
+			if(EffectName != null)
 			{
-				ByteAppender.AppendInt32(_codeMap[nameof(AnimationName)], bytes, ref nowIndex);
-				ByteAppender.AppendString(AnimationName, bytes, ref nowIndex);
+				byteWriter.WriteInt32(_codeMap[nameof(EffectName)]);
+				byteWriter.WriteInt32(EffectName.Length);
+				for(int i = 0;i < EffectName.Length; i++)
+				{
+					byteWriter.WriteString(EffectName[i]);
+				}
 			}
 			else
 			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
+				byteWriter.WriteInt32(int.MinValue);
 			}
 
-			if(SoundName != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(SoundName)], bytes, ref nowIndex);
-				ByteAppender.AppendString(SoundName, bytes, ref nowIndex);
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			if(MusicName != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(MusicName)], bytes, ref nowIndex);
-				ByteAppender.AppendString(MusicName, bytes, ref nowIndex);
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			ByteAppender.AppendInt32(_codeMap[nameof(XPosition)], bytes, ref nowIndex);
-			ByteAppender.AppendFloat(XPosition, bytes, ref nowIndex);
+			byteWriter.WriteInt32(_codeMap[nameof(XPosition)]);
+			byteWriter.WriteSingle(XPosition);
 			
-			ByteAppender.AppendInt32(_codeMap[nameof(Yposition)], bytes, ref nowIndex);
-			ByteAppender.AppendFloat(Yposition, bytes, ref nowIndex);
+			byteWriter.WriteInt32(_codeMap[nameof(Yposition)]);
+			byteWriter.WriteSingle(Yposition);
 			
-			return bytes;
 		}
-		public void Deserialize(byte[] bytes)
+		public void Read(ref ByteReader byteReader)
 		{
-			int nowIndex = 0;
 			int code;
 
-			short count;
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			(_setMap[code] as SetAction<DialogueInfo, int>).Invoke(this, ByteConverter.ToInt32(bytes, ref nowIndex));
+			int count;
+			code = byteReader.ReadInt32();
+			(_setMap[code] as SetAction<DialogueInfo, int>).Invoke(this, byteReader.ReadInt32());
 			
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
+			code = byteReader.ReadInt32();
 			if(code != int.MinValue)
 			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
+				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, byteReader.ReadString());
 			}
 
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			(_setMap[code] as SetAction<DialogueInfo, int>).Invoke(this, ByteConverter.ToInt32(bytes, ref nowIndex));
+			code = byteReader.ReadInt32();
+			(_setMap[code] as SetAction<DialogueInfo, int>).Invoke(this, byteReader.ReadInt32());
 			
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
+			code = byteReader.ReadInt32();
 			if(code != int.MinValue)
 			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
+				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, byteReader.ReadString());
 			}
 
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
+			code = byteReader.ReadInt32();
 			if(code != int.MinValue)
 			{
-				count = ByteConverter.ToInt16(bytes, ref nowIndex);
+				count = byteReader.ReadInt32();
 				int[] tempArray = new int[count];
 				for(int i = 0;i < tempArray.Length; i++)
 				{
-					tempArray[i] = ByteConverter.ToInt32(bytes, ref nowIndex);
+					tempArray[i] = byteReader.ReadInt32();
 				}
 				(_setMap[code] as SetAction<DialogueInfo, int[]>).Invoke(this, tempArray);
 			}
 
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
+			code = byteReader.ReadInt32();
 			if(code != int.MinValue)
 			{
-				count = ByteConverter.ToInt16(bytes, ref nowIndex);
+				count = byteReader.ReadInt32();
 				string[] tempArray = new string[count];
 				for(int i = 0;i < tempArray.Length; i++)
 				{
-					tempArray[i] = ByteConverter.ToString(bytes, ref nowIndex);
+					tempArray[i] = byteReader.ReadString();
 				}
 				(_setMap[code] as SetAction<DialogueInfo, string[]>).Invoke(this, tempArray);
 			}
 
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
+			code = byteReader.ReadInt32();
 			if(code != int.MinValue)
 			{
-				count = ByteConverter.ToInt16(bytes, ref nowIndex);
+				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, byteReader.ReadString());
+			}
+
+			code = byteReader.ReadInt32();
+			if(code != int.MinValue)
+			{
+				count = byteReader.ReadInt32();
 				string[] tempArray = new string[count];
 				for(int i = 0;i < tempArray.Length; i++)
 				{
-					tempArray[i] = ByteConverter.ToString(bytes, ref nowIndex);
+					tempArray[i] = byteReader.ReadString();
 				}
 				(_setMap[code] as SetAction<DialogueInfo, string[]>).Invoke(this, tempArray);
 			}
 
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
+			code = byteReader.ReadInt32();
 			if(code != int.MinValue)
 			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
+				count = byteReader.ReadInt32();
+				string[] tempArray = new string[count];
+				for(int i = 0;i < tempArray.Length; i++)
+				{
+					tempArray[i] = byteReader.ReadString();
+				}
+				(_setMap[code] as SetAction<DialogueInfo, string[]>).Invoke(this, tempArray);
 			}
 
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
+			code = byteReader.ReadInt32();
 			if(code != int.MinValue)
 			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
+				count = byteReader.ReadInt32();
+				string[] tempArray = new string[count];
+				for(int i = 0;i < tempArray.Length; i++)
+				{
+					tempArray[i] = byteReader.ReadString();
+				}
+				(_setMap[code] as SetAction<DialogueInfo, string[]>).Invoke(this, tempArray);
 			}
 
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			(_setMap[code] as SetAction<DialogueInfo, float>).Invoke(this, ByteConverter.ToFloat(bytes, ref nowIndex));
+			code = byteReader.ReadInt32();
+			(_setMap[code] as SetAction<DialogueInfo, float>).Invoke(this, byteReader.ReadSingle());
 			
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			(_setMap[code] as SetAction<DialogueInfo, float>).Invoke(this, ByteConverter.ToFloat(bytes, ref nowIndex));
+			code = byteReader.ReadInt32();
+			(_setMap[code] as SetAction<DialogueInfo, float>).Invoke(this, byteReader.ReadSingle());
 			
 		}
 
@@ -399,6 +391,12 @@ namespace ZincFramework.TreeGraphView.TextTree
 			}
 
 			bytesLength += 4;
+			if(NextTextTreeName != null)
+			{
+				bytesLength += ByteUtility.GetStringLength(NextTextTreeName);
+			}
+
+			bytesLength += 4;
 			if(ConditionExpressions != null)
 			{
 				bytesLength += 2;
@@ -411,25 +409,21 @@ namespace ZincFramework.TreeGraphView.TextTree
 			bytesLength += 4;
 			if(EventExpression != null)
 			{
-				bytesLength += ByteUtility.GetStringLength(EventExpression);
+				bytesLength += 2;
+				for(int i = 0;i < EventExpression.Length; i++)
+				{
+				bytesLength += ByteUtility.GetStringLength(EventExpression[i]);
+				}
 			}
 
 			bytesLength += 4;
-			if(AnimationName != null)
+			if(EffectName != null)
 			{
-				bytesLength += ByteUtility.GetStringLength(AnimationName);
-			}
-
-			bytesLength += 4;
-			if(SoundName != null)
-			{
-				bytesLength += ByteUtility.GetStringLength(SoundName);
-			}
-
-			bytesLength += 4;
-			if(MusicName != null)
-			{
-				bytesLength += ByteUtility.GetStringLength(MusicName);
+				bytesLength += 2;
+				for(int i = 0;i < EffectName.Length; i++)
+				{
+				bytesLength += ByteUtility.GetStringLength(EffectName[i]);
+				}
 			}
 
 			bytesLength += 4;
@@ -440,213 +434,6 @@ namespace ZincFramework.TreeGraphView.TextTree
 			
 			return bytesLength;
 
-		}
-		public void Append(byte[] bytes, ref int nowIndex)
-		{
-			ByteAppender.AppendInt32(_codeMap[nameof(TextId)], bytes, ref nowIndex);
-			ByteAppender.AppendInt32(TextId, bytes, ref nowIndex);
-			
-			if(CharacterName != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(CharacterName)], bytes, ref nowIndex);
-				ByteAppender.AppendString(CharacterName, bytes, ref nowIndex);
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			ByteAppender.AppendInt32(_codeMap[nameof(Differential)], bytes, ref nowIndex);
-			ByteAppender.AppendInt32(Differential, bytes, ref nowIndex);
-			
-			if(DialogueText != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(DialogueText)], bytes, ref nowIndex);
-				ByteAppender.AppendString(DialogueText, bytes, ref nowIndex);
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			if(NextTextId != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(NextTextId)], bytes, ref nowIndex);
-				ByteAppender.AppendInt16((short)NextTextId.Length, bytes, ref nowIndex);
-				for(int i = 0;i < NextTextId.Length; i++)
-				{
-					ByteAppender.AppendInt32(NextTextId[i], bytes, ref nowIndex);
-				}
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			if(ChoiceTexts != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(ChoiceTexts)], bytes, ref nowIndex);
-				ByteAppender.AppendInt16((short)ChoiceTexts.Length, bytes, ref nowIndex);
-				for(int i = 0;i < ChoiceTexts.Length; i++)
-				{
-					ByteAppender.AppendString(ChoiceTexts[i], bytes, ref nowIndex);
-				}
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			if(ConditionExpressions != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(ConditionExpressions)], bytes, ref nowIndex);
-				ByteAppender.AppendInt16((short)ConditionExpressions.Length, bytes, ref nowIndex);
-				for(int i = 0;i < ConditionExpressions.Length; i++)
-				{
-					ByteAppender.AppendString(ConditionExpressions[i], bytes, ref nowIndex);
-				}
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			if(EventExpression != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(EventExpression)], bytes, ref nowIndex);
-				ByteAppender.AppendString(EventExpression, bytes, ref nowIndex);
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			if(AnimationName != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(AnimationName)], bytes, ref nowIndex);
-				ByteAppender.AppendString(AnimationName, bytes, ref nowIndex);
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			if(SoundName != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(SoundName)], bytes, ref nowIndex);
-				ByteAppender.AppendString(SoundName, bytes, ref nowIndex);
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			if(MusicName != null)
-			{
-				ByteAppender.AppendInt32(_codeMap[nameof(MusicName)], bytes, ref nowIndex);
-				ByteAppender.AppendString(MusicName, bytes, ref nowIndex);
-			}
-			else
-			{
-				ByteAppender.AppendInt32(int.MinValue, bytes, ref nowIndex);
-			}
-
-			ByteAppender.AppendInt32(_codeMap[nameof(XPosition)], bytes, ref nowIndex);
-			ByteAppender.AppendFloat(XPosition, bytes, ref nowIndex);
-			
-			ByteAppender.AppendInt32(_codeMap[nameof(Yposition)], bytes, ref nowIndex);
-			ByteAppender.AppendFloat(Yposition, bytes, ref nowIndex);
-			
-		}
-		public void Convert(byte[] bytes, ref int nowIndex)
-		{
-			int code;
-
-			short count;
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			(_setMap[code] as SetAction<DialogueInfo, int>).Invoke(this, ByteConverter.ToInt32(bytes, ref nowIndex));
-			
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			(_setMap[code] as SetAction<DialogueInfo, int>).Invoke(this, ByteConverter.ToInt32(bytes, ref nowIndex));
-			
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				count = ByteConverter.ToInt16(bytes, ref nowIndex);
-				int[] tempArray = new int[count];
-				for(int i = 0;i < tempArray.Length; i++)
-				{
-					tempArray[i] = ByteConverter.ToInt32(bytes, ref nowIndex);
-				}
-				(_setMap[code] as SetAction<DialogueInfo, int[]>).Invoke(this, tempArray);
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				count = ByteConverter.ToInt16(bytes, ref nowIndex);
-				string[] tempArray = new string[count];
-				for(int i = 0;i < tempArray.Length; i++)
-				{
-					tempArray[i] = ByteConverter.ToString(bytes, ref nowIndex);
-				}
-				(_setMap[code] as SetAction<DialogueInfo, string[]>).Invoke(this, tempArray);
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				count = ByteConverter.ToInt16(bytes, ref nowIndex);
-				string[] tempArray = new string[count];
-				for(int i = 0;i < tempArray.Length; i++)
-				{
-					tempArray[i] = ByteConverter.ToString(bytes, ref nowIndex);
-				}
-				(_setMap[code] as SetAction<DialogueInfo, string[]>).Invoke(this, tempArray);
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			if(code != int.MinValue)
-			{
-				(_setMap[code] as SetAction<DialogueInfo, string>).Invoke(this, ByteConverter.ToString(bytes, ref nowIndex));
-			}
-
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			(_setMap[code] as SetAction<DialogueInfo, float>).Invoke(this, ByteConverter.ToFloat(bytes, ref nowIndex));
-			
-			code = ByteConverter.ToInt32(bytes, ref nowIndex);
-			(_setMap[code] as SetAction<DialogueInfo, float>).Invoke(this, ByteConverter.ToFloat(bytes, ref nowIndex));
-			
 		}
 	}
 }

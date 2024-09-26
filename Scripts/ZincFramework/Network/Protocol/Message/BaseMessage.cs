@@ -13,12 +13,13 @@ namespace ZincFramework
             /// 序列化三步骤，先写当前编码，在写当前类的长度，最后写各个类
             /// 一旦继承了该类，就必须在这个类的静态构造函数中调用一次SerializationCache的注册方法
             /// </summary>
-            [BinarySerializable()]
-            public abstract record BaseMessage : ISerializable, IConvertable, IAppend
+            [ZincSerializable()]
+            public abstract class BaseMessage : ISerializable
             {
                 public abstract int SerializableCode { get; }
 
                 public virtual int TypeLength => _typeLength == 0 ? GetTypeLength() : _typeLength;
+
 
                 private int _typeLength = 0;
 
@@ -29,10 +30,7 @@ namespace ZincFramework
                 /// 如果改变了这条规则，则不能够使用NetSerializer里的反序列化方法,必须要自定义反序列化方法
                 /// </summary>
                 /// <returns></returns>
-                public virtual byte[] Serialize()
-                {
-                    return BinarySerializer.Serialize(this);
-                }
+                public abstract void Write(ByteWriter byteWriter);
 
                 /// <summary>
                 /// 反序列化三步骤，先读入当前类的编码，再读当前类的长度，最后读各个类
@@ -40,29 +38,7 @@ namespace ZincFramework
                 /// 如果你的序列化规则被改变，那么请一定要改变反序列化方法里的规则
                 /// </summary>
                 /// <param name="bytes"></param>
-                public virtual void Deserialize(byte[] bytes)
-                {
-
-                }
-
-                /// <summary>
-                /// 这个方法相当于没带头文件的序列化方法
-                /// </summary>
-                /// </summary>
-                /// <returns></returns>
-                public virtual void Append(byte[] buffer, ref int nowIndex)
-                {
-
-                }
-
-                /// <summary>
-                /// 这个方法相当于没带头文件的反序列化方法
-                /// </summary>
-                /// <param name="bytes"></param>
-                public virtual void Convert(byte[] bytes, ref int nowIndex)
-                {
-
-                }
+                public abstract void Read(ref ByteReader byteReader);
 
                 /// <summary>
                 /// 序列化的时候必须要调用这个方法

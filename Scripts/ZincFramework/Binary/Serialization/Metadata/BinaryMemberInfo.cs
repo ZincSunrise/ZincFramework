@@ -20,8 +20,7 @@ namespace ZincFramework.Binary.Serialization
 
             public int OrdinalNumber { get; protected set; }
 
-            public virtual Type MemberType { get; }
-
+            public virtual Type MemberType { get; protected set; }
 
             public Func<object, object> GetAction
             {

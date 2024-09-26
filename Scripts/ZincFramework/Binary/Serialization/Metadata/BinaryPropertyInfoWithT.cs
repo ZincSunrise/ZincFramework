@@ -1,6 +1,6 @@
 using System;
-using System.Diagnostics;
 using System.Reflection;
+using System.Diagnostics.Contracts;
 using ZincFramework.Binary.Serialization.Converters;
 using ZincFramework.Binary.Serialization.MetaModule;
 
@@ -38,9 +38,9 @@ namespace ZincFramework.Binary.Serialization
             private Action<object, T> _setAction;
 
 
-            public BinaryPropertyInfo(BinaryTypeInfo onwerType, MemberInfo memberInfo, SerializerOption serializerOption) : base(onwerType, memberInfo, serializerOption)
+            public BinaryPropertyInfo(BinaryTypeInfo ownerType, Type memberType, MemberInfo memberInfo, SerializerOption serializerOption) : base(ownerType, memberInfo, serializerOption)
             {
-                _wrapperConverter = new WrapperConverter<T>(Converter);
+                MemberType = memberType;
             }
 
             public override void GetAsObjectAndWrite(object obj, ByteWriter byteWriter, SerializerOption serializerOption)
@@ -58,7 +58,7 @@ namespace ZincFramework.Binary.Serialization
 
             public override void ReadAndSetAsObject(object obj, ref ByteReader byteReader, SerializerOption serializerOption)
             {
-                T value = _wrapperConverter.Convert(ref byteReader, serializerOption);
+                T value = _wrapperConverter.Read(ref byteReader, serializerOption);
                 SetAction.Invoke(obj, value);
             }
 
@@ -71,7 +71,7 @@ namespace ZincFramework.Binary.Serialization
 
             private protected override void SetGetter(Delegate getter)
             {
-                Debug.Assert(getter is Func<object, T> || getter is Func<object, object>);
+                Contract.Assert(getter is Func<object, T> || getter is Func<object, object>);
 
                 if(getter is Func<object, T> typedGetter)
                 {
@@ -87,7 +87,7 @@ namespace ZincFramework.Binary.Serialization
 
             private protected override void SetSetter(Delegate setter)
             {
-                Debug.Assert(setter is Action<object, T> || setter is Action<object, object>);
+                Contract.Assert(setter is Action<object, T> || setter is Action<object, object>);
 
                 if (setter is Action<object, T> typedSetter)
                 {
@@ -104,11 +104,12 @@ namespace ZincFramework.Binary.Serialization
             internal override void ConfigureConverter(int ordinalNumber)
             {
                 OrdinalNumber = ordinalNumber;
-                var typeInfo = _serializeOption.GetTypeInfo<T>();
+                var typeInfo = _serializeOption.GetTypeInfo(MemberType);
                 _binaryTypeInfo = typeInfo;
 
+                
                 Converter = typeInfo.BinaryConverter;
-                _wrapperConverter = typeInfo.WrapperConverter;
+                _wrapperConverter = new WrapperConverter<T>(typeInfo.BinaryConverter);
             }
         }
     }

@@ -4,7 +4,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class DateTimeConverter : SimpleValueConverter<DateTime>
     {
-        public override DateTime Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override DateTime Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return byteReader.ReadDateTime();
         }

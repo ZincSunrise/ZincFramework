@@ -15,10 +15,6 @@ namespace ZincFramework
 
                 [SerializeField]
                 protected BaseTextNode _child;
-
-                public override BaseTextNode Execute() => _child;
-
-
 #if UNITY_EDITOR
                 public override void ClearChild()
                 {
@@ -38,6 +34,14 @@ namespace ZincFramework
                 public override string InputHtmlColor => "#56EEF4";
 
                 public override string OutputHtmlColor => "#90D7FF";
+
+
+                public override DialogueInfo GetDialogueInfo()
+                {
+                    DialogueInfo dialogueInfo = base.GetDialogueInfo();
+                    dialogueInfo.NextTextId = new int[1] { Child.Index };
+                    return dialogueInfo;
+                }
 #endif
             }
         }

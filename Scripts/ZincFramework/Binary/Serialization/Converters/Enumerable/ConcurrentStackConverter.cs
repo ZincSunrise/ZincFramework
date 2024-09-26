@@ -5,15 +5,15 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class ConcurrentStackConverter<T> : IEnumerableConverter<ConcurrentStack<T>, T>
     {
-        public override ConcurrentStack<T> Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override ConcurrentStack<T> Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
-            int count = SimpleConverters.Int32Converter.Convert(ref byteReader, serializerOption);
+            int count = SimpleConverters.Int32Converter.Read(ref byteReader, serializerOption);
             _elementTypeInfo ??= GetElementTypeInfo(serializerOption);
             ConcurrentStack<T> stack = new ConcurrentStack<T>();
 
             for (int i = 0; i < count; i++) 
             {
-                T element = _elementTypeInfo.WrapperConverter.Convert(ref byteReader, serializerOption);
+                T element = _elementTypeInfo.WrapperConverter.Read(ref byteReader, serializerOption);
                 if(stack.Count > 0)
                 {
                     stack.TryPop(out var pop);

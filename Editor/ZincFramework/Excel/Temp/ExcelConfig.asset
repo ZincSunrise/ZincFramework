@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 75bfbe4023f51b54c9dedcdf29ff00c0, type: 3}
+  m_Name: ExcelConfig
+  m_EditorClassIdentifier: 
+  nameLine: 0
+  typeLine: 1
+  keyLine: 2
+  numberLine: 4
+  startLine: 6
+  usingNamespaces:
+  - GameSystem
+  - System.Collections
+  - System.Reflection
+  - System.Collections.Generic
+  - ZincFramework.Binary
+  - ZincFramework.Serialization
+  - ZincFramework.Serialization.Events
+  - ZincFramework.Binary.Excel
+  - ZincFramework.Binary.Serialization
+  savePath:
+  - Scripts
+  - Gamedatas
+  - StaticData

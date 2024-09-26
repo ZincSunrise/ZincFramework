@@ -2,7 +2,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class UInt32Converter : SimpleValueConverter<uint>
     {
-        public override uint Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override uint Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return byteReader.ReadUInt32();
         }

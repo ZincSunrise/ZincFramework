@@ -1,9 +1,8 @@
 using System;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Reflection;
 using System.Reflection.Emit;
-using Unity.VisualScripting;
-
 
 
 #if UNITY_EDITOR
@@ -268,14 +267,14 @@ namespace ZincFramework
 
                 public static Func<object, object> GetGetField(FieldInfo fieldInfo)
                 {
-                    DynamicMethod dynamicMethod = new DynamicMethod($"<get_{fieldInfo.Name}field>", typeof(object), new Type[] { typeof(object) });
+                    DynamicMethod dynamicMethod = new DynamicMethod($"<get_{fieldInfo.Name}field>", typeof(object), new Type[] { typeof(object) }, true);
                     ILGenerator il = dynamicMethod.GetILGenerator();
 
                     il.Emit(OpCodes.Ldarg_0);
-                    CastOrBox(il, fieldInfo.DeclaringType);
+                    il.CastOrUnBox(fieldInfo.DeclaringType);
 
                     il.Emit(OpCodes.Ldfld, fieldInfo);
-                    CastOrBox(il, fieldInfo.FieldType);
+                    il.CastOrBox(fieldInfo.FieldType);
                     il.Emit(OpCodes.Ret);
 
                     return (Func<object, object>)dynamicMethod.CreateDelegate(typeof(Func<object, object>));
@@ -283,15 +282,14 @@ namespace ZincFramework
 
                 public static Action<object, object> GetSetField(FieldInfo fieldInfo)
                 {
-                    DynamicMethod dynamicMethod = new DynamicMethod($"<set_{fieldInfo.Name}field>", typeof(void), new Type[] { typeof(object), typeof(object) });
+                    DynamicMethod dynamicMethod = new DynamicMethod($"<set_{fieldInfo.Name}field>", typeof(void), new Type[] { typeof(object), typeof(object) }, true);
                     ILGenerator il = dynamicMethod.GetILGenerator();
-                    il.Emit(OpCodes.Ldarg_0);
 
-                    CastOrUnBox(il, fieldInfo.DeclaringType);
-                    il.Emit(OpCodes.Castclass, fieldInfo.DeclaringType);
+                    il.Emit(OpCodes.Ldarg_0);
+                    il.CastOrUnBox(fieldInfo.DeclaringType);
 
                     il.Emit(OpCodes.Ldarg_1);
-                    CastOrUnBox(il, fieldInfo.FieldType);
+                    il.CastOrUnBox(fieldInfo.FieldType);
 
                     il.Emit(OpCodes.Stfld, fieldInfo);
                     il.Emit(OpCodes.Ret);
@@ -301,10 +299,13 @@ namespace ZincFramework
 
                 public static Func<object, TR> GetGetField<TR>(FieldInfo fieldInfo)
                 {
-                    DynamicMethod dynamicMethod = new DynamicMethod($"<get_{fieldInfo.Name}field>", typeof(TR), new Type[] { typeof(object) });
+                    Contract.Assert(fieldInfo.FieldType == typeof(TR), $"{fieldInfo.FieldType.Name}, {typeof(TR)}");
+
+                    DynamicMethod dynamicMethod = new DynamicMethod($"<get_{fieldInfo.Name}field>", typeof(TR), new Type[] { typeof(object) }, true);
                     ILGenerator il = dynamicMethod.GetILGenerator();
                     il.Emit(OpCodes.Ldarg_0);
-                    CastOrBox(il, fieldInfo.DeclaringType);
+                    il.CastOrUnBox(fieldInfo.DeclaringType);
+
                     il.Emit(OpCodes.Ldfld, fieldInfo);
                     il.Emit(OpCodes.Ret);
 
@@ -313,10 +314,12 @@ namespace ZincFramework
 
                 public static Action<object, TS> GetSetField<TS>(FieldInfo fieldInfo)
                 {
-                    DynamicMethod dynamicMethod = new DynamicMethod($"<set_{fieldInfo.Name}field>", typeof(void), new Type[] { typeof(object), typeof(TS) });
+                    Contract.Assert(fieldInfo.FieldType == typeof(TS));
+
+                    DynamicMethod dynamicMethod = new DynamicMethod($"<set_{fieldInfo.Name}field>", typeof(void), new Type[] { typeof(object), typeof(TS) }, true);
                     ILGenerator il = dynamicMethod.GetILGenerator();
                     il.Emit(OpCodes.Ldarg_0);
-                    CastOrUnBox(il, fieldInfo.DeclaringType);
+                    il.CastOrBox(fieldInfo.DeclaringType);
                     il.Emit(OpCodes.Ldarg_1);
                     il.Emit(OpCodes.Stfld, fieldInfo);
                     il.Emit(OpCodes.Ret);
@@ -326,7 +329,9 @@ namespace ZincFramework
 
                 public static Func<T, TR> GetGetField<T, TR>(FieldInfo fieldInfo)
                 {
-                    DynamicMethod dynamicMethod = new DynamicMethod($"<get_{fieldInfo.Name}field>", typeof(TR), new Type[] { typeof(T) });
+                    Contract.Assert(fieldInfo.FieldType == typeof(TR));
+
+                    DynamicMethod dynamicMethod = new DynamicMethod($"<get_{fieldInfo.Name}field>", typeof(TR), new Type[] { typeof(T) }, true);
                     ILGenerator il = dynamicMethod.GetILGenerator();
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldfld, fieldInfo);
@@ -337,7 +342,9 @@ namespace ZincFramework
 
                 public static Action<T, TS> GetSetField<T, TS>(FieldInfo fieldInfo)
                 {
-                    DynamicMethod dynamicMethod = new DynamicMethod($"<set_{fieldInfo.Name}field>", typeof(void), new Type[] { typeof(T), typeof(TS) });
+                    Contract.Assert(fieldInfo.FieldType == typeof(TS));
+
+                    DynamicMethod dynamicMethod = new DynamicMethod($"<set_{fieldInfo.Name}field>", typeof(void), new Type[] { typeof(T), typeof(TS) }, true);
                     ILGenerator il = dynamicMethod.GetILGenerator();
                     il.Emit(OpCodes.Ldarg_0);
                     il.Emit(OpCodes.Ldarg_1);
@@ -348,9 +355,9 @@ namespace ZincFramework
                 }
                 #endregion
 
-                private static void CastOrBox(ILGenerator iLGenerator, Type targetType)
+                private static void CastOrBox(this ILGenerator iLGenerator, Type targetType)
                 {
-                    Debug.Assert(targetType != null);
+                    Contract.Assert(targetType != null);
                     if (targetType.IsValueType)
                     {
                         iLGenerator.Emit(OpCodes.Box, targetType);
@@ -361,12 +368,12 @@ namespace ZincFramework
                     }
                 }
 
-                private static void CastOrUnBox(ILGenerator iLGenerator, Type targetType)
+                private static void CastOrUnBox(this ILGenerator iLGenerator, Type targetType)
                 {
-                    Debug.Assert(targetType != null);
+                    Contract.Assert(targetType != null);
                     if (targetType.IsValueType) 
                     {
-                        iLGenerator.Emit(OpCodes.Unbox, targetType);
+                        iLGenerator.Emit(OpCodes.Unbox_Any, targetType);
                     }
                     else
                     {

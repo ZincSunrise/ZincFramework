@@ -10,13 +10,6 @@ namespace ZincFramework
         public static class VariableUtility
         {
             #region 深浅拷贝相关
-            public static T DeepCopy<T>(ISerializable serializable) where T : ISerializable, new()
-            {
-                T data = new T();
-                data.Deserialize(serializable.Serialize());
-                return data;
-            }
-
             public static T DeepCopy<T>(T data)
             {
                 byte[] bytes = BinarySerializer.Serialize<T>(data);

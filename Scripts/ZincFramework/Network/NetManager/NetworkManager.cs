@@ -6,6 +6,7 @@ using ZincFramework.Events;
 using ZincFramework.Network.Protocol;
 using ZincFramework.Network.BufferHandler;
 using ZincFramework.Network.Module;
+using ZincFramework.Binary.Serialization;
 
 
 namespace ZincFramework
@@ -17,7 +18,7 @@ namespace ZincFramework
             public bool IsReconnecting { get; private set; }
             public bool IsConnected { get; private set; }
 
-            private ConcurrentQueue<byte[]> _sendQueue = new ConcurrentQueue<byte[]>();
+            private ConcurrentQueue<Memory<byte>> _sendQueue = new ConcurrentQueue<Memory<byte>>();
 
             private int _sendOffsetTime = 10;
 
@@ -31,8 +32,11 @@ namespace ZincFramework
 
             private readonly ZincEvent _onSend = new ZincEvent();
 
+            private ByteWriter _writer;
+            private PooledBufferWriter _pooledBufferWriter;
             private NetworkManager() 
             {
+                _writer = ByteWriterPool.GetCachedWriter(SerializerOption.Message, out _pooledBufferWriter);
                 _heartMessage = new HeartMessage();
  
                 (_sendOffsetTime, _protocolType) = FrameworkConsole.Instance.SharedData;
@@ -161,14 +165,16 @@ namespace ZincFramework
 
             public void SendMassage(BaseMessage massage)
             {
-                byte[] massages = massage.Serialize();
-                _sendQueue.Enqueue(massages);
+                massage.Write(_writer);
+                _sendQueue.Enqueue(_pooledBufferWriter.WrittenMemory);
             }
 
             private void HandleReceive(int id, byte[] bytes)
             {
+                ByteReader byteReader = new ByteReader(bytes.AsSpan(), SerializerOption.Message.GetReaderOption());
                 BaseMessage baseMessage = MessagePool.GetBaseMessage(id);
-                baseMessage.Deserialize(bytes);
+                baseMessage.Read(ref byteReader);
+
                 IHandleMessage handle = MessagePool.GetBaseHandler(id, baseMessage);
                 _handlerQueue.Enqueue(handle);
             }
@@ -206,9 +212,9 @@ namespace ZincFramework
 
                 while (_sendQueue.Count > 0)
                 {
-                    if (_sendQueue.TryDequeue(out byte[] item))
+                    if (_sendQueue.TryDequeue(out Memory<byte> item))
                     {
-                        Buffer.BlockCopy(item, 0, sendBuffer, nowIndex, item.Length);
+                        item.CopyTo(sendBuffer.AsMemory(nowIndex));
                         nowIndex += item.Length;
                     }
                     else

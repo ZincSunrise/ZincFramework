@@ -13,7 +13,7 @@ namespace ZincFramework
             {
                 public readonly bool IsReadEnd => !Bytes.IsEmpty && _position >= Bytes.Length || !Memory.IsEmpty && _position >= Memory.Length;
 
-                public BinaryReaderOption BinaryReaderOption { get; set; }
+                public BinaryReaderOption ReaderOption { get; set; }
 
                 public ReadOnlySpan<byte> Bytes { get; private set; }
 
@@ -26,14 +26,14 @@ namespace ZincFramework
                     Memory = memory;
                     Bytes = memory.Span;
                     _position = 0;
-                    BinaryReaderOption = binaryReaderOption;
+                    ReaderOption = binaryReaderOption;
                 }
 
                 public ByteReader(ReadOnlySpan<byte> bytes, in BinaryReaderOption binaryReaderOption)
                 {
                     Bytes = bytes;
                     _position = 0;
-                    BinaryReaderOption = binaryReaderOption;
+                    ReaderOption = binaryReaderOption;
 
                     Memory = default;
                 }
@@ -57,17 +57,56 @@ namespace ZincFramework
                 }
 
                 public short ReadInt16() 
-                {                 
-                    short value = MemoryMarshal.Read<short>(Bytes[_position..]);
-                    _position += 2;
+                {
+                    short value;
+                    if (ReaderOption.IsUsingVariant)
+                    {
+                        value = ReadVarInt16();
+                    }
+                    else
+                    {
+                        value = MemoryMarshal.Read<short>(Bytes[_position..]);
+                        _position += 2;
+                    }
+  
                     return value;
                 }
 
                 public ushort ReadUInt16()
                 {
-                    ushort value = MemoryMarshal.Read<ushort>(Bytes[_position..]);
-                    _position += 2;
+                    ushort value;                 
+                    if (ReaderOption.IsUsingVariant)
+                    {
+                        value = (ushort)ReadVarInt16();
+                    }
+                    else
+                    {
+                        value = MemoryMarshal.Read<ushort>(Bytes[_position..]);
+                        _position += 2;
+                    }
+
                     return value;
+                }
+
+                public short ReadVarInt16()
+                {
+                    int value = 0;
+                    int shift = 0;
+
+                    while (true)
+                    {
+                        byte currentByte = Bytes[_position++];
+                        value |= (currentByte & 0x7F) << shift;
+
+                        if ((currentByte & 0x80) == 0)
+                        {
+                            break;
+                        }
+
+                        shift += 7;
+                    }
+
+                    return (short)value;
                 }
 
                 public bool ReadBoolean()
@@ -81,7 +120,7 @@ namespace ZincFramework
                 {
                     byte count = ReadByte();
                     char value;
-                    if (BinaryReaderOption.Encoding == Encoding.Unicode)
+                    if (ReaderOption.Encoding == Encoding.Unicode)
                     {
                         value = MemoryMarshal.Read<char>(Bytes.Slice(_position, count));
 
@@ -91,7 +130,7 @@ namespace ZincFramework
                     else
                     {
                         Span<char> chars = stackalloc char[1];
-                        BinaryReaderOption.Encoding.GetChars(Bytes.Slice(_position, count), chars);
+                        ReaderOption.Encoding.GetChars(Bytes.Slice(_position, count), chars);
 
                         _position += count;
                         return chars[0];
@@ -121,15 +160,32 @@ namespace ZincFramework
 
                 public int ReadInt32()
                 {
-                    int value = MemoryMarshal.Read<int>(Bytes[_position..]);
-                    _position += 4;
+                    int value;
+                    if (ReaderOption.IsUsingVariant)
+                    {
+                        value = ReadVarInt32();
+                    }
+                    else
+                    {
+                        value = MemoryMarshal.Read<int>(Bytes[_position..]);
+                        _position += 4;
+                    }
+
                     return value;
                 }
 
                 public uint ReadUInt32()
                 {
-                    uint value = MemoryMarshal.Read<uint>(Bytes[_position..]);
-                    _position += 4;
+                    uint value;
+                    if (ReaderOption.IsUsingVariant)
+                    {
+                        value = (uint)ReadVarInt32();
+                    }
+                    else
+                    {
+                        value = MemoryMarshal.Read<uint>(Bytes[_position..]);
+                        _position += 4;
+                    }
                     return value;
                 }
 
@@ -142,15 +198,55 @@ namespace ZincFramework
 
                 public long ReadInt64()
                 {
-                    long value = MemoryMarshal.Read<long>(Bytes[_position..]);
-                    _position += 8;
+                    long value;
+                    if (ReaderOption.IsUsingVariant)
+                    {
+                        value = ReadVarInt64();
+                    }
+                    else
+                    {
+                        value = MemoryMarshal.Read<long>(Bytes[_position..]);
+                        _position += 8;
+                    }
+
                     return value;
                 }
 
                 public ulong ReadUInt64()
                 {
-                    ulong value = MemoryMarshal.Read<ulong>(Bytes[_position..]);
-                    _position += 8;
+                    ulong value;
+
+                    if (ReaderOption.IsUsingVariant)
+                    {
+                        value = (ulong)ReadVarInt64();
+                    }
+                    else
+                    {
+                        value = MemoryMarshal.Read<ulong>(Bytes[_position..]);
+                        _position += 8;
+                    }
+
+                    return value;
+                }
+
+                public long ReadVarInt64()
+                {
+                    long value = 0;
+                    int shift = 0;
+
+                    while (true)
+                    {
+                        byte currentByte = Bytes[_position++];
+                        value |= (uint)((currentByte & 0x7F) << shift);
+
+                        if ((currentByte & 0x80) == 0)
+                        {
+                            break;
+                        }
+
+                        shift += 7;
+                    }
+
                     return value;
                 }
 
@@ -167,14 +263,14 @@ namespace ZincFramework
                     ReadOnlySpan<byte> sliceSpan = Bytes.Slice(_position, length);
                     _position += length;
 
-                    if (BinaryReaderOption.Encoding == Encoding.Unicode)
+                    if (ReaderOption.Encoding == Encoding.Unicode)
                     {
                         ReadOnlySpan<char> str = MemoryMarshal.Cast<byte, char>(sliceSpan);                 
                         return new string(str);
                     }
                     else
                     {
-                        return BinaryReaderOption.Encoding.GetString(sliceSpan);
+                        return ReaderOption.Encoding.GetString(sliceSpan);
                     }
                 }
 

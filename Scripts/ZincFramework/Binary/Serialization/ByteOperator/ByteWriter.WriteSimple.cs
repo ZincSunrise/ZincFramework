@@ -2,7 +2,6 @@ using System;
 using System.Text;
 using System.Buffers;
 using System.Runtime.InteropServices;
-using System.Runtime.CompilerServices;
 
 
 namespace ZincFramework.Binary.Serialization
@@ -26,22 +25,47 @@ namespace ZincFramework.Binary.Serialization
 
         public void WriteInt16(short value)
         {
-            Span<short> shorts = stackalloc short[1] { value };
-            _bufferWriter.Write(MemoryMarshal.AsBytes(shorts));
+            if (WriterOption.IsUsingVariant)
+            {
+                WriteVarInt16((ushort)value);
+            }
+            else
+            {
+                Span<short> span = stackalloc short[1] { value };
+                _bufferWriter.Write(MemoryMarshal.AsBytes(span));
+            }
         }
 
         public void WriteUInt16(ushort value)
         {
-            Span<ushort> shorts = stackalloc ushort[1] { value };
-            _bufferWriter.Write(MemoryMarshal.AsBytes(shorts));
+            if (WriterOption.IsUsingVariant)
+            {
+                WriteVarInt16(value);
+            }
+            else
+            {
+                Span<ushort> span = stackalloc ushort[1] { value };
+                _bufferWriter.Write(MemoryMarshal.AsBytes(span));
+            }
+        }
+
+        public void WriteVarInt16(ushort value)
+        {
+            while (value >= 0x80)
+            {
+                WriteByte((byte)(value | 0x80));
+                value >>= 7;
+            }
+
+            WriteByte((byte)value);
         }
 
         public void WriteChar(char value)
         {
             if (WriterOption.Encoding == Encoding.Unicode)
             {
-                Span<char> shorts = stackalloc char[1] { value };
-                var bytes = MemoryMarshal.AsBytes(shorts);
+                Span<char> span = stackalloc char[1] { value };
+                var bytes = MemoryMarshal.AsBytes(span);
 
                 WriteByte((byte)bytes.Length);
                 _bufferWriter.Write(bytes);
@@ -58,56 +82,94 @@ namespace ZincFramework.Binary.Serialization
 
         public void WriteBoolean(bool value)
         {
-            Span<bool> shorts = stackalloc bool[1] { value };
-            _bufferWriter.Write(MemoryMarshal.AsBytes(shorts));
+            Span<bool> span = stackalloc bool[1] { value };
+            _bufferWriter.Write(MemoryMarshal.AsBytes(span));
         }
 
         public void WriteInt32(int value)
         {
-            Span<int> shorts = stackalloc int[1] { value };
-            _bufferWriter.Write(MemoryMarshal.AsBytes(shorts));
-        }
-
-        public void WriteVarInt32(int value)
-        {
-            uint unsignedValue = (uint)value;
-            while (unsignedValue >= 0x80)
+            if (WriterOption.IsUsingVariant)
             {
-                WriteByte((byte)(unsignedValue | 0x80));
-                unsignedValue >>= 7;
+                WriteVarInt32((uint)value);
             }
-
-            WriteByte((byte)unsignedValue);
+            else
+            {
+                Span<int> span = stackalloc int[1] { value };
+                _bufferWriter.Write(MemoryMarshal.AsBytes(span));
+            }
         }
 
         public void WriteUInt32(uint value)
         {
-            Span<uint> shorts = stackalloc uint[1] { value };
-            _bufferWriter.Write(MemoryMarshal.AsBytes(shorts));
+            if (WriterOption.IsUsingVariant)
+            {
+                WriteVarInt32(value);
+            }
+            else
+            {
+                Span<uint> span = stackalloc uint[1] { value };
+                _bufferWriter.Write(MemoryMarshal.AsBytes(span));
+            }
+        }
+
+        public void WriteVarInt32(uint value)
+        {
+            while (value >= 0x80)
+            {
+                WriteByte((byte)(value | 0x80));
+                value >>= 7;
+            }
+
+            WriteByte((byte)value);
         }
 
         public void WriteSingle(float value)
         {
-            Span<float> shorts = stackalloc float[1] { value };
-            _bufferWriter.Write(MemoryMarshal.AsBytes(shorts));
+            Span<float> span = stackalloc float[1] { value };
+            _bufferWriter.Write(MemoryMarshal.AsBytes(span));
         }
 
         public void WriteInt64(long value)
         {
-            Span<long> shorts = stackalloc long[1] { value };
-            _bufferWriter.Write(MemoryMarshal.AsBytes(shorts));
+            if (WriterOption.IsUsingVariant)
+            {
+                WriteVarInt64((ulong)value);
+            }
+            else
+            {
+                Span<long> span = stackalloc long[1] { value };
+                _bufferWriter.Write(MemoryMarshal.AsBytes(span));
+            }
         }
 
         public void WriteUInt64(ulong value)
         {
-            Span<ulong> shorts = stackalloc ulong[1] { value };
-            _bufferWriter.Write(MemoryMarshal.AsBytes(shorts));
+            if (WriterOption.IsUsingVariant)
+            {
+                WriteVarInt64(value);
+            }
+            else
+            {
+                Span<ulong> span = stackalloc ulong[1] { value };
+                _bufferWriter.Write(MemoryMarshal.AsBytes(span));
+            }
+        }
+
+        public void WriteVarInt64(ulong value)
+        {
+            while (value >= 0x80)
+            {
+                WriteByte((byte)(value | 0x80));
+                value >>= 7;
+            }
+
+            WriteByte((byte)value);
         }
 
         public void WriteDouble(double value)
         {
-            Span<double> shorts = stackalloc double[1] { value };
-            _bufferWriter.Write(MemoryMarshal.AsBytes(shorts));
+            Span<double> span = stackalloc double[1] { value };
+            _bufferWriter.Write(MemoryMarshal.AsBytes(span));
         }
 
         public void WriteString(string value)

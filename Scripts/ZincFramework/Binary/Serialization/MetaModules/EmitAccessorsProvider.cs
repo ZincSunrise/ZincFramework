@@ -1,7 +1,5 @@
 using System;
 using System.Reflection;
-using Unity.VisualScripting;
-using ZincFramework.Binary.Serialization.Metadata;
 using ZincFramework.Serialization.Runtime;
 
 
@@ -43,6 +41,7 @@ namespace ZincFramework.Binary.Serialization.MetaModule
         {
             Func<object, object> getter = EmitTool.GetGetAccessor(propertyInfo);
             Action<object, object> setter = EmitTool.GetSetAccessor(propertyInfo);
+
             return (getter, setter);
         }
 
@@ -59,6 +58,11 @@ namespace ZincFramework.Binary.Serialization.MetaModule
             Action<TOwner, TValue> setter = (Action<TOwner, TValue>)propertyInfo.GetSetMethod(true).CreateDelegate(typeof(Action<TOwner, TValue>));
 
             return (getter, setter);
+        }
+
+        public Action<TList, int> SetSizeField<TList>(FieldInfo fieldInfo)
+        {
+            return EmitTool.GetSetField<TList, int>(fieldInfo);
         }
     }
 }

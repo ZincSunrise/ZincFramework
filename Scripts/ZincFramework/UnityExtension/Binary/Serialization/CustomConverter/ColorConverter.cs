@@ -4,7 +4,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class ColorConverter : BinaryConverter<Color>
     {
-        public override Color Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override Color Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             float r = byteReader.ReadSingle();
             float g = byteReader.ReadSingle();

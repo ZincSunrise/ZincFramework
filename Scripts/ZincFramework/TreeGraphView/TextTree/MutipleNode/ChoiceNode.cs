@@ -35,8 +35,6 @@ namespace ZincFramework
                     }
                 }
 
-                public string NowText { get; set; }
-
                 public int ChildCount => _choiceInfos.Count;
 
                 public List<ChoiceInfo> ChoiceInfos => _choiceInfos;
@@ -44,10 +42,6 @@ namespace ZincFramework
                 [SerializeField]
                 private List<ChoiceInfo> _choiceInfos = new List<ChoiceInfo>();
 
-                public override BaseTextNode Execute()
-                {
-                    return _choiceInfos.Find(x => x.ChoiceText == NowText).ChoiceNode;
-                }
 
                 public BaseTextNode[] GetChildren()
                 {
@@ -83,6 +77,20 @@ namespace ZincFramework
                 public void RemoveChild(BaseTextNode baseTextNode)
                 {
                     _choiceInfos.RemoveAll(x => x.ChoiceNode == baseTextNode);
+                }
+
+                public override DialogueInfo GetDialogueInfo()
+                {
+                    DialogueInfo dialogueInfo = base.GetDialogueInfo();
+                    if(_choiceInfos != null)
+                    {
+                        ChoiceInfo[] choiceInfos = _choiceInfos.ToArray();
+                        dialogueInfo.ChoiceTexts = Array.ConvertAll(choiceInfos, x => x.ChoiceText);
+                        dialogueInfo.NextTextId = Array.ConvertAll(choiceInfos, x => x.ChoiceNode.Index);
+                    }
+                    
+
+                    return dialogueInfo;
                 }
 #endif
             }

@@ -2,7 +2,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class UInt64Converter : SimpleValueConverter<ulong>
     {
-        public override ulong Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override ulong Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             return byteReader.ReadUInt64();
         }

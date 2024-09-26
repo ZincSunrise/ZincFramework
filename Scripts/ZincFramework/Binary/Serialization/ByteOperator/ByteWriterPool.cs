@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using ZincFramework.DataPool;
-
 
 
 namespace ZincFramework.Binary.Serialization
@@ -17,7 +15,7 @@ namespace ZincFramework.Binary.Serialization
             return byteWriter;
         }
 
-        public static void ReturnWriter(ByteWriter writer, PooledBufferWriter pooledBuffer) 
+        public static void ReturnWriterAndBuffer(ByteWriter writer, PooledBufferWriter pooledBuffer) 
         {
             DataPoolManager.ReturnInfo(writer);
             DataPoolManager.ReturnInfo(pooledBuffer);

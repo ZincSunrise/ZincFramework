@@ -5,7 +5,7 @@ namespace ZincFramework.Binary.Serialization.Converters
 {
     public class DefaultObjectConverter<T> : ObjectConverter<T> where T : notnull
     {
-        public override T Convert(ref ByteReader byteReader, SerializerOption serializerOption)
+        public override T Read(ref ByteReader byteReader, SerializerOption serializerOption)
         {
             BinaryTypeInfo<T> binaryTypeInfo = serializerOption.GetTypeInfo<T>();
 

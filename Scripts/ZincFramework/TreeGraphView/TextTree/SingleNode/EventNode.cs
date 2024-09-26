@@ -13,16 +13,8 @@ namespace ZincFramework
             {
                 public IList<IExpressionInfo<BaseTextNode>> Expressions => _expressions;
 
-                public IExpressionParser<BaseTextNode> Parser { get; set; }
-
                 [SerializeField]
                 private TextExpression[] _expressions;
-
-                public override BaseTextNode Execute()
-                {
-                    Parser.ParseExpression(_expressions);
-                    return base.Execute();
-                }
 
 #if UNITY_EDITOR
                 void IExpressionNode<BaseTextNode>.AddChild(BaseTextNode child, string expression)
@@ -45,10 +37,17 @@ namespace ZincFramework
                 public override void Intialize(DialogueInfo dialogueInfo)
                 {
                     base.Intialize(dialogueInfo);
-                    _expressions = new TextExpression[1]
-                    { 
-                        new TextExpression(dialogueInfo.EventExpression, null)
-                    };
+                    _expressions = Array.ConvertAll(dialogueInfo.EventExpression, x => new TextExpression(x, Child));
+                }
+
+                public override DialogueInfo GetDialogueInfo()
+                {
+                    DialogueInfo dialogueInfo = base.GetDialogueInfo();
+                    if(dialogueInfo.EventExpression != null)
+                    {
+                        dialogueInfo.EventExpression = Array.ConvertAll(_expressions, x => x.Expression);
+                    }           
+                    return dialogueInfo;
                 }
 
                 public override void SetChild(BaseTextNode child)
@@ -60,6 +59,7 @@ namespace ZincFramework
 
                 public override void DiscardChild()
                 {
+                    
                     base.DiscardChild();
                     _expressions = null;
                 }

@@ -10,7 +10,7 @@ namespace ZincFramework
             {
                 public string StaffName => _staffName;
 
-                public string Statement => _statement;
+                public string DialogueText => _dialogueText;
 
                 public int Differential => _differential;
 
@@ -20,27 +20,36 @@ namespace ZincFramework
                 private string _staffName;
 
                 [SerializeField]
-                private string _statement;
+                private string _dialogueText;
 
                 [SerializeField]
                 private int _differential;
 
                 [SerializeField]
-                public int _index;
-
-                /// <summary>
-                /// 选择下一个节点的方法
-                /// </summary>
-                /// <returns></returns>
-                public abstract BaseTextNode Execute();
+                private int _index;
 
 #if UNITY_EDITOR
                 public virtual void Intialize(DialogueInfo dialogueInfo)
                 {
                     _differential = dialogueInfo.Differential;
                     _staffName = dialogueInfo.CharacterName;
-                    _statement = dialogueInfo.DialogueText;
+                    _dialogueText = dialogueInfo.DialogueText;
                     _index = dialogueInfo.TextId;
+                }
+
+                public virtual DialogueInfo GetDialogueInfo()
+                {
+                    DialogueInfo dialogueInfo = new DialogueInfo()
+                    {
+                        TextId = _index,
+                        CharacterName = _staffName,
+                        DialogueText = _dialogueText,
+                        Differential = _differential,
+                        XPosition = position.x,
+                        Yposition = position.y,
+                    };
+
+                    return dialogueInfo;
                 }
 #endif
             }
