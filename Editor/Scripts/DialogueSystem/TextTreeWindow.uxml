@@ -1,0 +1,27 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Assets/Editor/ZincFramework/DialogueSystem/TextTreeWindow.uss?fileID=7433441132597879392&amp;guid=ac703acd0d2235243852a173ca7dedc1&amp;type=3#TextTreeWindow" />
+    <Style src="project://database/Assets/Editor/ZincFramework/TreeGraphView/TreeGraphView.uss?fileID=7433441132597879392&amp;guid=274f45f816eb40e4cadffb8b3b5b043b&amp;type=3#TreeGraphView" />
+    <ui:VisualElement name="TreeContainer" style="flex-grow: 1;">
+        <uie:Toolbar focusable="true">
+            <ZincFramework.DialogueSystem.GraphView.TextToolContainer style="flex-direction: row;">
+                <uie:ToolbarMenu tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" text="选择显示内容" />
+                <uie:ToolbarButton text="创建新树" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonCreateNewTree" />
+                <uie:ToolbarButton text="从Excel导入" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonExcelToTree" />
+                <uie:ToolbarButton text="转换为Excel表格" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonTreeToExcel" />
+                <uie:ToolbarButton text="保存所有文本" parse-escape-sequences="true" display-tooltip-when-elided="true" focusable="true" name="ButtonSave" />
+                <uie:ToolbarButton text="刷新" parse-escape-sequences="true" display-tooltip-when-elided="true" focusable="true" name="ButtonRefresh" enable-rich-text="true" />
+            </ZincFramework.DialogueSystem.GraphView.TextToolContainer>
+        </uie:Toolbar>
+        <ui:VisualElement name="SplitWindowContainer" style="flex-grow: 1;">
+            <ZincFramework.TreeService.GraphView.SplitView fixed-pane-initial-dimension="300">
+                <ui:VisualElement name="LeftContainer">
+                    <ui:Label tabindex="-1" text="Inspector" parse-escape-sequences="true" display-tooltip-when-elided="true" style="background-color: rgb(60, 60, 60); margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; border-left-color: rgb(188, 188, 188); border-right-color: rgb(188, 188, 188); border-top-color: rgb(188, 188, 188); border-bottom-color: rgb(188, 188, 188); padding-left: 5px; font-size: 20px; flex-grow: 0;" />
+                    <ZincFramework.DialogueSystem.GraphView.TextInspector style="flex-grow: 1;" />
+                </ui:VisualElement>
+                <ui:VisualElement name="RightContainer" style="flex-grow: 1;">
+                    <ZincFramework.DialogueSystem.GraphView.TextGraphView />
+                </ui:VisualElement>
+            </ZincFramework.TreeService.GraphView.SplitView>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

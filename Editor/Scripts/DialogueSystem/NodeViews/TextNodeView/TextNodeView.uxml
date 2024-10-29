@@ -1,0 +1,42 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Editor/ZincFramework/TreeGraphView/TextGraphView/NodeViews/TextNodeView/TextNodeView.uss?fileID=7433441132597879392&amp;guid=b5219c1ba96df944c9b055aefcda7413&amp;type=3#TextNodeView" />
+    <ui:VisualElement name="NodeContainer" style="flex-grow: 1; max-width: 500px; min-width: 200px;">
+        <ui:VisualElement name="node-border">
+            <ui:VisualElement name="contents" style="max-width: none;">
+                <ui:VisualElement name="top">
+                    <ui:VisualElement name="input" />
+                    <ui:VisualElement name="divider" class="vertical" />
+                    <ui:VisualElement name="content" style="flex-basis: auto; flex-grow: 1;">
+                        <ui:VisualElement name="Padding" style="flex-grow: 1;">
+                            <ui:VisualElement name="UpContainer" style="flex-grow: 1;" />
+                            <ui:VisualElement name="PaddingDivider" />
+                            <ui:VisualElement name="title">
+                                <ui:Label name="title-label" text="ConditionTextNode" class="unity-text-element unity-label" />
+                                <ui:VisualElement name="title-button-container">
+                                    <ui:VisualElement name="collapse-button">
+                                        <ui:VisualElement name="icon" />
+                                    </ui:VisualElement>
+                                </ui:VisualElement>
+                            </ui:VisualElement>
+                            <ui:Label tabindex="-1" text="Label" parse-escape-sequences="true" display-tooltip-when-elided="true" name="description" />
+                            <ui:VisualElement name="PaddingDivider" />
+                            <ui:VisualElement name="DownContainer" style="flex-grow: 1;" />
+                        </ui:VisualElement>
+                        <ui:VisualElement name="divider" class="horizontal" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="output" />
+                </ui:VisualElement>
+                <ui:VisualElement name="buttom" style="flex-grow: 1; flex-direction: row;">
+                    <ui:VisualElement name="down">
+                        <ui:Foldout text="文本语句" name="foldoutText">
+                            <ui:TextField picking-mode="Ignore" multiline="true" name="nameField" auto-correction="false" label="人物名称" />
+                            <ui:TextField picking-mode="Ignore" multiline="true" name="dialogueField" auto-correction="false" label="文本语句" />
+                        </ui:Foldout>
+                    </ui:VisualElement>
+                    <ui:VisualElement name="right" style="flex-grow: 1;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="selection-border" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>
