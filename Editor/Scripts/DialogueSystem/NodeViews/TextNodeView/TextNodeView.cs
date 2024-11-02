@@ -83,7 +83,7 @@ namespace ZincFramework.DialogueSystem.GraphView
 
         private void IntialListView(VisibleState[] visibleStates)
         {
-            _visibleStates = new List<VisibleState>(visibleStates);
+            _visibleStates = new List<VisibleState>(visibleStates ?? Array.Empty<VisibleState>());
             _listView = new ListView(_visibleStates, 150, () => new SpriteContainer(ChangeVisiblable), (container, i) => (container as SpriteContainer).UpdateSprite(i, _visibleStates[i]));
 
             _listView.style.maxHeight = new StyleLength(StyleKeyword.None);
