@@ -46,7 +46,8 @@ namespace ZincFramework.Pool.GameObjects
         public override void ReturnValue(ReuseableObject reusableGameObject)
         {
             reusableGameObject.OnReturn();
-            reusableGameObject.gameObject.SetActive(false); 
+            reusableGameObject.gameObject.SetActive(false);
+            reusableGameObject.transform.SetParent(_rootObject.transform);
         }
 
         public abstract void ReturnAll();

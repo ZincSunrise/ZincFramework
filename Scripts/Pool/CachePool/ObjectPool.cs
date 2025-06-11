@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 
 namespace ZincFramework
@@ -14,17 +15,33 @@ namespace ZincFramework
 
             public int CacheCount => _unuseValues.Count;
 
-            public int MaxCount { get ; set; }
+            public virtual int MaxCount { get; set; }
 
+#if UNITY_EDITOR
+            private readonly bool _isCheckRepeat = true;
+
+            public void CheckRepeat(TValue value)
+            {
+                foreach(var data in _unuseValues)
+                {
+                    if(data.Equals(value))
+                    {
+                        Debug.LogWarning("出现了两个一样的对象");
+                    }
+                }
+            }
+#endif
             public ObjectPool()
             {
                 _unuseValues = new Queue<TValue>(16);
+                MaxCount = -1;
             }
 
             public ObjectPool(Func<TValue> createAction)
             {
                 _factory = createAction;
                 _unuseValues = new Queue<TValue>(16);
+                MaxCount = -1;
             }
 
             public ObjectPool(Func<TValue> createAction, int maxCount)
@@ -33,7 +50,6 @@ namespace ZincFramework
                 _factory = createAction;
                 _unuseValues = new Queue<TValue>(maxCount == -1 ? 30 : maxCount);
             }
-
 
             public virtual void Clear()
             {
@@ -60,7 +76,13 @@ namespace ZincFramework
 
             public virtual void ReturnValue(TValue value)
             {
-                if (MaxCount != -1 && _unuseValues.Count < MaxCount)
+#if UNITY_EDITOR
+                if (_isCheckRepeat)
+                {
+                    CheckRepeat(value);
+                }
+#endif
+                if (MaxCount == -1 || _unuseValues.Count <= MaxCount)
                 {
                     _unuseValues.Enqueue(value);
                 }

@@ -83,6 +83,7 @@ namespace ZincFramework
                 {
                     _soundBases.Remove(soundBase);
                 }
+
                 soundBase.Pause();
                 soundBase.Refresh();
             }

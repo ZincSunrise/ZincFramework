@@ -14,6 +14,8 @@ namespace ZincFramework
             {
                 return string.Format(_originString, uIWriteInfo.Name, uIWriteInfo.Path, uIWriteInfo.Type);
             }
+
+            public static string GetViewStatement(in UIWriteInfo uIWriteInfo) => $"{uIWriteInfo.Name} = this.Q<{uIWriteInfo.Type}>(nameof({uIWriteInfo.Name}));";
         } 
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using ZincFramework.MVC.Core;
 using ZincFramework.MVC.Interfaces;
+using ZincFramework.MVC.Observation;
 
 
 namespace ZincFramework.MVC
@@ -60,9 +61,9 @@ namespace ZincFramework.MVC
             _model.RegistProcessor(processor);
         }
 
-        public void RegistCommand(string name, Func<ICommand> factory)
+        public void RegistCommand(string name, ICommand command)
         {
-            _controller.RegistCommand(name, factory);
+            _controller.RegistCommand(name, command);
         }
 
         public void RemoveProcessor(string processorName)
@@ -133,6 +134,16 @@ namespace ZincFramework.MVC
         public T GetMediator<T>(string mediatorName) where T : IMediator
         {
             return (T)_view.GetMediator(mediatorName);
+        }
+
+        public void RegistObserver(string name, IObserver observer)
+        {
+            _view.RegistObserver(name, observer);
+        }
+
+        public void UnregistObserver(string name, IObserver observer)
+        {
+            _view.RemoveObserver(name, observer);
         }
     }
 }

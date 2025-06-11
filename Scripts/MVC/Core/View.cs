@@ -17,9 +17,9 @@ namespace ZincFramework
 
                 private readonly static Lazy<View> _instance = new Lazy<View>(() => new View());
 
-                private readonly ConcurrentDictionary<string, IMediator> _mediatorMap = new ConcurrentDictionary<string, IMediator>();
+                private readonly Dictionary<string, IMediator> _mediatorMap = new Dictionary<string, IMediator>();
 
-                private readonly ConcurrentDictionary<string, List<IObserver>> _observerMap = new ConcurrentDictionary<string, List<IObserver>>();
+                private readonly Dictionary<string, List<IObserver>> _observerMap = new Dictionary<string, List<IObserver>>();
 
                 public void RegistMediator(IMediator mediator)
                 {
@@ -40,15 +40,17 @@ namespace ZincFramework
 
                 public void RemoveMediator(string mediatorName)
                 {
-                    _mediatorMap.TryRemove(mediatorName, out var mediator);
-                    var attentions = mediator.GetAttention();
-
-                    for (int i = 0; i < attentions.Length; i++)
+                    if (_mediatorMap.Remove(mediatorName, out var mediator))
                     {
-                        RemoveObserver(attentions[i], mediator);
-                    }
+                        var attentions = mediator.GetAttention();
 
-                    mediator.OnRemove();
+                        for (int i = 0; i < attentions.Length; i++)
+                        {
+                            RemoveObserver(attentions[i], mediator);
+                        }
+
+                        mediator.OnRemove();
+                    }
                 }
 
                 public bool IsHasMediator(string mediatorName)

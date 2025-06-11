@@ -2,9 +2,7 @@ using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEngine.UIElements;
-using ZincFramework.MVC;
 using ZincFramework.LoadServices.Editor;
-using GameSystem.Models.Dialogue;
 
 
 
@@ -101,11 +99,7 @@ namespace ZincFramework.DialogueSystem.GraphView
         {
             if (EditorApplication.isPlaying)
             {
-                if (Facade.GetFacade(() => new Facade()).TryGetProcessor(nameof(DialogueProcessor), out var processor))
-                {
-                    DialogueProcessor dialogueProcessor = processor as DialogueProcessor;
-                    ShowTree(dialogueProcessor.NowTextTree);
-                }
+                ShowTree(TextTreeRunner.Instance.MainTextTree);
             }
         }
 

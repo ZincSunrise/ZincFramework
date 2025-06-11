@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
+using UnityEditor;
 using ZincFramework.Excel;
-using ZincFramework.LoadServices.Editor;
+
 
 namespace ZincFramework
 {
@@ -19,10 +17,9 @@ namespace ZincFramework
 
             private ExcelResManager()
             {
-                string path = Path.Combine(AssetDataManager.FrameworkLoadPath, "Excel", "Temp");
-                ExcelDefault = AssetDataManager.LoadAssetAtPath<AutoWriteConfig>(Path.Combine(path, "ExcelConfig"));
-                DefaultStyleData = AssetDataManager.LoadAssetAtPath<ExcelSytleData>(Path.Combine(path, "DefaultStyleData"));
-                ProtocolDefault = AssetDataManager.LoadAssetAtPath<AutoWriteConfig>(Path.Combine(AssetDataManager.FrameworkLoadPath, "ProtocolTool", "Temp", "ProtocolConfig"));
+                string path = "Assets/Editor/ZincFramework/Excel/Temp";
+                ExcelDefault = AssetDatabase.LoadAssetAtPath<AutoWriteConfig>(Path.Combine(path, "ExcelConfig.asset"));
+                DefaultStyleData = AssetDatabase.LoadAssetAtPath<ExcelSytleData>(Path.Combine(path, "DefaultStyleData.asset"));
             }
         }
     }

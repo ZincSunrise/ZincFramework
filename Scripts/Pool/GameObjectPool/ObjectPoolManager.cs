@@ -87,6 +87,15 @@ namespace ZincFramework.Pool
             }
         }
 
+
+        public void SetPoolMaxCount(string name, int maxCount)
+        {
+            if (_objectDic.TryGetValue(name, out GameObjectPool gameObjectPool))
+            {
+                gameObjectPool.MaxCount = maxCount;
+            }
+        }
+
         /// <summary>
         /// 检查是否有这个池子
         /// </summary>

@@ -10,13 +10,13 @@ namespace ZincFramework
         internal class ComponentPool : ObjectPool<Component>
         {
             private Queue<Component> _usingComponent = new Queue<Component>();
+
             public GameObject CompnentContainer { get; private set; } = new GameObject();
 
             public ComponentPool(Func<Component> addFunc, int maxCount, string name) : base(addFunc, maxCount)
             {
                 CompnentContainer.name = name + "Container";
             }
-
 
             public override Component RentValue()
             {

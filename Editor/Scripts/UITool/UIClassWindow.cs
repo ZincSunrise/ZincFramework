@@ -8,6 +8,8 @@ using ZincFramework.UI.EditorUI;
 using ZincFramework.ScriptWriter;
 using SystemAssembly = System.Reflection.Assembly;
 using ZincFramework.UI.ScriptWriter;
+using UnityEngine.EventSystems;
+using System.Linq;
 
 
 
@@ -39,12 +41,12 @@ namespace ZincFramework
 
             private readonly EditorCollection _editorUIBases;
 
+            private bool _isIncludeText;
+
             private string _savePath;
             private string _selectingName;
 
-            private Selectable[] Selectables { get; set; }
-
-            public static string UIPath { get; } = Path.Combine(Application.dataPath, "Scripts", "UI");
+            private UIBehaviour[] UIBehaviours { get; set; }
 
             public UIClassWindow()
             {
@@ -56,7 +58,7 @@ namespace ZincFramework
 
             private void OnEnable()
             {
-                _uiConfig.Value = AssetDatabase.LoadAssetAtPath<UIConfig>(UIConfig.DefaultLoadPath);
+                _uiConfig.Value = AssetDatabase.LoadAssetAtPath<UIConfig>(UIConfig.UILoadPath);
                 OnSelectionChange();
             }
 
@@ -104,6 +106,7 @@ namespace ZincFramework
 
             private void OnGUI()
             {
+                _isIncludeText = GUILayout.Toggle(_isIncludeText, "是否包含Text");
                 _editorUIBases.ForEach(ExcuteGUI);
             }
 
@@ -117,16 +120,16 @@ namespace ZincFramework
                 CompilationPipeline.assemblyCompilationFinished -= AssemblyCompilationFinished;
                 CompilationPipeline.assemblyCompilationFinished += AssemblyCompilationFinished;
 
-                if (!Directory.Exists(UIPath))
+                if (!Directory.Exists(UIConfig.UIPath))
                 {
-                    Directory.CreateDirectory(UIPath);
+                    Directory.CreateDirectory(UIConfig.UIPath);
                 }
 
-                _savePath = EditorUtility.SaveFilePanel("保存你的文件", UIPath, _selectingName + "Base", "cs");
+                _savePath = EditorUtility.SaveFilePanel("保存你的文件", UIConfig.UIPath, _selectingName + "Base", "cs");
 
                 if (!string.IsNullOrEmpty(_savePath))
                 {
-                    UIClassWriter.WriteClass(Selectables, _selectingName, _savePath, _uiConfig.Value);   
+                    UIClassWriter.WriteClass(UIBehaviours, _selectingName, _savePath, _uiConfig.Value);   
                 }
                 else
                 {
@@ -140,15 +143,23 @@ namespace ZincFramework
                 {
                     GameObject gameObject = Selection.activeGameObject;
 
-                    if (!gameObject.transform.IsChildOf(GameObject.Find("Canvas").transform) || !gameObject.name.Contains("Panel"))
+                    if (!gameObject.transform.root.TryGetComponent<Canvas>(out _) || !gameObject.name.Contains("Panel"))
                     {
                         return;
                     }
                     _selectingName = gameObject.name;
 
-                    Selectables = gameObject.GetComponentsInChildren<Selectable>();
+                    if (_isIncludeText)
+                    {
+                        UIBehaviours = gameObject.GetComponentsInChildren<UIBehaviour>().Where(x => x is Selectable && x is not Scrollbar || x is Text).ToArray();
+                    }
+                    else
+                    {
+                        UIBehaviours = gameObject.GetComponentsInChildren<Selectable>();
+                    }
+
                     CSharpWriter cSharpWriter = CSharpWriter.RentWriter();
-                    string[] strings = UIClassWriter.GetClassStrings(cSharpWriter, _selectingName, Selectables, _uiConfig.Value);
+                    string[] strings = UIClassWriter.GetClassStrings(cSharpWriter, _selectingName, UIBehaviours, _uiConfig.Value);
                     _baseLabel.Title = string.Join(Environment.NewLine, strings);
                 }
             }

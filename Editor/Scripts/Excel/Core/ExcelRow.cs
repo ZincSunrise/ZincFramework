@@ -65,7 +65,10 @@ namespace ZincFramework
 
             public bool TryGetValue(int cellIndex, out string value)
             {
-                _excelCells.TryGetValue(cellIndex, out ExcelCell cell);
+                if(!_excelCells.TryGetValue(cellIndex, out ExcelCell cell))
+                {
+                    Debug.Log("不存在对应格子");
+                }
 
                 value = cell?.GetValue() ?? string.Empty;
                 return cell != null;

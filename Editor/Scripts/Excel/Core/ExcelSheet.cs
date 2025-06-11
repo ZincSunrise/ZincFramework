@@ -1,10 +1,7 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using DocumentFormat.OpenXml.Drawing.Charts;
 
 
 
@@ -24,7 +21,7 @@ namespace ZincFramework
 
             public int ColCount { get; private set; }
 
-            public uint StyleIndex {  get; private set; }
+            public uint StyleIndex { get; private set; }
 
             public string TableName { get; }
 
@@ -40,7 +37,7 @@ namespace ZincFramework
                 StyleIndex = styleIndex;
 
                 foreach (var row in Worksheet.Descendants<Row>())
-                {                    
+                {
                     ExcelRow excelRow = new ExcelRow(StyleIndex, row, CreateCell, GetCellValue, SetCellValue);
                     _rowMap.Add(row.RowIndex, excelRow);
 
@@ -73,11 +70,11 @@ namespace ZincFramework
                     }
 
                     excelRow[cellIndex] = value;
-                    if(rowIndex > RowCount)
+                    if (rowIndex > RowCount)
                     {
                         RowCount = rowIndex;
                     }
-                    if(excelRow.ColCount > ColCount)
+                    if (excelRow.ColCount > ColCount)
                     {
                         ColCount = excelRow.ColCount;
                     }
@@ -121,6 +118,11 @@ namespace ZincFramework
 
             public bool TryGetRow(int rowIndex, out ExcelRow excelRow) => _rowMap.TryGetValue((uint)(rowIndex + 1), out excelRow);
 
+            /// <summary>
+            /// 创建一个行的方法
+            /// </summary>
+            /// <param name="rowIndex"></param>
+            /// <returns></returns>
             public ExcelRow CreateRow(int rowIndex)
             {
                 Row row = new Row() { RowIndex = (uint)rowIndex };
@@ -148,12 +150,16 @@ namespace ZincFramework
                 return new ExcelRow(StyleIndex, row, CreateCell, GetCellValue, SetCellValue);
             }
 
+            /// <summary>
+            /// 创建一个格子的方法
+            /// </summary>
+            /// <param name="cellValue"></param>
+            /// <returns></returns>
             private ExcelCell CreateCell(string cellValue)
             {
-                bool isNumber = long.TryParse(cellValue, out _) && (float.TryParse(cellValue, out _) || double.TryParse(cellValue, out _));
                 Cell cell = new Cell();
 
-                if (isNumber)
+                if (cellValue.All(x => char.IsNumber(x)))
                 {
                     cell.DataType = CellValues.Number;
                     cell.CellValue = new CellValue(cellValue);
@@ -161,11 +167,7 @@ namespace ZincFramework
                 else
                 {
                     cell.DataType = CellValues.SharedString;
-                    if (!SharedStringPool.TryGetShared(cellValue, out var index))
-                    {
-                        SharedStringPool.AddSharedString(cellValue, out index);
-                    }
-
+                    SharedStringPool.AddOrGet(cellValue, out var index);
                     cell.CellValue = new CellValue(index);
                 }
 
@@ -193,16 +195,16 @@ namespace ZincFramework
                         Width = width
                     };
 
-                    foreach(var col in columns.Descendants<Column>())
+                    foreach (var col in columns.Descendants<Column>())
                     {
-                        if(col.Max > column.Max)
+                        if (col.Max > column.Max)
                         {
                             columns.InsertBefore(column, col);
                             break;
                         }
                     }
 
-                    if(column.Parent != columns)
+                    if (column.Parent != columns)
                     {
                         columns.AppendChild(column);
                     }
@@ -229,23 +231,15 @@ namespace ZincFramework
 
             private string GetCellValue(Cell cell)
             {
-                if (cell.CellValue == null)
-                {
-                    return string.Empty;
-                }
-
-                return cell.DataType != null && cell.DataType == CellValues.SharedString ? SharedStringPool[cell.CellValue.InnerText] : cell.CellValue.InnerText;
+                return SharedStringPool.GetCellValue(cell);
             }
+
 
             private void SetCellValue(Cell cell, string value)
             {
-                if(cell.DataType != null && cell.DataType == CellValues.SharedString)
+                if (cell.DataType != null && cell.DataType == CellValues.SharedString)
                 {
-                    if (!SharedStringPool.TryGetShared(value, out var index))
-                    {
-                        SharedStringPool.AddSharedString(value, out index);
-                    }
-
+                    SharedStringPool.AddOrGet(value, out var index);
                     cell.CellValue = new CellValue(index);
                 }
                 else
@@ -257,6 +251,22 @@ namespace ZincFramework
             public void SaveSheet()
             {
                 Worksheet.Save();
+            }
+
+            /// <summary>
+            /// 得到一整列的方法
+            /// </summary>
+            /// <param name="colIndex"></param>
+            /// <returns></returns>
+            public string[] GetColomn(int colIndex)
+            {
+                string[] strings = new string[RowCount];
+                for (int i = 0; i < RowCount; i++)
+                {
+                    strings[i] = this[i][colIndex];
+                }
+
+                return strings;
             }
         }
     }

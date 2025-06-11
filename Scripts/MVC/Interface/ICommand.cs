@@ -1,12 +1,10 @@
-using ZincFramework.DataPools;
-
 namespace ZincFramework
 {
     namespace MVC
     {
         namespace Interfaces
         {
-            public interface ICommand : IReuseable
+            public interface ICommand
             {
                 void Execute(in Notification notification);
             }

@@ -10,16 +10,13 @@ namespace ZincFramework.Pool.GameObjects
     /// 循环对象池，当对象池达到最大数量，会拿出第一个正在使用队列中的第一个游戏对象来使用
     /// 适用于子弹, 特效等能够已经确定好出生顺序的物体
     /// </summary>
-    public sealed class CyclicPool : GameObjectPool
+    internal sealed class CyclicPool : GameObjectPool
     {
         public override IEnumerable UsingObjects => _usingObjects;
 
-
         private LinkedList<ReuseableObject> _usingObjects;
 
-
         private LinkedListNodePool<ReuseableObject> _nodePool = new LinkedListNodePool<ReuseableObject>();
-
 
         public CyclicPool(GameObject prefab, int maxCount = -1, GameObject rootObject = null) : base(prefab, maxCount, rootObject)
         {
@@ -111,8 +108,6 @@ namespace ZincFramework.Pool.GameObjects
             }
 
             base.Dispose();
-
-            _nodePool.Dispose();
             _usingObjects = null;
             _unuseValues = null;
         }

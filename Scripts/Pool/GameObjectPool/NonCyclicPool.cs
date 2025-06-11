@@ -62,7 +62,7 @@ namespace ZincFramework.Pool.GameObjects
             foreach(ReuseableObject reuseableObject in _usingObjects)
             {
                 reuseableObject.gameObject.SetActive(false);
-                reuseableObject.OnRent();
+                reuseableObject.OnReturn();
                 _unuseValues.Enqueue(reuseableObject);
             }
 

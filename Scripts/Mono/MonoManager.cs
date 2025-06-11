@@ -1,106 +1,118 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using ZincFramework.MonoModel;
+
 
 namespace ZincFramework
 {
     public class MonoManager : BaseAutoMonoSingleton<MonoManager>
     {
-        private readonly List<IMonoObserver> _fixedUpdateObservers = new List<IMonoObserver>(0);
-        private readonly List<IMonoObserver> _updateObservers = new List<IMonoObserver>(0);
-        private readonly List<IMonoObserver> _lateUpdateObservers = new List<IMonoObserver>(0);
-        private readonly List<IMonoObserver> _applicationQuitObservers = new List<IMonoObserver>(0);
+        private readonly List<IMonoObserver> _fixedUpdateObversers = new List<IMonoObserver>(0);
 
-        private readonly HashSet<IMonoObserver> _deleteFixedUpdateObservers = new HashSet<IMonoObserver>();
-        private readonly HashSet<IMonoObserver> _deleteUpdateObservers = new HashSet<IMonoObserver>();
-        private readonly HashSet<IMonoObserver> _deleteLateUpdateObservers = new HashSet<IMonoObserver>();
+        private readonly List<IMonoObserver> _updateObversers = new List<IMonoObserver>(0);
+
+        private readonly List<IMonoObserver> _lateUpdateObversers = new List<IMonoObserver>(0);
+
+        private readonly HashSet<IMonoObserver> _willDeteleUpdateObversers = new HashSet<IMonoObserver>();
+
+
+        private readonly List<IMonoObserver> _applicationQuitObversers = new List<IMonoObserver>(0);
+
 
         public void AddUpdateListener(IMonoObserver updateObserver)
         {
-            _updateObservers.Add(updateObserver);
+            _updateObversers.Add(updateObserver);
             updateObserver.OnRegist();
         }
 
         public void RemoveUpdateListener(IMonoObserver updateObserver)
         {
-            _deleteUpdateObservers.Add(updateObserver);
+            _updateObversers.Remove(updateObserver);
             updateObserver.OnRemove();
         }
 
         public void AddFixedUpdateObserver(IMonoObserver fixedUpdateObserver)
         {
-            _fixedUpdateObservers.Add(fixedUpdateObserver);
+            _fixedUpdateObversers.Add(fixedUpdateObserver);
             fixedUpdateObserver.OnRegist();
         }
 
-        public void RemoveFixedUpdateObserver(IMonoObserver fixedUpdateObserver)
+        public void RemoveFixedUpdateObserver(IMonoObserver fixedUpdateObserver, bool isImmediately = false)
         {
-            _deleteFixedUpdateObservers.Add(fixedUpdateObserver);
+            if (isImmediately)
+            {
+                _fixedUpdateObversers.Remove(fixedUpdateObserver);
+            }
+            else
+            {
+                _willDeteleUpdateObversers.Add(fixedUpdateObserver);
+            }
+
             fixedUpdateObserver.OnRemove();
         }
 
+
         public void AddLateUpdateListener(IMonoObserver lateUpdateObserver)
         {
-            _lateUpdateObservers.Add(lateUpdateObserver);
+            _lateUpdateObversers.Add(lateUpdateObserver);
             lateUpdateObserver.OnRegist();
         }
 
         public void RemoveLateUpdateListener(IMonoObserver lateUpdateObserver)
         {
-            _deleteLateUpdateObservers.Add(lateUpdateObserver);
+            _lateUpdateObversers.Remove(lateUpdateObserver);
             lateUpdateObserver.OnRemove();
         }
 
+
         public void AddOnApplicationQuitListener(IMonoObserver quitObserver)
         {
-            _applicationQuitObservers.Add(quitObserver); // ÐÞÕý
+            _applicationQuitObversers.Add(quitObserver);
             quitObserver.OnRegist();
         }
 
         public void RemoveOnApplicationQuitListener(IMonoObserver quitObserver)
         {
-            _applicationQuitObservers.Remove(quitObserver);
+            _applicationQuitObversers.Remove(quitObserver);
             quitObserver.OnRemove();
         }
 
-        private void CleanupObservers(List<IMonoObserver> observers, HashSet<IMonoObserver> deleteObservers)
-        {
-            if (deleteObservers.Count > 0)
-            {
-                observers.RemoveAll(deleteObservers.Contains);
-                deleteObservers.Clear();
-            }
-        }
 
         private void Update()
         {
-            CleanupObservers(_updateObservers, _deleteUpdateObservers);
-            for (int i = 0; i < _updateObservers.Count; i++)
+            for (int i = _updateObversers.Count - 1; i >= 0; i--)
             {
-                _updateObservers[i].NotifyObserver();
+                _updateObversers[i].NotifyObserver();
             }
         }
 
         private void FixedUpdate()
         {
-            CleanupObservers(_fixedUpdateObservers, _deleteFixedUpdateObservers);
-            for (int i = 0; i < _fixedUpdateObservers.Count; i++)
+            if(_willDeteleUpdateObversers.Count > 0)
             {
-                _fixedUpdateObservers[i].NotifyObserver();
+                _fixedUpdateObversers.RemoveAll(_willDeteleUpdateObversers.Contains);
+                _willDeteleUpdateObversers.Clear();
+            }
+
+            for (int i = _fixedUpdateObversers.Count - 1; i >= 0; i--)
+            {
+                _fixedUpdateObversers[i].NotifyObserver();
             }
         }
 
         private void LateUpdate()
         {
-            CleanupObservers(_lateUpdateObservers, _deleteLateUpdateObservers);
-            for (int i = _lateUpdateObservers.Count - 1; i >= 0; i--)
+            for (int i = _lateUpdateObversers.Count - 1; i >= 0; i--)
             {
-                _lateUpdateObservers[i].NotifyObserver();
+                _lateUpdateObversers[i].NotifyObserver();
             }
         }
 
         private void OnApplicationQuit()
         {
-            _applicationQuitObservers.ForEach(x => x.NotifyObserver());
+            for (int i = _applicationQuitObversers.Count - 1; i >= 0; i--)
+            {
+                _applicationQuitObversers[i].NotifyObserver();
+            }
         }
     }
 }

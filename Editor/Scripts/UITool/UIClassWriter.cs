@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using ZincFramework.ScriptWriter;
 using ZincFramework.UI.Collections;
 using ZincFramework.UI.Complex;
+using UnityEngine.EventSystems;
 
 
 
@@ -13,21 +14,21 @@ namespace ZincFramework.UI.ScriptWriter
 {
     public static class UIClassWriter
     {
-        public readonly static string[] _baseStatement = new string[] { "base.Initialize();" };
+        public static string[] BaseStatement { get; } = new string[] { "base.Initialize();" };
 
         private readonly static List<string> _baseLines = new List<string>(100);
 
-        public static void WriteClass(Selectable[] selectables, string className, string savePath, UIConfig uIConfig)
+        public static void WriteClass(UIBehaviour[] uiBehaviours, string className, string savePath, UIConfig uIConfig)
         {
             //先写父类
             CSharpWriter cSharpWriter = CSharpWriter.RentWriter();
-            File.WriteAllLines(savePath, GetClassStrings(cSharpWriter, className, selectables, uIConfig));
+            File.WriteAllLines(savePath, GetClassStrings(cSharpWriter, className, uiBehaviours, uIConfig));
             int count = string.IsNullOrEmpty(uIConfig.ClassNamespaces) ? 0 : 1;
 
             string childName = className.Replace("Base", string.Empty);
 
             //检查子类是否存在
-            if (typeof(ComplexUI).Assembly.GetType(uIConfig.ClassNamespaces + $".{childName}") == null)
+            if (typeof(ComplexUI).Assembly.GetType($"{uIConfig.ClassNamespaces}.{childName}") == null)
             {
                 using (FileStream fileStream = File.Create(savePath.Replace("Base", string.Empty)))
                 {
@@ -35,7 +36,7 @@ namespace ZincFramework.UI.ScriptWriter
                     cSharpWriter.WriteNamespace(uIConfig.Namespaces.ToArray());
                     cSharpWriter.BeginWriteClass(count, uIConfig.ClassNamespaces, null, className.Replace("Base", string.Empty), parents: new string[] { className + "Base" });
 
-                    cSharpWriter.WriteMethod(count + 1, "Initialize", "void", CSharpWriter.Modifiers.Override, null, _baseStatement);
+                    cSharpWriter.WriteMethod(count + 1, "Initialize", "void", CSharpWriter.Modifiers.Override, null, BaseStatement);
 
                     cSharpWriter.EndWriteClass(count, count > 0);
                     cSharpWriter.WriteAndReturn(fileStream);
@@ -45,7 +46,7 @@ namespace ZincFramework.UI.ScriptWriter
             AssetDatabase.Refresh();
         }
 
-        public static string[] GetClassStrings(CSharpWriter cSharpWriter, string className, IList<Selectable> allBehaviors, UIConfig uIConfig)
+        public static string[] GetClassStrings(CSharpWriter cSharpWriter, string className, IList<UIBehaviour> allBehaviors, UIConfig uIConfig)
         {
             int count = string.IsNullOrEmpty(uIConfig.ClassNamespaces) ? 0 : 1;
             cSharpWriter.WriteNamespace(uIConfig.Namespaces.ToArray());
@@ -62,27 +63,27 @@ namespace ZincFramework.UI.ScriptWriter
             return readStr;
         }
 
-        private static string[] CreateFields(CSharpWriter cSharpWriter, string className, int count, IList<Selectable> selectables)
+        private static string[] CreateFields(CSharpWriter cSharpWriter, string className, int count, IList<UIBehaviour> uiBehaviours)
         {
-            string[] statements = new string[selectables.Count + 1];
+            string[] statements = new string[uiBehaviours.Count + 1];
             HashSet<string> fields = new HashSet<string>();
             UICollector collector = new UICollector();
 
-            for (int i = 0; i < selectables.Count; i++)
+            for (int i = 0; i < uiBehaviours.Count; i++)
             {
-                if (selectables[i] is Scrollbar)
+                if (uiBehaviours[i] is Scrollbar)
                 {
                     continue;
                 }
 
-                if (!fields.Contains(selectables[i].name))
+                if (!fields.Contains(uiBehaviours[i].name))
                 {
-                    UIWriteInfo uIWriteInfo = collector.GetUIWriteInfos(className, selectables[i]);
+                    UIWriteInfo uIWriteInfo = collector.GetUIWriteInfos(className, uiBehaviours[i]);
                     cSharpWriter.WriteAutoProperty(count, uIWriteInfo.Type, uIWriteInfo.Name, CSharpWriter.Accessors.Public, CSharpWriter.Accessors.Protected);
                     cSharpWriter.WriteLine();
 
                     statements[i] = UIMethodWriter.GetMethodStatement(uIWriteInfo);
-                    fields.Add(selectables[i].name);
+                    fields.Add(uiBehaviours[i].name);
                 }
             }
 

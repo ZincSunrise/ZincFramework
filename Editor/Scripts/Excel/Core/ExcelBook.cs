@@ -17,8 +17,6 @@ namespace ZincFramework
 
             public ExcelBook(WorkbookPart workbookPart)
             {
-                SharedStringTable sharedStringTable = workbookPart.SharedStringTablePart.SharedStringTable;
-                
                 var sheets = workbookPart.Workbook.Sheets.Descendants<Sheet>();
 
                 ExcelSheets = new ExcelSheet[sheets.Count()];

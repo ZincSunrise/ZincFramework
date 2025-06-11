@@ -1,67 +1,63 @@
 using System;
-using System.Collections.Concurrent;
-using ZincFramework.MVC.PooledCommand;
 using ZincFramework.MVC.Interfaces;
 using ZincFramework.MVC.Observation;
+using System.Collections.Generic;
 
 
 
-namespace ZincFramework
+namespace ZincFramework.MVC.Core
 {
-    namespace MVC
+    /// <summary>
+    /// 如果可能出现多线程请将 Dictionary<string, ICommand> 
+    /// 改为                 ConcurrentDictionary<string, Func<ICommand>>
+    /// 如果要复用命令，字典键值用传入对象池类 DataPool<ICommand>，但是要让ICommand继承IResumeable
+    /// </summary>
+    public sealed class Controller : Notifier, IController
     {
-        namespace Core
+        public static Controller Instance => _instance.Value;
+
+        private readonly static Lazy<Controller> _instance = new Lazy<Controller>(() => new Controller());
+
+        private Controller() { }
+
+        private IView View => Core.View.Instance;
+
+
+        private readonly Dictionary<string, ICommand> _commands = new Dictionary<string, ICommand>();
+
+        public void ExcuteCommand(Notification notification)
         {
-            public sealed class Controller : Notifier, IController
+            if (_commands.TryGetValue(notification.Name, out var command))
             {
-                public static Controller Instance => _instance.Value;
-
-                private readonly static Lazy<Controller> _instance = new Lazy<Controller>(() => new Controller());
-
-                private Controller() { }
-
-                private IView View => Core.View.Instance;
-
-
-                private readonly ConcurrentDictionary<string, CommandPool> _commands = new ConcurrentDictionary<string, CommandPool>();
-
-                public void ExcuteCommand(Notification notification)
-                {
-                    if(_commands.TryGetValue(notification.Name, out var factory))
-                    {
-                        var command = factory.RentCommand(out var weakReference);
-                        command.Execute(notification);
-                        factory.ReturnCommand(weakReference);
-                    }
-                }
-
-                public void RegistCommand(string name, Func<ICommand> commandFactory)
-                {
-                    if (!_commands.ContainsKey(name))
-                    {
-                        View.RegistObserver(name, new Observer(ExcuteCommand, this));
-                    }
-
-                    _commands[name] = new CommandPool(commandFactory);
-                }
-
-                public bool RemoveCommand(string name)
-                {
-                    if (!_commands.TryRemove(name, out _))
-                    {
-                        UnityEngine.Debug.LogWarning($"移除{name}失败");
-                        return false;
-                    }
-
-                    View.RemoveObserver(name, this);
-                    return true;
-                }
-
-                public bool IsHasCommand(string name)
-                {
-                    return _commands.ContainsKey(name);
-                }
+                command.Execute(notification);
             }
+        }
+
+        public void RegistCommand(string name, ICommand command)
+        {
+            if (!_commands.ContainsKey(name))
+            {
+                View.RegistObserver(name, new Observer(ExcuteCommand, this));
+            }
+
+            _commands[name] = command;
+        }
+
+        public bool RemoveCommand(string name)
+        {
+            if (!_commands.Remove(name, out _))
+            {
+                UnityEngine.Debug.LogWarning($"移除{name}失败");
+                return false;
+            }
+
+            View.RemoveObserver(name, this);
+            return true;
+        }
+
+        public bool IsHasCommand(string name)
+        {
+            return _commands.ContainsKey(name);
         }
     }
 }

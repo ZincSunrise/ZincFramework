@@ -1,7 +1,3 @@
-using System;
-using ZincFramework.MVC.Observation;
-
-
 namespace ZincFramework
 {
     namespace MVC
@@ -10,7 +6,7 @@ namespace ZincFramework
         {
             public interface IController
             {
-                void RegistCommand(string name, Func<ICommand> factory);
+                void RegistCommand(string name, ICommand factory);
 
                 bool RemoveCommand(string name);
 

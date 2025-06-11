@@ -1,9 +1,9 @@
-using UnityEngine;
+using UnityEditor;
 using UnityEditor.UIElements;
+using UnityEngine;
 using UnityEngine.UIElements;
-using ZincFramework.Events;
 using ZincFramework.DialogueSystem.TextData;
-using ZincFramework.LoadServices.Addressable;
+using ZincFramework.Events;
 
 
 
@@ -79,7 +79,7 @@ namespace ZincFramework.DialogueSystem.GraphView
         }
 
 
-        public async void UpdateSprite(int index, VisibleState visibleState)
+        public void UpdateSprite(int index, VisibleState visibleState)
         {
             Index = index;
             VisableState = visibleState;
@@ -103,7 +103,7 @@ namespace ZincFramework.DialogueSystem.GraphView
 
             if (assetName != string.Empty)
             {
-                ChangeSprite(await AddressablesManager.Instance.LoadAssetAsync<Sprite>(assetName));
+                ChangeSprite(AssetDatabase.LoadAssetAtPath<Sprite>(assetName));
             }
 
             FocusToggle.RegisterValueChangedCallback(OnToggleChanged);

@@ -1,15 +1,12 @@
 using System.Collections;
-using System.Data;
 using System.IO;
 using UnityEngine;
-using ZincFramework.LoadServices.Editor;
 using ZincFramework.Serialization;
-using ZincFramework.Binary.Excel;
 using ZincFramework.Serialization.TypeWriter;
 using ZincFramework.ScriptWriter;
 using System;
 using System.Collections.Generic;
-using ZincFramework.DataPools;
+using ZincFramework.Binary.Excel;
 
 
 
@@ -42,7 +39,10 @@ namespace ZincFramework
                 string dataName = TextUtility.UpperFirstChar(className);
                 path = Path.Combine(path, dataName + ".cs");
 
-                File.WriteAllText(path, "");
+                if (File.Exists(path))
+                {
+                    File.WriteAllText(path, string.Empty);
+                }
 
                 using (FileStream fileStream = File.Open(path, FileMode.OpenOrCreate, FileAccess.Write))
                 {

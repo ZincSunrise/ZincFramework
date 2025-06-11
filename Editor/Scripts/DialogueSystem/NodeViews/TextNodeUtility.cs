@@ -1,10 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Collections.Generic;
-using UnityEngine;
-using ZincFramework.Excel;
 using ZincFramework.DialogueSystem.TextData;
+using ZincFramework.Excel;
 using CharacterInfo = ZincFramework.DialogueSystem.TextData.CharacterInfo;
 
 
