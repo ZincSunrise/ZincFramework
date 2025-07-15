@@ -13,11 +13,11 @@ namespace ZincFramework
 {
     namespace Security
     {
-        //¼ÓÃÜ¹ÜÀíÆ÷
+        //åŠ å¯†ç®¡ç†å™¨
         public static class CryptoEngine
         {
             /// <summary>
-            /// ½¨ÒéÊ¹ÓÃÊ¹ÓÃCrcµÄStandard_32Ä£Ê½, ¹şÏ£Ëã·¨µÄSHA-256
+            /// å»ºè®®ä½¿ç”¨ä½¿ç”¨Crcçš„Standard_32æ¨¡å¼, å“ˆå¸Œç®—æ³•çš„SHA-256
             /// </summary>
             /// <param name="data"></param>
             /// <param name="isUseCrc"></param>
@@ -65,8 +65,8 @@ namespace ZincFramework
                     if (!cryptoStrategy.VerifyData(encryptData.ToArray(), checkCode.ToArray()))
                     {
                         verifyDefeatAction?.Invoke();
-                        LogUtility.LogError("Êı¾İ±»´Û¸Ä");
-                        //throw new ArgumentException("Êı¾İ±»´Û¸Ä");
+                        LogUtility.LogError("æ•°æ®è¢«ç¯¡æ”¹");
+                        //throw new ArgumentException("æ•°æ®è¢«ç¯¡æ”¹");
                     }
 
                     using (MemoryStream memoryStream = new MemoryStream())
@@ -76,12 +76,12 @@ namespace ZincFramework
 
                         using (CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write))
                         {
-                            // ½«¼ÓÃÜÊı¾İĞ´Èë CryptoStream£¬Ëü»á×Ô¶¯½âÃÜ²¢Ğ´Èë MemoryStream  
+                            // å°†åŠ å¯†æ•°æ®å†™å…¥ CryptoStreamï¼Œå®ƒä¼šè‡ªåŠ¨è§£å¯†å¹¶å†™å…¥ MemoryStream  
                             cryptoStream.Write(encryptData);
-                            cryptoStream.FlushFinalBlock(); // µ÷ÓÃ´Ë·½·¨ÒÔÈ·±£ËùÓĞÊı¾İ¶¼±»´¦Àí²¢Ë¢ĞÂµ½µ×²ãÁ÷  
+                            cryptoStream.FlushFinalBlock(); // è°ƒç”¨æ­¤æ–¹æ³•ä»¥ç¡®ä¿æ‰€æœ‰æ•°æ®éƒ½è¢«å¤„ç†å¹¶åˆ·æ–°åˆ°åº•å±‚æµ  
                         }
 
-                        // ´Ó MemoryStream »ñÈ¡½âÃÜºóµÄÊı¾İ  
+                        // ä» MemoryStream è·å–è§£å¯†åçš„æ•°æ®  
                         byte[] decryptData = memoryStream.ToArray();
                         return decryptData;
                     }
@@ -90,7 +90,7 @@ namespace ZincFramework
 
 
             /// <summary>
-            /// ½¨ÒéÊ¹ÓÃÊ¹ÓÃCrcµÄStandard_32Ä£Ê½, ¹şÏ£Ëã·¨µÄSHA-256
+            /// å»ºè®®ä½¿ç”¨ä½¿ç”¨Crcçš„Standard_32æ¨¡å¼, å“ˆå¸Œç®—æ³•çš„SHA-256
             /// </summary>
             /// <param name="data"></param>
             /// <param name="isUseCrc"></param>
@@ -149,8 +149,8 @@ namespace ZincFramework
                     if (!cryptoStrategy.VerifyData(encryptData.ToArray(), checkCode.ToArray()))
                     {
                         verifyDefeatAction?.Invoke();
-                        LogUtility.LogError("Êı¾İ±»´Û¸Ä");
-                        //throw new ArgumentException("Êı¾İ±»´Û¸Ä");
+                        LogUtility.LogError("æ•°æ®è¢«ç¯¡æ”¹");
+                        //throw new ArgumentException("æ•°æ®è¢«ç¯¡æ”¹");
                     }
 
                     using (MemoryStream memoryStream = new MemoryStream())
@@ -159,12 +159,12 @@ namespace ZincFramework
                         ICryptoTransform cryptoTransform = aes.CreateDecryptor();
                         using (CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write))
                         {
-                            // ½«¼ÓÃÜÊı¾İĞ´Èë CryptoStream£¬Ëü»á×Ô¶¯½âÃÜ²¢Ğ´Èë MemoryStream  
+                            // å°†åŠ å¯†æ•°æ®å†™å…¥ CryptoStreamï¼Œå®ƒä¼šè‡ªåŠ¨è§£å¯†å¹¶å†™å…¥ MemoryStream  
                             cryptoStream.Write(encryptData);
-                            cryptoStream.FlushFinalBlock(); // µ÷ÓÃ´Ë·½·¨ÒÔÈ·±£ËùÓĞÊı¾İ¶¼±»´¦Àí²¢Ë¢ĞÂµ½µ×²ãÁ÷  
+                            cryptoStream.FlushFinalBlock(); // è°ƒç”¨æ­¤æ–¹æ³•ä»¥ç¡®ä¿æ‰€æœ‰æ•°æ®éƒ½è¢«å¤„ç†å¹¶åˆ·æ–°åˆ°åº•å±‚æµ  
                         }
 
-                        // ´Ó MemoryStream »ñÈ¡½âÃÜºóµÄÊı¾İ  
+                        // ä» MemoryStream è·å–è§£å¯†åçš„æ•°æ®  
                         byte[] decryptData = memoryStream.ToArray();
                         return decryptData;
                     }
@@ -214,8 +214,8 @@ namespace ZincFramework
                     if (!cryptoStrategy.VerifyData(encryptData.ToArray(), checkCode.ToArray()))
                     {
                         verifyDefeatAction?.Invoke();
-                        LogUtility.LogError("Êı¾İ±»´Û¸Ä");
-                        //throw new ArgumentException("Êı¾İ±»´Û¸Ä");
+                        LogUtility.LogError("æ•°æ®è¢«ç¯¡æ”¹");
+                        //throw new ArgumentException("æ•°æ®è¢«ç¯¡æ”¹");
                     }
 
                     using (MemoryStream memoryStream = new MemoryStream())
@@ -223,12 +223,12 @@ namespace ZincFramework
                         ICryptoTransform cryptoTransform = aes.CreateDecryptor();
                         using (CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write))
                         {
-                            // ½«¼ÓÃÜÊı¾İĞ´Èë CryptoStream£¬Ëü»á×Ô¶¯½âÃÜ²¢Ğ´Èë MemoryStream  
+                            // å°†åŠ å¯†æ•°æ®å†™å…¥ CryptoStreamï¼Œå®ƒä¼šè‡ªåŠ¨è§£å¯†å¹¶å†™å…¥ MemoryStream  
                             await cryptoStream.WriteAsync(encryptData);
-                            cryptoStream.FlushFinalBlock(); // µ÷ÓÃ´Ë·½·¨ÒÔÈ·±£ËùÓĞÊı¾İ¶¼±»´¦Àí²¢Ë¢ĞÂµ½µ×²ãÁ÷  
+                            cryptoStream.FlushFinalBlock(); // è°ƒç”¨æ­¤æ–¹æ³•ä»¥ç¡®ä¿æ‰€æœ‰æ•°æ®éƒ½è¢«å¤„ç†å¹¶åˆ·æ–°åˆ°åº•å±‚æµ  
                         }
 
-                        // ´Ó MemoryStream »ñÈ¡½âÃÜºóµÄÊı¾İ  
+                        // ä» MemoryStream è·å–è§£å¯†åçš„æ•°æ®  
                         byte[] decryptData = memoryStream.ToArray();
                     }
                 }
@@ -236,7 +236,7 @@ namespace ZincFramework
 
 
             /// <summary>
-            /// ½¨ÒéÊ¹ÓÃÊ¹ÓÃCrcµÄStandard_32Ä£Ê½, ¹şÏ£Ëã·¨µÄSHA-256
+            /// å»ºè®®ä½¿ç”¨ä½¿ç”¨Crcçš„Standard_32æ¨¡å¼, å“ˆå¸Œç®—æ³•çš„SHA-256
             /// </summary>
             /// <param name="data"></param>
             /// <param name="isUseCrc"></param>
@@ -293,8 +293,8 @@ namespace ZincFramework
                     if (!cryptoStrategy.VerifyData(encryptData.ToArray(), checkCode.ToArray()))
                     {
                         verifyDefeatAction?.Invoke();
-                        LogUtility.LogError("Êı¾İ±»´Û¸Ä");
-                        //throw new ArgumentException("Êı¾İ±»´Û¸Ä");
+                        LogUtility.LogError("æ•°æ®è¢«ç¯¡æ”¹");
+                        //throw new ArgumentException("æ•°æ®è¢«ç¯¡æ”¹");
                     }
 
                     using (MemoryStream memoryStream = new MemoryStream())
@@ -303,12 +303,12 @@ namespace ZincFramework
                         ICryptoTransform cryptoTransform = aes.CreateDecryptor();
                         using (CryptoStream cryptoStream = new CryptoStream(memoryStream, cryptoTransform, CryptoStreamMode.Write))
                         {
-                            // ½«¼ÓÃÜÊı¾İĞ´Èë CryptoStream£¬Ëü»á×Ô¶¯½âÃÜ²¢Ğ´Èë MemoryStream  
+                            // å°†åŠ å¯†æ•°æ®å†™å…¥ CryptoStreamï¼Œå®ƒä¼šè‡ªåŠ¨è§£å¯†å¹¶å†™å…¥ MemoryStream  
                             await cryptoStream.WriteAsync(encryptData);
-                            cryptoStream.FlushFinalBlock(); // µ÷ÓÃ´Ë·½·¨ÒÔÈ·±£ËùÓĞÊı¾İ¶¼±»´¦Àí²¢Ë¢ĞÂµ½µ×²ãÁ÷  
+                            cryptoStream.FlushFinalBlock(); // è°ƒç”¨æ­¤æ–¹æ³•ä»¥ç¡®ä¿æ‰€æœ‰æ•°æ®éƒ½è¢«å¤„ç†å¹¶åˆ·æ–°åˆ°åº•å±‚æµ  
                         }
 
-                        // ´Ó MemoryStream »ñÈ¡½âÃÜºóµÄÊı¾İ  
+                        // ä» MemoryStream è·å–è§£å¯†åçš„æ•°æ®  
                         byte[] decryptData = memoryStream.ToArray();
                     }
                 }
@@ -319,7 +319,7 @@ namespace ZincFramework
                 byte[] decryptedKey;
                 using (RSA rsa = RSA.Create())
                 {
-                    TextAsset textAsset = ResourcesManager.Instance.Load<TextAsset>("Security/RSAKeyCode");
+                    TextAsset textAsset = ResourcesManager.LoadAsset<TextAsset>("Security/RSAKeyCode");
                     byte[] encryptedRSAKey = textAsset.bytes;
 
                     using (FileStream fileStream = File.OpenRead(Path.Combine(FrameworkPaths.SavePath, "SaveCore" + BinaryDataManager.Extension)))

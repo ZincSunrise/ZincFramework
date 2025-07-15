@@ -1,6 +1,6 @@
-namespace ZincFramework.LoadServices.Addressable
+namespace ZincFramework.LoadServices.AssetBundles
 {
-    public readonly struct AssetBundlePair
+    public class AssetBundlePair
     {
         public string BundleName { get; }
 

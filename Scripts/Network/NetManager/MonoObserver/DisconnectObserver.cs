@@ -1,4 +1,4 @@
-using ZincFramework.MonoModel;
+using ZincFramework.Loop;
 
 
 namespace ZincFramework.Network
@@ -7,9 +7,10 @@ namespace ZincFramework.Network
     {
         private class DisconnectObserver : IMonoObserver
         {
-            public void NotifyObserver()
+            public bool Tick()
             {
                 Instance.Disconnect(true);
+                return false;
             }
 
             public void OnRegist()

@@ -1,11 +1,10 @@
 using System;
-using UnityEngine;
 using System.Collections.Generic;
-using ZincFramework.Pool.GameObjects;
-using ZincFramework.DataPools;
+using UnityEngine;
+using ZincFramework.Pools.GameObjects;
 
 
-namespace ZincFramework.Pool
+namespace ZincFramework.Pools
 {
     public class ObjectPoolManager : BaseSafeSingleton<ObjectPoolManager>
     {
@@ -17,22 +16,22 @@ namespace ZincFramework.Pool
 
 
         /// <summary>
-        /// ²»Ñ­»·¶ÔÏó³Ø£¬Èç¹û´ïµ½×î´óÈİÁ¿²»ÔÙ»áÈ¡³ö¶ÔÏó
+        /// ä¸å¾ªç¯å¯¹è±¡æ± ï¼Œå¦‚æœè¾¾åˆ°æœ€å¤§å®¹é‡ä¸å†ä¼šå–å‡ºå¯¹è±¡
         /// </summary>
         /// <param name="name"></param>
         /// <param name="sourceObject"></param>
-        /// <param name="maxCount">Èç¹ûÌîÈë-1Ôò´ú±íÃ»ÓĞ×î´óÈİÁ¿ÏŞÖÆ</param>
+        /// <param name="maxCount">å¦‚æœå¡«å…¥-1åˆ™ä»£è¡¨æ²¡æœ‰æœ€å¤§å®¹é‡é™åˆ¶</param>
         public void RegistNonCyclicPool(string name, GameObject sourceObject, int maxCount = 0, GameObject rootObject = null)
         {
 #if UNITY_EDITOR
             if (_objectDic.ContainsKey(name))
             {
-                Debug.LogWarning($"ÄãÌæ»»ÁË¶ÔÏó³ØÖĞÃû×ÖÎª{name}µÄ¶ÔÏó");
+                Debug.LogWarning($"ä½ æ›¿æ¢äº†å¯¹è±¡æ± ä¸­åå­—ä¸º{name}çš„å¯¹è±¡");
             }
 #endif
             if (!sourceObject.TryGetComponent<IReuseable>(out _))
             {
-                throw new NotSupportedException("²»Ö§³Ö²»¼Ì³Ğ" + nameof(IReuseable) + "µÄÀà");
+                throw new NotSupportedException("ä¸æ”¯æŒä¸ç»§æ‰¿" + nameof(IReuseable) + "çš„ç±»");
             }
 
             sourceObject.name = name;
@@ -42,7 +41,7 @@ namespace ZincFramework.Pool
 
 
         /// <summary>
-        /// Ñ­»·¶ÔÏó³Ø£¬Èç¹û´ïµ½×î´óÈİÁ¿£¬»á½«×îÔçÈ¡³öµÄ¶ÔÏóÖØÖÃ²¢È¡³ö
+        /// å¾ªç¯å¯¹è±¡æ± ï¼Œå¦‚æœè¾¾åˆ°æœ€å¤§å®¹é‡ï¼Œä¼šå°†æœ€æ—©å–å‡ºçš„å¯¹è±¡é‡ç½®å¹¶å–å‡º
         /// </summary>
         /// <param name="name"></param>
         /// <param name="sourceObject"></param>
@@ -52,13 +51,13 @@ namespace ZincFramework.Pool
 #if UNITY_EDITOR
             if (_objectDic.ContainsKey(name))
             {
-                Debug.LogWarning($"ÄãÌæ»»ÁË¶ÔÏó³ØÖĞÃû×ÖÎª{name}µÄ¶ÔÏó");
+                Debug.LogWarning($"ä½ æ›¿æ¢äº†å¯¹è±¡æ± ä¸­åå­—ä¸º{name}çš„å¯¹è±¡");
             }
 #endif
 
             if (!sourceObject.TryGetComponent<IReuseable>(out _))
             {
-                throw new NotSupportedException("²»Ö§³Ö²»¼Ì³Ğ" + nameof(IReuseable) + "µÄÀà");
+                throw new NotSupportedException("ä¸æ”¯æŒä¸ç»§æ‰¿" + nameof(IReuseable) + "çš„ç±»");
             }
 
             sourceObject.name = name;
@@ -67,7 +66,7 @@ namespace ZincFramework.Pool
         }
 
         /// <summary>
-        /// »áÉ¾³ıËùÓĞÔÚ¶ÔÏó³ØÖ®ÖĞµÄÎïÌå
+        /// ä¼šåˆ é™¤æ‰€æœ‰åœ¨å¯¹è±¡æ± ä¹‹ä¸­çš„ç‰©ä½“
         /// </summary>
         /// <param name="name"></param>
         public void UnRegistPool(string name)
@@ -79,15 +78,6 @@ namespace ZincFramework.Pool
             }
         }
 
-        public void SetPoolParent(string name, GameObject parent)
-        {
-            if (_objectDic.TryGetValue(name, out GameObjectPool gameObjectPool))
-            {
-                gameObjectPool.RootObject = parent;
-            }
-        }
-
-
         public void SetPoolMaxCount(string name, int maxCount)
         {
             if (_objectDic.TryGetValue(name, out GameObjectPool gameObjectPool))
@@ -97,13 +87,13 @@ namespace ZincFramework.Pool
         }
 
         /// <summary>
-        /// ¼ì²éÊÇ·ñÓĞÕâ¸ö³Ø×Ó
+        /// æ£€æŸ¥æ˜¯å¦æœ‰è¿™ä¸ªæ± å­
         /// </summary>
         /// <param name="name"></param>
         public bool ContainsPool(string name) => _objectDic.ContainsKey(name);
 
         /// <summary>
-        /// Çå³ıÄ³Ò»¸ö¶ÔÏó³Ø
+        /// æ¸…é™¤æŸä¸€ä¸ªå¯¹è±¡æ± 
         /// </summary>
         /// <param name="name"></param>
         public void ClearPool(string name)
@@ -116,23 +106,23 @@ namespace ZincFramework.Pool
 
 
         /// <summary>
-        /// ½èÓÃÖ®Ç°¼ÇµÃÏÈ×¢²á
+        /// å€Ÿç”¨ä¹‹å‰è®°å¾—å…ˆæ³¨å†Œ
         /// </summary>
         /// <param name="name"></param>
-        /// <returns>²»×¢²á¾Í»á±¨´íÅ¶</returns>
+        /// <returns>ä¸æ³¨å†Œå°±ä¼šæŠ¥é”™å“¦</returns>
         /// <exception cref="ArgumentException"></exception>
         public T RentReuseableObject<T>(string name) where T : ReuseableObject
         {
             if (!_objectDic.TryGetValue(name, out GameObjectPool gameObjectPool))
             {
-                throw new ArgumentException($"ÄãÃ»ÓĞ×¢²áÃû×ÖÎª{name}µÄ¶ÔÏó");
+                throw new ArgumentException($"ä½ æ²¡æœ‰æ³¨å†Œåå­—ä¸º{name}çš„å¯¹è±¡");
             }
 
             return gameObjectPool.RentValue() as T;
         }
 
         /// <summary>
-        /// ½èÓÃ¿É»ØÊÕ¶ÔÏó
+        /// å€Ÿç”¨å¯å›æ”¶å¯¹è±¡
         /// </summary>
         /// <param name="reuseableObject"></param>
         /// <param name="resetCallback"></param>
@@ -144,16 +134,16 @@ namespace ZincFramework.Pool
 
 
         /// <summary>
-        /// ½èÓÃÖ®Ç°¼ÇµÃÏÈ×¢²á
+        /// å€Ÿç”¨ä¹‹å‰è®°å¾—å…ˆæ³¨å†Œ
         /// </summary>
         /// <param name="name"></param>
-        /// <returns>²»×¢²á¾Í»á±¨´íÅ¶</returns>
+        /// <returns>ä¸æ³¨å†Œå°±ä¼šæŠ¥é”™å“¦</returns>
         /// <exception cref="ArgumentException"></exception>
         public GameObject RentGameObject(string name)
         {
             if (!_objectDic.TryGetValue(name, out GameObjectPool gameObjectPool))
             {
-                throw new ArgumentException($"ÄãÃ»ÓĞ×¢²áÃû×ÖÎª{name}µÄ¶ÔÏó");
+                throw new ArgumentException($"ä½ æ²¡æœ‰æ³¨å†Œåå­—ä¸º{name}çš„å¯¹è±¡");
             }
 
             return gameObjectPool.RentValue().gameObject;
@@ -161,7 +151,7 @@ namespace ZincFramework.Pool
 
 
         /// <summary>
-        /// ²»½¨ÒéÖ±½ÓÊ¹ÓÃÕâ¸ö,¸üÓ¦¸ÃÊ¹ÓÃ²ÎÊıÎªReuseableObjectµÄ
+        /// ä¸å»ºè®®ç›´æ¥ä½¿ç”¨è¿™ä¸ª,æ›´åº”è¯¥ä½¿ç”¨å‚æ•°ä¸ºReuseableObjectçš„
         /// </summary>
         /// <param name="gameObject"></param>
         /// <param name="resetCallback"></param>
@@ -173,21 +163,21 @@ namespace ZincFramework.Pool
 
 
         /// <summary>
-        /// »ØÊÕ²»Çå³ıÄ³Ò»¸ö¶ÔÏó³ØÖĞµÄ¶ÔÏó
+        /// å›æ”¶ä¸æ¸…é™¤æŸä¸€ä¸ªå¯¹è±¡æ± ä¸­çš„å¯¹è±¡
         /// </summary>
         /// <param name="poolName"></param>
         public void PoolReturnAll(string poolName)
         {
             if (!_objectDic.TryGetValue(poolName, out GameObjectPool gameObjectPool))
             {
-                throw new ArgumentException($"ÄãÃ»ÓĞ×¢²áÃû×ÖÎª{poolName}µÄ¶ÔÏó");
+                throw new ArgumentException($"ä½ æ²¡æœ‰æ³¨å†Œåå­—ä¸º{poolName}çš„å¯¹è±¡");
             }
 
             gameObjectPool.ReturnAll();
         }
 
         /// <summary>
-        /// »ØÊÕµ«ÊÇ²»Çå³ı¶ÔÏó³ØÖĞ¶ÔÏó
+        /// å›æ”¶ä½†æ˜¯ä¸æ¸…é™¤å¯¹è±¡æ± ä¸­å¯¹è±¡
         /// </summary>
         public void ReturnAll()
         {
@@ -199,7 +189,7 @@ namespace ZincFramework.Pool
 
 
         /// <summary>
-        /// Çå³ı¶ÔÏó³ØÖĞµÄÒıÓÃ£¬µ«ÊÇ²»Çå³ı¶ÔÏó
+        /// æ¸…é™¤å¯¹è±¡æ± ä¸­çš„å¼•ç”¨ï¼Œä½†æ˜¯ä¸æ¸…é™¤å¯¹è±¡
         /// </summary>
         public void ClearAllPool()
         {
@@ -211,7 +201,7 @@ namespace ZincFramework.Pool
 
 
         /// <summary>
-        /// Çå³ı¶ÔÏó³ØºÍ¶ÔÏó³ØÖĞµÄËùÓĞ¶ÔÏó
+        /// æ¸…é™¤å¯¹è±¡æ± å’Œå¯¹è±¡æ± ä¸­çš„æ‰€æœ‰å¯¹è±¡
         /// </summary>
         public void DisposeAllPool()
         {

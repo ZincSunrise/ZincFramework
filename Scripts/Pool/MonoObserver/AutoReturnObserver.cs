@@ -1,8 +1,8 @@
 using UnityEngine;
-using ZincFramework.MonoModel;
+using ZincFramework.Loop;
 
 
-namespace ZincFramework.Pool.GameObjects
+namespace ZincFramework.Pools.GameObjects
 {
     public class AutoReturnObserver : IMonoObserver
     {
@@ -18,7 +18,7 @@ namespace ZincFramework.Pool.GameObjects
             _returnOffset = returnOffset;
         }
 
-        public void NotifyObserver()
+        public bool Tick()
         {
             if (Time.time - _returnTimer > _returnOffset)
             {
@@ -27,8 +27,11 @@ namespace ZincFramework.Pool.GameObjects
                     ObjectPoolManager.Instance.ReturnReusableGameObject(_reuseableObject);
                 }
 
-                MonoManager.Instance.RemoveFixedUpdateObserver(this);
+                ZincLoopSystem.RemoveFixedUpdateObserver(this);
+                return false;
             }
+
+            return true;
         }
 
         public void OnRegist()

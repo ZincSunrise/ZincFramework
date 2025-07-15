@@ -1,64 +1,65 @@
 using System.Net.Sockets;
 using UnityEngine;
+using ZincFramework.Audio;
 
 
 namespace ZincFramework
 {
     public class FrameworkData : ScriptableObject
     {
-        [Header("-----------ÎÄ¼ş¶ÁÈ¡´æ´¢Ïà¹Ø-----------")]
-        [Header("±£´æÎÄ¼şµÄÍØÕ¹Ãû")]
+        [Header("-----------æ–‡ä»¶è¯»å–å­˜å‚¨ç›¸å…³-----------")]
+        [Header("ä¿å­˜æ–‡ä»¶çš„æ‹“å±•å")]
         public string extension;
 
-        [Header("-----------×ÊÔ´¶ÁÈ¡Ïà¹Ø-----------")]
-        [Header("ÊÇ·ñÔÚ¼ÓÔØ×ÊÔ´µÄÊ±ºòÊÇdebugÄ£Ê½")]
+        [Header("-----------èµ„æºè¯»å–ç›¸å…³-----------")]
+        [Header("æ˜¯å¦æ˜¯debugæ¨¡å¼ï¼Œä¼šæ‰“å¼€ç»å¤§éƒ¨åˆ†æ§åˆ¶å°æç¤º")]
         public bool isDebug = false;
 
-        [Header("-----------ÒôÀÖÏà¹Ø-----------")]
-        [Header("ÒôÀÖÄ£Ê½")]
+        [Header("-----------éŸ³ä¹ç›¸å…³-----------")]
+        [Header("éŸ³ä¹æ¨¡å¼")]
         public E_Sound_Mode soundMode = E_Sound_Mode.TwoD;
-        [Header("ÒôÀÖµ­³öÊ±¼ä")]
+        [Header("éŸ³ä¹æ·¡å‡ºæ—¶é—´")]
         public float fadePersent = 0.2f;
-        [Header("ÒôÀÖÒôĞ§µ¥Î»×î´óÊıÁ¿,±ØĞëÊÇ2µÄÃİ´Î·½")]
+        [Header("éŸ³ä¹éŸ³æ•ˆå•ä½æœ€å¤§æ•°é‡,å¿…é¡»æ˜¯2çš„å¹‚æ¬¡æ–¹")]
         public int maxSoundCount = 32;
-        [Header("3DÄ£Ê½ÏÂ,ÒôÀÖÎïÌåµÄ²¥·ÅÍêºóµÄÏûÊ§ÑÓ³Ù")]
+        [Header("3Dæ¨¡å¼ä¸‹,éŸ³ä¹ç‰©ä½“çš„æ’­æ”¾å®Œåçš„æ¶ˆå¤±å»¶è¿Ÿ")]
         public float disappearOffset = 0.2f;
 
-        [Header("-----------¶ÔÏó³ØÏà¹Ø-----------")]
-        [Header("ÊÇ·ñ¿ªÆôÓÎÏ·¶ÔÏó³ØÅÅÁĞ¹¦ÄÜ")]
+        [Header("-----------å¯¹è±¡æ± ç›¸å…³-----------")]
+        [Header("æ˜¯å¦å¼€å¯æ¸¸æˆå¯¹è±¡æ± æ’åˆ—åŠŸèƒ½")]
         public bool isOpenLayout = false;
-        [Header("ÓÎÏ·¶ÔÏó³Ø´´½¨¶ÔÏó³ØµÄÄ¬ÈÏ×î´óÈİÁ¿")]
+        [Header("æ¸¸æˆå¯¹è±¡æ± åˆ›å»ºå¯¹è±¡æ± çš„é»˜è®¤æœ€å¤§å®¹é‡")]
         public int maxPoolCount = 16;
 
 
-        [Header("-----------ÊäÈëÏµÍ³Ïà¹Ø-----------")]
-        [Header("ÊÇ·ñÆôÓÃÁËĞÂÊäÈëÏµÍ³")]
+        [Header("-----------è¾“å…¥ç³»ç»Ÿç›¸å…³-----------")]
+        [Header("æ˜¯å¦å¯ç”¨äº†æ–°è¾“å…¥ç³»ç»Ÿ")]
         public bool isInputSystem = false;
 
-        [Header("-----------¼ÆÊ±Ïà¹Ø-----------")]
-        [Header("¼ÆÊ±¹ÜÀíÆ÷Ã¿¸ô¶àÉÙÃë¼ì²âÒ»´Î")]
+        [Header("-----------è®¡æ—¶ç›¸å…³-----------")]
+        [Header("è®¡æ—¶ç®¡ç†å™¨æ¯éš”å¤šå°‘ç§’æ£€æµ‹ä¸€æ¬¡")]
         public float intervalCheckTime = 0.05f;
 
-        [Header("-----------×Ô¶¯±£´æÏà¹Ø-----------")]
-        [Header("×Ô¶¯±£´æ¼ä¸ôÊ±¼ä")]
+        [Header("-----------è‡ªåŠ¨ä¿å­˜ç›¸å…³-----------")]
+        [Header("è‡ªåŠ¨ä¿å­˜é—´éš”æ—¶é—´")]
         public int saveOffset = 600;
 
-        [Header("-----------ÍøÂçÏà¹Ø-----------")]
-        [Header("±¾µØIPµØÖ·")]
+        [Header("-----------ç½‘ç»œç›¸å…³-----------")]
+        [Header("æœ¬åœ°IPåœ°å€")]
         public string localAddress = "127.0.0.1";
-        [Header("±¾µØIPµØÖ·µÄ¶Ë¿Ú")]
+        [Header("æœ¬åœ°IPåœ°å€çš„ç«¯å£")]
         public short localPort = 11451;
 
-        [Header("Ô¶¶Ë·şÎñÆ÷IPµØÖ·")]
+        [Header("è¿œç«¯æœåŠ¡å™¨IPåœ°å€")]
         public string remoteAddress = "127.0.0.1";
-        [Header("Ô¶¶Ë·şÎñÆ÷IPµØÖ·µÄ¶Ë¿Ú")]
+        [Header("è¿œç«¯æœåŠ¡å™¨IPåœ°å€çš„ç«¯å£")]
         public short remotePort = 19198;
 
-        [Header("¼ä¸ô¶àÉÙÃëÏò·şÎñÆ÷·¢ËÍĞÄÌøÏûÏ¢")]
+        [Header("é—´éš”å¤šå°‘ç§’å‘æœåŠ¡å™¨å‘é€å¿ƒè·³æ¶ˆæ¯")]
         public int sendHeartMassageOffset = 10;
 
         
-        [Header("±¾µØÁ´½ÓĞ­Òé")]
+        [Header("æœ¬åœ°é“¾æ¥åè®®")]
         public ProtocolType protocolType = ProtocolType.Tcp;
 
 

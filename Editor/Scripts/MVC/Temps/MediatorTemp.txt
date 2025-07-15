@@ -1,0 +1,12 @@
+using ZincFramework.MVC;
+
+namespace GameSystem.Models.{0}
+{{
+    public class {0}Mediator : Mediator
+    {{
+        public {0}Mediator() : base(nameof({0}Mediator))
+        {{
+
+        }}
+    }}
+}}

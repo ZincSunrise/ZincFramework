@@ -1,11 +1,12 @@
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using ZincFramework.Pools;
 
 
 namespace ZincFramework.LoadServices.AssetBundles
 {
-    public readonly struct AssetBundleAwaiter : INotifyCompletion
+    public readonly struct AssetBundleAwaiter : INotifyCompletion, ICriticalNotifyCompletion 
     {
         public bool IsCompleted => _assetBundleRequest.isDone;
 
@@ -16,21 +17,19 @@ namespace ZincFramework.LoadServices.AssetBundles
             _assetBundleRequest = assetBundleRequest;
         }
 
-        public void OnCompleted(Action continuation)
-        {
-            if (_assetBundleRequest.isDone)
-            {
-                continuation.Invoke();
-            }
-            else
-            {
-                _assetBundleRequest.completed += (x) => continuation.Invoke();
-            }
-        }
-
         public UnityEngine.Object GetResult() 
         {
             return _assetBundleRequest.asset;
+        }
+
+        public void OnCompleted(Action continuation)
+        {
+            UnsafeOnCompleted(continuation);
+        }
+
+        public void UnsafeOnCompleted(Action continuation)
+        {
+            _assetBundleRequest.completed += PooledDelegate<AsyncOperation>.Create(continuation);
         }
     }
 }

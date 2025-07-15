@@ -1,8 +1,9 @@
 using System;
-using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine;
 using ZincFramework.Analysis;
-using ZincFramework.LoadServices.Addressable;
+using ZincFramework.LoadServices;
+using ZincFramework.LoadServices.AssetBundles;
 using UnityObject = UnityEngine.Object;
 
 
@@ -115,9 +116,9 @@ namespace ZincFramework.DialogueSystem.Analysis
 
         private static class ThrowHelper
         {
-            public static ArgumentException ThrowNonArgumentException(object index) => throw new ArgumentException($"没有注册标号{index}");
+            public static ArgumentException ThrowNonArgumentException(object index) => throw new ArgumentException($"娌℃湁娉ㄥ唽鏍囧彿{index}");
 
-            public static ArgumentException ThrowContainsArgumentException(object index) => throw new ArgumentException($"请不要添加同一标号{index}");
+            public static ArgumentException ThrowContainsArgumentException(object index) => throw new ArgumentException($"璇蜂笉瑕佹坊鍔犲悓涓�鏍囧彿{index}");
         }
     }
 }

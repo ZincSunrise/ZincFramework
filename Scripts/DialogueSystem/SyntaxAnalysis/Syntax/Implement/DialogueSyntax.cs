@@ -1,5 +1,5 @@
 using ZincFramework.Analysis;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 
 
 namespace ZincFramework.DialogueSystem.Analysis

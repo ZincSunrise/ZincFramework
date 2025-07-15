@@ -2,15 +2,34 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 
 
 namespace ZincFramework
 {
     public static class ArrayListUtility
     {
-        private readonly static HashSet<int> _indicesIndex = new HashSet<int>();
+        private static HashSet<int> _indicesIndex;
 
+        #region æ•°ç»„æ‰©å®¹ç›¸å…³
+        public static void AddLast<T>(ref T[] array, T value)
+        {
+            Array.Resize(ref array, array.Length + 1);
+            array[^1] = value;
+        }
+
+        public static void AddFirst<T>(ref T[] array, T value)
+        {
+            int preLength = array.Length;
+
+            Array.Resize(ref array, preLength + 1);
+            Array.Copy(array, 0, array, 1, preLength);
+            array[0] = value;
+        }
+
+        #endregion
+
+        #region åˆ¤æ–­å®¹é‡ç›¸å…³
         public static bool IsNullOrEmpty(IEnumerable enumerable)
         {
             if (enumerable == null)
@@ -66,8 +85,9 @@ namespace ZincFramework
 
             return true;
         }
+        #endregion
 
-        #region ¶ÔÏó³ØÊı×éÏà¹Ø
+        #region å¯¹è±¡æ± æ•°ç»„ç›¸å…³
         public static void Fill<T>(T[] array, DataPool<T> dataPool) where T : class, IReuseable
         {
             for (int i = 0; i < array.Length; i++)
@@ -86,7 +106,7 @@ namespace ZincFramework
 
 
         /// <summary>
-        /// ×ñÑ­Ô­Ôò£¬´ÓÄÄÀïÀ´£¬µ½ÄÄÀïÈ¥
+        /// éµå¾ªåŸåˆ™ï¼Œä»å“ªé‡Œæ¥ï¼Œåˆ°å“ªé‡Œå»
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
@@ -104,7 +124,7 @@ namespace ZincFramework
         }
 
         /// <summary>
-        /// ×ñÑ­Ô­Ôò£¬´ÓÄÄÀïÀ´£¬µ½ÄÄÀïÈ¥
+        /// éµå¾ªåŸåˆ™ï¼Œä»å“ªé‡Œæ¥ï¼Œåˆ°å“ªé‡Œå»
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
@@ -131,10 +151,10 @@ namespace ZincFramework
 
         #endregion
 
-        #region Êı×éË³ĞòÏà¹Ø
+        #region æ•°ç»„é¡ºåºç›¸å…³
 
         /// <summary>
-        /// Ëæ»úÌî³äÒ»Î¬Êı×éÄ³Ò»²¿·ÖµÄº¯Êı
+        /// éšæœºå¡«å……ä¸€ç»´æ•°ç»„æŸä¸€éƒ¨åˆ†çš„å‡½æ•°
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="array"></param>
@@ -143,9 +163,11 @@ namespace ZincFramework
         /// <exception cref="ArgumentException"></exception>
         public static void RamdomPadding<T>(T[] array, Func<T> factory, int count)
         {
+            _indicesIndex ??= new HashSet<int>();
+
             if (count > array.Length)
             {
-                throw new ArgumentException("²åÈëµÄÊıÁ¿²»ÄÜ´óÓÚÊı×é³¤¶È");
+                throw new ArgumentException("æ’å…¥çš„æ•°é‡ä¸èƒ½å¤§äºæ•°ç»„é•¿åº¦");
             }
 
             while (_indicesIndex.Count < count)
@@ -184,7 +206,7 @@ namespace ZincFramework
         }
 
         /// <summary>
-        /// ÓÃÓÚ½«Ò»Î¬Êı×é±íÊ¾Îª¶şÎ¬Êı×éÊ±µÄÔ½½ç·ÖÎö
+        /// ç”¨äºå°†ä¸€ç»´æ•°ç»„è¡¨ç¤ºä¸ºäºŒç»´æ•°ç»„æ—¶çš„è¶Šç•Œåˆ†æ
         /// </summary>
         /// <returns></returns>
         public static bool IsOutRange(int index, int colCount, int rowCount)
@@ -225,7 +247,7 @@ namespace ZincFramework
 
         #endregion
 
-        #region ¶ÔÏó½»»»Ïà¹Ø
+        #region å¯¹è±¡äº¤æ¢ç›¸å…³
         public static void Swap<T>(ref T a, ref T b)
         {
             (a, b) = (b, a);

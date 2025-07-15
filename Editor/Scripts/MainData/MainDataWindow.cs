@@ -6,30 +6,24 @@ using System.IO;
 
 
 
-namespace ZincFramework
+namespace ZincFramework.UI.Main
 {
-    namespace UI
+    public class MainDataWindow : EditorWindow
     {
-        namespace Main
+        [MenuItem("FrameworkConsole/MainDataWindow")]
+        public static void ShowExample()
         {
-            public class MainDataWindow : EditorWindow
-            {
-                [MenuItem("FrameworkConsole/MainDataWindow")]
-                public static void ShowExample()
-                {
-                    MainDataWindow wnd = GetWindow<MainDataWindow>();
-                    wnd.titleContent = new GUIContent("MainDataWindow");
-                }
+            MainDataWindow wnd = GetWindow<MainDataWindow>();
+            wnd.titleContent = new GUIContent("MainDataWindow");
+        }
 
-                public void CreateGUI()
-                {
-                    VisualTreeAsset asset = AssetDataManager.LoadAssetAtPath<VisualTreeAsset>(Path.Combine(AssetDataManager.FrameworkLoadPath, "MainData", nameof(MainDataWindow)));
-                    asset.CloneTree(rootVisualElement);
+        public void CreateGUI()
+        {
+            VisualTreeAsset asset = AssetDataManager.LoadAssetAtPath<VisualTreeAsset>(Path.Combine(AssetDataManager.FrameworkLoadPath, "MainData", nameof(MainDataWindow)));
+            asset.CloneTree(rootVisualElement);
 
-                    StyleSheet styleSheet = AssetDataManager.LoadAssetAtPath<StyleSheet>(Path.Combine(AssetDataManager.FrameworkLoadPath, "MainData", nameof(MainDataWindow)));
-                    rootVisualElement.styleSheets.Add(styleSheet);
-                }
-            }
+            StyleSheet styleSheet = AssetDataManager.LoadAssetAtPath<StyleSheet>(Path.Combine(AssetDataManager.FrameworkLoadPath, "MainData", nameof(MainDataWindow)));
+            rootVisualElement.styleSheets.Add(styleSheet);
         }
     }
 }

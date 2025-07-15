@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 
 namespace ZincFramework.SpatialPartition.QuadTree
 {

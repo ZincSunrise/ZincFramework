@@ -1,18 +1,15 @@
-using System.Threading;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using ZincFramework.Analysis;
-using ZincFramework.LoadServices.Addressable;
 using ZincFramework.DialogueSystem.Analysis.Factory;
 using ZincFramework.DialogueSystem.Analysis.Service;
 using ZincFramework.DialogueSystem.Analysis.SyntaxParse;
+using ZincFramework.LoadServices;
 
 
 
 namespace ZincFramework.DialogueSystem.Analysis
 {
     /// <summary>
-    /// 默认使用AssetBundle加载
+    /// 榛樿浣跨敤AssetBundle鍔犺浇
     /// </summary>
     public class TextAnalyzeConfig
     {
@@ -83,7 +80,7 @@ namespace ZincFramework.DialogueSystem.Analysis
 
         private static class ThrowHelper
         {
-            public static System.ArgumentException ThorwNonKeyException(string key) => throw new System.ArgumentException("没有这样的键" + key);
+            public static System.ArgumentException ThorwNonKeyException(string key) => throw new System.ArgumentException("娌℃湁杩欐牱鐨勯敭" + key);
         }
     }
 }

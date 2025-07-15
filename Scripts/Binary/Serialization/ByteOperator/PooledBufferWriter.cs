@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.IO.Pipelines;
 using System.Threading;
 using System.Threading.Tasks;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 
 
 
@@ -130,7 +130,7 @@ namespace ZincFramework.Binary.Serialization
                     newSize = currentLength + sizeHint;
                     if ((uint)newSize > _maxCapacity)
                     {
-                        throw new OutOfMemoryException($"借用数组长度过大{(uint)newSize}");
+                        throw new OutOfMemoryException($"鍊熺敤鏁扮粍闀垮害杩囧ぇ{(uint)newSize}");
                     }
                 }
 

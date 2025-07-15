@@ -1,4 +1,4 @@
-using ZincFramework.MonoModel;
+using ZincFramework.Loop;
 using ZincFramework.Network.Protocol;
 
 namespace ZincFramework.Network
@@ -7,7 +7,7 @@ namespace ZincFramework.Network
     {
         public class HandleMessageObserver : IMonoObserver
         {
-            public void NotifyObserver()
+            public bool Tick()
             {
                 while (Instance._handlerQueue.Count > 0)
                 {
@@ -16,6 +16,8 @@ namespace ZincFramework.Network
                         handler.HandleMessage();
                     }
                 }
+
+                return true;
             }
 
             public void OnRegist()

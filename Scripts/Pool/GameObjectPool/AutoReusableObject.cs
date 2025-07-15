@@ -1,4 +1,6 @@
-namespace ZincFramework.Pool.GameObjects
+using ZincFramework.Loop;
+
+namespace ZincFramework.Pools.GameObjects
 {
     public abstract class AutoReusableObject : ReuseableObject
     {
@@ -9,17 +11,17 @@ namespace ZincFramework.Pool.GameObjects
         public override void OnRent()
         {
             _autoReturnObserver ??= new AutoReturnObserver(this, ReturnOffset);
-            MonoManager.Instance.AddFixedUpdateObserver(_autoReturnObserver);
+            ZincLoopSystem.AddFixedUpdateObserver(_autoReturnObserver);
         }
 
         public override void OnReturn()
         {
-            MonoManager.Instance.RemoveFixedUpdateObserver(_autoReturnObserver);
+            ZincLoopSystem.RemoveFixedUpdateObserver(_autoReturnObserver);
         }
 
         protected virtual void OnDestroy()
         {
-            MonoManager.Instance.RemoveFixedUpdateObserver(_autoReturnObserver);
+            ZincLoopSystem.RemoveFixedUpdateObserver(_autoReturnObserver);
         }
     }
 }

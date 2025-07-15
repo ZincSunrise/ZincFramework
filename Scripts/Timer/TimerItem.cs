@@ -1,5 +1,5 @@
 using ZincFramework.Events;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 
 
 namespace ZincFramework
@@ -7,7 +7,7 @@ namespace ZincFramework
     internal class TimeEvent : ZincEvent{ }
 
     /// <summary>
-    ///¼ÆÁ¿µ¥Î»ÎªºÁÃë
+    ///è®¡é‡å•ä½ä¸ºæ¯«ç§’
     /// </summary>
     internal class TimerItem : IReuseable
     {

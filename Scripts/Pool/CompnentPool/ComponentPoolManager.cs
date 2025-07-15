@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace ZincFramework.DataPools
+namespace ZincFramework.Pools
 {
     /// <summary>
-    /// ×é¼ş³Ø, ÓÃÀ´·´¸´ÀûÓÃÄ³Ò»¸ö×é¼ş
+    /// ç»„ä»¶æ± , ç”¨æ¥åå¤åˆ©ç”¨æŸä¸€ä¸ªç»„ä»¶
     /// </summary>
     public class ComponentPoolManager : BaseSafeSingleton<ComponentPoolManager>
     {

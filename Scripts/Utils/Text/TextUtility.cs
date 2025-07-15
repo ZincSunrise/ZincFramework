@@ -2,8 +2,9 @@ using System;
 using System.Text;
 using System.Collections;
 using UnityEngine;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 using ZincFramework.Events;
+using ZincFramework.Loop;
 
 
 namespace ZincFramework
@@ -15,7 +16,7 @@ namespace ZincFramework
         private static readonly StringBuilder _dialogueText = new StringBuilder(30);
 
 
-        //ÌáÈ¡³ö×Ö·û´®¿ªÍ·µÄÊı×Ö²¿·Ö
+        //æå–å‡ºå­—ç¬¦ä¸²å¼€å¤´çš„æ•°å­—éƒ¨åˆ†
         public static int SubHeadNumber(string str)
         {
             int index = 0;
@@ -35,7 +36,7 @@ namespace ZincFramework
 
         public static Coroutine ShowTextStep(string showText, float offset, ZincAction<string> callback, ZincAction endCallback = null)
         {
-            return MonoManager.Instance.StartCoroutine(ShowTextStep(showText, offset, callback, endCallback));
+            return ZincLoopSystem.StartCoroutine(nameof(ShowTextStep), ShowTextStep(showText, offset, callback, endCallback));
 
             IEnumerator ShowTextStep(string showText, float offset, ZincAction<string> callback, ZincAction endCallback)
             {
@@ -117,7 +118,7 @@ namespace ZincFramework
 
 
         /// <summary>
-        /// Ö±½Ó½«×Ö·û´®×ª»»ÎªintÊı×é
+        /// ç›´æ¥å°†å­—ç¬¦ä¸²è½¬æ¢ä¸ºintæ•°ç»„
         /// </summary>
         /// <param name="str"></param>
         /// <param name="character"></param>
@@ -135,10 +136,10 @@ namespace ZincFramework
         }
 
         /// <summary>
-        /// ¸øintÖµ²¹ÁãµÄ·½·¨
+        /// ç»™intå€¼è¡¥é›¶çš„æ–¹æ³•
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="length">Êä³ö¶àÉÙÎ»£¬Ã»³¬¹ı¾Í»áÔÚÇ°Ãæ²¹0£¬Èç¹û³¬¹ı¸Ã³¤¶ÈÔòÊä³öÔ­À´µÄvalue</param>
+        /// <param name="length">è¾“å‡ºå¤šå°‘ä½ï¼Œæ²¡è¶…è¿‡å°±ä¼šåœ¨å‰é¢è¡¥0ï¼Œå¦‚æœè¶…è¿‡è¯¥é•¿åº¦åˆ™è¾“å‡ºåŸæ¥çš„value</param>
         /// <returns></returns>
         public static string IntToStringWithBehindZero(int value, int length)
         {
@@ -146,17 +147,17 @@ namespace ZincFramework
         }
 
         /// <summary>
-        /// ²»ËÄÉáÎåÈë±£ÁôfloatµÄĞ¡Êı
+        /// ä¸å››èˆäº”å…¥ä¿ç•™floatçš„å°æ•°
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="decimalNumber">±£Áô¼¸Î»Ğ¡ÊıµÄ³¤¶È</param>
+        /// <param name="decimalNumber">ä¿ç•™å‡ ä½å°æ•°çš„é•¿åº¦</param>
         /// <returns></returns>
         public static string KeepDecimalPlace(float value, int decimalNumber)
         {
             return value.ToString($"F{decimalNumber}");
         }
 
-        public static string BigNumberToString(long number, string units1 = "Íò", string units2 = "ÒÚ")
+        public static string BigNumberToString(long number, string units1 = "ä¸‡", string units2 = "äº¿")
         {
             _result.Clear();
             Span<char> chars = stackalloc char[16];
@@ -184,7 +185,7 @@ namespace ZincFramework
             return _result.ToString();
         }
 
-        public static string IntToTime(int seconds, string secondUnit = "Ãë", string minuteUnit = "·Ö", string hourUnit = "Ê±")
+        public static string IntToTime(int seconds, string secondUnit = "ç§’", string minuteUnit = "åˆ†", string hourUnit = "æ—¶")
         {
             _result.Clear();
             float second = seconds % 60;
@@ -233,19 +234,19 @@ namespace ZincFramework
                 case '$':
                     break;
                 case ',':
-                    _result.Replace('£¬', ',');
+                    _result.Replace('ï¼Œ', ',');
                     break;
                 case ';':
-                    _result.Replace('£»', ';');
+                    _result.Replace('ï¼›', ';');
                     break;
                 case ':':
-                    _result.Replace('£º', ':');
+                    _result.Replace('ï¼š', ':');
                     break;
                 case '?':
-                    _result.Replace('£¿', '?');
+                    _result.Replace('ï¼Ÿ', '?');
                     break;
                 case '.':
-                    _result.Replace('¡£', '.');
+                    _result.Replace('ã€‚', '.');
                     break;
             }
 

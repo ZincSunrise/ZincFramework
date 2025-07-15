@@ -1,37 +1,35 @@
 using UnityEngine.Events;
+using ZincFramework.MVC.Interfaces;
 
 
-namespace ZincFramework
+namespace ZincFramework.UI
 {
-    namespace UI
+    public interface IPanelInfo
     {
-        public interface IPanelInfo
-        {
-            IViewBase ViewBase { get; }
+        IViewBase ViewBase { get; }
 
-            //这个属性仅显示是否要被移除
-            bool WillDestroy { get; }
+        //杩欎釜灞炴�т粎鏄剧ず鏄惁瑕佽绉婚櫎
+        bool WillDestroy { get; }
+    }
+
+    public class PanelInfo<T> : IPanelInfo where T : BasePanel
+    {
+        public IViewBase ViewBase => Panel;
+
+        public T Panel { get; set; }
+
+        public bool WillDestroy { get; set; }
+
+        public UnityAction<T> PanelAction { get; set; }
+
+        public PanelInfo(UnityAction<T> action)
+        {
+            PanelAction += action;
         }
 
-        public class PanelInfo<T> : IPanelInfo where T : BasePanel
+        public PanelInfo()
         {
-            public IViewBase ViewBase => Panel;
 
-            public T Panel { get; set; }
-
-            public bool WillDestroy { get; set; }
-
-            public UnityAction<T> PanelAction { get; set; }
-
-            public PanelInfo(UnityAction<T> action)
-            {
-                PanelAction += action;
-            }
-
-            public PanelInfo()
-            {
-
-            }
         }
     }
 }

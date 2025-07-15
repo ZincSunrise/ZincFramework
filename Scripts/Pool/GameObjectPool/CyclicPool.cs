@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 
 
-namespace ZincFramework.Pool.GameObjects
+namespace ZincFramework.Pools.GameObjects
 {
     /// <summary>
-    /// Ñ­»·¶ÔÏó³Ø£¬µ±¶ÔÏó³Ø´ïµ½×î´óÊıÁ¿£¬»áÄÃ³öµÚÒ»¸öÕıÔÚÊ¹ÓÃ¶ÓÁĞÖĞµÄµÚÒ»¸öÓÎÏ·¶ÔÏóÀ´Ê¹ÓÃ
-    /// ÊÊÓÃÓÚ×Óµ¯, ÌØĞ§µÈÄÜ¹»ÒÑ¾­È·¶¨ºÃ³öÉúË³ĞòµÄÎïÌå
+    /// å¾ªç¯å¯¹è±¡æ± ï¼Œå½“å¯¹è±¡æ± è¾¾åˆ°æœ€å¤§æ•°é‡ï¼Œä¼šæ‹¿å‡ºç¬¬ä¸€ä¸ªæ­£åœ¨ä½¿ç”¨é˜Ÿåˆ—ä¸­çš„ç¬¬ä¸€ä¸ªæ¸¸æˆå¯¹è±¡æ¥ä½¿ç”¨
+    /// é€‚ç”¨äºå­å¼¹, ç‰¹æ•ˆç­‰èƒ½å¤Ÿå·²ç»ç¡®å®šå¥½å‡ºç”Ÿé¡ºåºçš„ç‰©ä½“
     /// </summary>
     internal sealed class CyclicPool : GameObjectPool
     {
@@ -40,7 +40,7 @@ namespace ZincFramework.Pool.GameObjects
                 reuseableObject.OnReturn();
                 reuseableObject.gameObject.SetActive(false);
 
-                //½«¸ÃÁ´±í½Úµã»¹»Ø
+                //å°†è¯¥é“¾è¡¨èŠ‚ç‚¹è¿˜å›
                 _nodePool.ReturnValue(firstNode);
             }
             else

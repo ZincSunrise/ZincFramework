@@ -1,7 +1,7 @@
 using UnityEngine.Networking;
 
 
-namespace ZincFramework.LoadSerivice.Network
+namespace ZincFramework.LoadServices.Network
 {
     public static class UnityWebRequestAsyncOperationExtension
     {

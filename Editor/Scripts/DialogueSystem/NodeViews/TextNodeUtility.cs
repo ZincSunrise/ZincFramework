@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ZincFramework.DialogueSystem.TextData;
-using ZincFramework.Excel;
-using CharacterInfo = ZincFramework.DialogueSystem.TextData.CharacterInfo;
 
 
 
@@ -13,8 +11,6 @@ namespace ZincFramework.DialogueSystem
     public static class TextNodeUtility
     {
         private readonly static Dictionary<string, FieldInfo> _setMap = new Dictionary<string, FieldInfo>();
-        public static CharacterData CharacterData { get; }
-
         static TextNodeUtility()
         {
             FieldInfo[] fieldInfos = typeof(BaseTextNode).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
@@ -28,8 +24,6 @@ namespace ZincFramework.DialogueSystem
             {
                 _setMap.Add(fieldInfo.Name, fieldInfo);
             }
-            
-            CharacterData = ExcelBinaryReader.LoadDictionaryData<CharacterData, int, CharacterInfo>("Characters");
         }
 
 
@@ -72,39 +66,6 @@ namespace ZincFramework.DialogueSystem
 
             visibleStates.RemoveAll(x => willDelete.Contains(x));
             _setMap["_visibleStates"].SetValue(baseTextNode, visibleStates.ToArray());
-        }
-
-        public static string GetSpriteName(in VisibleState visiblePair)
-        {
-            if(visiblePair.VisableId == 0 && visiblePair.Differential == 0)
-            {
-                return string.Empty;
-            }
-
-            int id = visiblePair.VisableId;
-            var characterName = CharacterData.CharacterInfos.First(x => x.Value.CharaceterId == id).Value.CharacterName;
-            return $"{characterName}_{visiblePair.Differential}";
-        }
-
-        public static void GetSpriteId(string name, out int visableId, out int differential)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
-                visableId = 0;
-                differential = 0;
-                return;
-            }
-
-            int index = name.IndexOf('_');
-            differential = int.Parse(name.AsSpan()[(index + 1)..]);
-
-            string charaName = name[..index];
-            visableId = CharacterData.CharacterInfos.First(x => x.Value.CharacterName == charaName).Value.CharaceterId;
-        }
-
-        public static string GetCharacterNameFormId(int id)
-        {
-            return CharacterData.CharacterInfos.First(x => x.Value.CharaceterId == id).Value.CharacterName;
         }
     }
 }

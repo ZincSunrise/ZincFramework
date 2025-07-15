@@ -1,12 +1,11 @@
 using UnityEngine;
-using ZincFramework.DataPools;
 
 
 
-namespace ZincFramework.Pool.GameObjects
+namespace ZincFramework.Pools.GameObjects
 {
     /// <summary>
-    /// ¶ÔÏó³Ø¶ÔÏóÏûÊ§Âß¼­±ØĞëĞ´ÔÚOnEnableÀï
+    /// å¯¹è±¡æ± å¯¹è±¡æ¶ˆå¤±é€»è¾‘å¿…é¡»å†™åœ¨OnEnableé‡Œ
     /// </summary>
     public abstract class ReuseableObject : MonoBehaviour, IReuseable
     {

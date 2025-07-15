@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace ZincFramework
 {
-    namespace DataPools
+    namespace Pools
     {
         internal class ComponentPool : ObjectPool<Component>
         {

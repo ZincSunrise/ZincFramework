@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ZincFramework
 {
-    namespace DataPools
+    namespace Pools
     {
         public static class DataPoolManager
         {

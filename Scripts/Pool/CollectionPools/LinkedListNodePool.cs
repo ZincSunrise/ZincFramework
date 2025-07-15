@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace ZincFramework.DataPools
+namespace ZincFramework.Pools
 {
     public class LinkedListNodePool<T> : ObjectPool<LinkedListNode<T>>
     {

@@ -1,69 +1,76 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 using ZincFramework.Events;
+using ZincFramework.Loop;
 
 
 
 namespace ZincFramework.DialogueSystem
 {
     /// <summary>
-    /// 类似星铁的文字显示，较消耗性能
+    /// 绫讳技鏄熼搧鐨勬枃瀛楁樉绀猴紝杈冩秷鑰楁�ц兘
     /// </summary>
-    public class MiddleTextShower : ITextShower
+    public class MiddleTextShower : MonoBehaviour, ITextShower
     {
         public bool IsShowingText { get; private set; }
 
-        public event ZincAction OnTextEnd;
+        public ZincAction OnTextEnd { get; set; }
 
-        private readonly WaitForSecondsRealtime _dialogueOffset;
+        public ZincAction OnTextBegin { get; set; }
 
-        private readonly float _defaultOffset;
+        public event ZincAction<int> OnTextShowing;
 
         private int _nowIndex;
 
+        private WaitForSecondsRealtime _dialogueOffset;
+
         private Coroutine _showTextCoroutine;
 
-        private readonly TextSpilter _textSpliter;
+        private TextSpilter _textSpliter;
 
-        public MiddleTextShower(RectTransform textContainer, float defaultOffset, float maxLineLength, ZincAction onTextEnd)
+        [SerializeField]
+        private RectTransform _textContainer;
+
+        [SerializeField]
+        private float _maxLineLength;
+
+        [SerializeField]
+        private float _defaultOffset;
+
+        private void Awake()
         {
-            _textSpliter = new TextSpilter(CreateText(textContainer, maxLineLength), maxLineLength);
-            _dialogueOffset = new WaitForSecondsRealtime(defaultOffset);
-
-            _defaultOffset = defaultOffset;
-            OnTextEnd += onTextEnd;
+            _textSpliter = new TextSpilter(CreateText(_textContainer, _maxLineLength), _maxLineLength);
+            _dialogueOffset = new WaitForSecondsRealtime(_defaultOffset);
         }
 
-        public void ShowTextAsync(string text, ZincAction OnShowComplete = null, float showOffset = -1)
+
+        public void ShowTextAsync(string name, string text)
         {
             _textSpliter.SliceText(text);
 
-            if (showOffset == 0)
+            if (_defaultOffset == 0)
             {
                 _textSpliter.Texts[0].text = text;
                 return;
-            }
-            else if (showOffset != -1)
-            {
-                _dialogueOffset.waitTime = showOffset;
             }
             else
             {
                 _dialogueOffset.waitTime = _defaultOffset;
             }
 
-            ShowTextInternal(OnShowComplete);
+            ShowTextInternal();
         }
 
-        private void ShowTextInternal(ZincAction OnShowComplete)
+        private void ShowTextInternal()
         {
             _dialogueOffset.Reset();
-            _showTextCoroutine = MonoManager.Instance.StartCoroutine(ShowTextCoroutine(OnShowComplete));
+            _showTextCoroutine = ZincLoopSystem.StartCoroutine(nameof(MiddleTextShower), ShowTextCoroutine());
         }
 
-        private IEnumerator ShowTextCoroutine(ZincAction OnShowComplete)
+        private IEnumerator ShowTextCoroutine()
         {
+            OnTextBegin?.Invoke();
             IsShowingText = true;
             string text;
 
@@ -79,12 +86,12 @@ namespace ZincFramework.DialogueSystem
                 _textSpliter.SetText(i, text);
             }
 
-            EndShowing(OnShowComplete);
+            EndShowing();
         }
 
-        public void CompleteImmidately(ZincAction OnShowComplete = null)
+        public void CompleteImmidately()
         {
-            MonoManager.Instance.StopCoroutine(_showTextCoroutine);
+            ZincLoopSystem.StopCoroutine(nameof(MiddleTextShower));
 
             string text = null;
             for (int i = 0; i < _textSpliter.Count; i++)
@@ -93,16 +100,15 @@ namespace ZincFramework.DialogueSystem
             }
 
             _nowIndex = text?.Length ?? 0;
-            EndShowing(OnShowComplete);
+            EndShowing();
         }
 
-        private void EndShowing(ZincAction OnShowComplete = null)
+        private void EndShowing()
         {
             _textSpliter.Dialogues.Clear();
             IsShowingText = false;
             _showTextCoroutine = null;
             OnTextEnd?.Invoke();
-            OnShowComplete?.Invoke();
         }
 
         private Text[] CreateText(RectTransform textContainer, float maxLineLength)
@@ -127,6 +133,31 @@ namespace ZincFramework.DialogueSystem
             }
 
             return textDialogues;
+        }
+
+        public void StartShowText()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void EndShowText()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SkipText()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SetRoleSprite(string name)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void SetRoleSprite(Sprite sprite)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

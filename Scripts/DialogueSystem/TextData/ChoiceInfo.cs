@@ -25,11 +25,9 @@ namespace ZincFramework.DialogueSystem.TextData
             _choiceText = text;
         }
 
-#if UNITY_EDITOR
         public void SetNode(BaseTextNode baseTextNode)
         {
             _choiceNode = baseTextNode;
         }
-#endif
     }
 }

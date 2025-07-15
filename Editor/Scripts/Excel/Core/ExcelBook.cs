@@ -1,60 +1,54 @@
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Linq;
-using UnityEngine;
 
 
 
-namespace ZincFramework
+namespace ZincFramework.Excel
 {
-    namespace Excel
+    public class ExcelBook
     {
-        public class ExcelBook
+        public ExcelSheet[] ExcelSheets { get; }
+
+        public ExcelBook(WorkbookPart workbookPart)
         {
-            public ExcelSheet[] ExcelSheets { get; }
+            var sheets = workbookPart.Workbook.Sheets.Descendants<Sheet>();
 
-            private SharedStringPool SharedStringPool { get; }
+            ExcelSheets = new ExcelSheet[sheets.Count()];
+            int index = 0;
 
-            public ExcelBook(WorkbookPart workbookPart)
+            WorkbookStylesPart stylesPart = workbookPart.WorkbookStylesPart;
+
+            SharedStringTable sharedStringTable = workbookPart.SharedStringTablePart?.SharedStringTable;
+
+            Stylesheet stylesheet = stylesPart.Stylesheet;
+
+            stylesheet.AppendChild(new CellFormat()
             {
-                var sheets = workbookPart.Workbook.Sheets.Descendants<Sheet>();
-
-                ExcelSheets = new ExcelSheet[sheets.Count()];
-                SharedStringPool = new SharedStringPool(workbookPart.SharedStringTablePart.SharedStringTable);
-
-                int index = 0;
-                
-                WorkbookStylesPart stylesPart = workbookPart.WorkbookStylesPart;
-                Stylesheet stylesheet = stylesPart.Stylesheet;
-
-                stylesheet.AppendChild(new CellFormat()
+                Alignment = new Alignment()
                 {
-                    Alignment = new Alignment()
-                    {
-                        WrapText = true,
-                    },
-                    
-                    ApplyAlignment = true,
-                });
+                    WrapText = true,
+                },
 
-                uint styleIndex = (uint)stylesheet.Descendants<CellFormat>().Count() - 1;
+                ApplyAlignment = true,
+            });
 
-                foreach (var sheet in sheets) 
-                {
-                    WorksheetPart worksheetPart = workbookPart.GetPartById(sheet.Id) as WorksheetPart;
-                    ExcelSheets[index++] = new ExcelSheet(sheet, worksheetPart.Worksheet, styleIndex, SharedStringPool);
-                }
-            }
-
-            public void AddSheet(string sheetName)
+            foreach (var sheet in sheets)
             {
-
+                WorksheetPart worksheetPart = workbookPart.GetPartById(sheet.Id) as WorksheetPart;
+                ExcelSheets[index++] = new ExcelSheet(sheet, worksheetPart.Worksheet, sharedStringTable);
+                UnityEngine.Debug.Log(ExcelSheets[index - 1]);
             }
+        }
 
-            public void RemoveSheet(string sheetName) 
-            {
+        public void AddSheet(string sheetName)
+        {
 
-            }
+        }
+
+        public void RemoveSheet(string sheetName)
+        {
+
         }
     }
 }

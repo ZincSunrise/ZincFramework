@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
-using ZincFramework.LoadServices.Addressable;
+using System.Collections.Generic;
+using ZincFramework.Threading.Tasks;
 
 
 
@@ -7,19 +7,39 @@ namespace ZincFramework.LoadServices.Resource
 {
     public class ResourcesLoader : AssetLoader<string>
     {
-        public override T LoadAsset<T>(string key)
+        public override ZincTask InitializeAsync()
         {
-            return ResourcesManager.Instance.Load<T>(key);
+            return new ZincTask();
         }
 
-        public override async Task<T> LoadAssetAsync<T>(string key)
+        public override T LoadAsset<T>(string key)
         {
-            return await ResourcesManager.Instance.LoadAsync<T>(key);
+            return ResourcesManager.LoadAsset<T>(key);
+        }
+
+        public override async ZincTask<T> LoadAssetAsync<T>(string key)
+        {
+            return await ResourcesManager.LoadAssetAsync<T>(key);
+        }
+
+        public override void LoadAssetAsync<T>(string key, Events.ZincAction<T> callback)
+        {
+            ResourcesManager.LoadAssetAsync<T>(key, callback);
+        }
+
+        public override ZincTask<IEnumerable<T>> LoadAssetsAsync<T>(string key)
+        {
+            throw new System.NotImplementedException("Resources不支持批量加载!");
+        }
+
+        public override void LoadAssetsAsync<T>(string label, Events.ZincAction<IEnumerable<T>> callback)
+        {
+            throw new System.NotImplementedException("Resources不支持批量加载!");
         }
 
         public override void Release<T>(string key)
         {
-            ResourcesManager.Instance.Release<T>(key);
+            ResourcesManager.Release<T>(key);
         }
     }
 }

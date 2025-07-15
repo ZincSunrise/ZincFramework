@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
+using ZincFramework.Threading.Tasks;
 
 
 
@@ -11,45 +11,21 @@ namespace ZincFramework
     public static class LerpUtility
     {
         /// <summary>
-        /// ø…”√”⁄“∆∂Øµƒ–≠≥Ã
-        /// </summary>
-        /// <param name="origin"></param>
-        /// <param name="target"></param>
-        /// <param name="updateTime"></param>
-        /// <param name="callback"></param>
-        /// <returns></returns>
-        public static IEnumerator UpdateVector2(Vector2 origin, Vector2 target, float updateTime, UnityAction<Vector2> callback, UnityAction endCallback = null)
-        {
-            Vector2 start;
-            for (float i = 0; i < 1 * updateTime; i += Time.deltaTime)
-            {
-                start = Vector2.Lerp(origin, target, i / updateTime);
-                callback?.Invoke(start);
-                yield return null;
-            }
-
-            start = target;
-            callback?.Invoke(start);
-
-            endCallback?.Invoke();
-        }
-
-        /// <summary>
-        /// ∏ƒ±‰—’…´µƒ–≠≥Ã
+        /// ÊîπÂèòÈ¢úËâ≤ÁöÑÂçèÁ®ã
         /// </summary>
         /// <param name="origin"></param>
         /// <param name="target"></param>
         /// <param name="callback"></param>
         /// <param name="updateTime"></param>
         /// <returns></returns>
-        public static IEnumerator UpdateColor(Color origin, Color target, float updateTime, UnityAction<Color> callback, UnityAction<Color> endCallback = null)
+        public static async ZincTask UpdateColor(Color origin, Color target, float updateTime, UnityAction<Color> callback, UnityAction<Color> endCallback = null)
         {
             Color startColor;
             for (float i = 0; i < 1 * updateTime; i += Time.deltaTime)
             {
                 startColor = Color.Lerp(origin, target, i / updateTime);
                 callback?.Invoke(startColor);
-                yield return null;
+                await ZincTask.Yield();
             }
 
             startColor = target;    
@@ -57,14 +33,19 @@ namespace ZincFramework
             endCallback?.Invoke(startColor);
         }
 
-        public static IEnumerator LerpValue(float originValue, float targetValue, float lerpTime, UnityAction<float> callback, UnityAction endCallback = null)
+        public static async ZincTask LerpValue(float originValue, float targetValue, float lerpTime, bool isRealTime, UnityAction<float> callback, UnityAction endCallback = null, CancellationToken cancellationToken = default)
         {
             float nowValue;
-            for (float i = 0; i < 1 * lerpTime; i += Time.deltaTime)
+            for (float i = 0; i < 1 * lerpTime; i += isRealTime ? Time.unscaledDeltaTime : Time.deltaTime)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    break;
+                }
+
                 nowValue = Mathf.Lerp(originValue, targetValue, i / lerpTime);
                 callback?.Invoke(nowValue);
-                yield return null;
+                await ZincTask.Yield();
             }
 
             nowValue = targetValue;
@@ -72,53 +53,7 @@ namespace ZincFramework
             endCallback?.Invoke();
         }
 
-
-
-        /// <summary>
-        ///  πµ√—’…´“˛≤ÿµƒ–≠≥Ã
-        /// </summary>
-        /// <param name="color"></param>
-        /// <param name="fadeTime">“˛≤ÿÀ˘–Ëµƒ ±º‰</param>
-        /// <returns></returns>
-        public static IEnumerator FadeColor(Color color, float fadeTime, UnityAction<Color> callback, UnityAction endCallback = null)
-        {
-            Color nowColor = color;
-            for (float i = 0; i < 1 * fadeTime; i += Time.deltaTime)
-            {             
-                nowColor.a = Mathf.Lerp(color.a, 0, i / fadeTime);
-                callback?.Invoke(nowColor);
-                yield return null;
-            }
-
-            nowColor.a = 0;
-            callback.Invoke(nowColor);
-            endCallback?.Invoke();
-        }
-
-        /// <summary>
-        ///  πµ√—’…´œ‘œ÷µƒ–≠≥Ã
-        /// </summary>
-        /// <param name="color"></param>
-        /// <param name="showTime">œ‘œ÷À˘–Ëµƒ ±º‰</param>
-        /// <returns></returns>
-
-        public static IEnumerator ShowColor(Color color, float showTime, UnityAction<Color> callback)
-        {
-            Color nowColor = color;
-            for (float i = 0; i < 1 * showTime; i += Time.deltaTime)
-            {
-                nowColor.a = Mathf.Lerp(color.a, 1, i / showTime);
-                callback?.Invoke(nowColor);
-                yield return null;
-            }
-
-            nowColor.a = 1;
-            callback?.Invoke(nowColor);
-        }
-
-
-
-        public static async Task ShowColorAsync(Color color, float showTime, UnityAction<Color> callback, CancellationToken cancellationToken)
+        public static async ZincTask ShowColorAsync(Color color, float showTime, UnityAction<Color> callback, CancellationToken cancellationToken)
         {
             Color nowColor = color;
             float elapsedTime = 0f;
@@ -128,14 +63,14 @@ namespace ZincFramework
                 elapsedTime += Time.deltaTime;
                 nowColor.a = Mathf.Lerp(color.a, 1, elapsedTime / showTime);
                 callback?.Invoke(nowColor);
-                await Task.Yield(); // ‘ –Ìøÿ÷∆»®∑µªÿµΩ÷˜œﬂ≥Ã
+                await ZincTask.Yield(); // ÂÖÅËÆ∏ÊéßÂà∂ÊùÉËøîÂõûÂà∞‰∏ªÁ∫øÁ®ã
             }
 
             nowColor.a = 1;
             callback?.Invoke(nowColor);
         }
 
-        public static async Task FadeColorAsync(Color color, float showTime, UnityAction<Color> callback, CancellationToken cancellationToken)
+        public static async ZincTask FadeColorAsync(Color color, float showTime, UnityAction<Color> callback, CancellationToken cancellationToken)
         {
             Color nowColor = color;
             float elapsedTime = 0f;
@@ -145,11 +80,37 @@ namespace ZincFramework
                 elapsedTime += Time.deltaTime;
                 nowColor.a = Mathf.Lerp(color.a, 0, elapsedTime / showTime);
                 callback?.Invoke(nowColor);
-                await Task.Yield();
+                await ZincTask.Yield();
             }
 
             nowColor.a = 0;
             callback?.Invoke(nowColor);
+        }
+
+        /// <summary>
+        /// ÈªòËÆ§‰ª•Update‰Ωú‰∏∫ÈÄüÁéá
+        /// </summary>
+        /// <param name="colorA"></param>
+        /// <param name="colorB"></param>
+        /// <param name="lerpTime"></param>
+        /// <param name="callback"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public static async ZincTask LerpColorAsync(Color colorA, Color colorB, float lerpTime, UnityAction<Color> callback, CancellationToken cancellationToken)
+        {
+            float elapsedTime = 0f;
+            Color nowColor;
+
+            while (elapsedTime < lerpTime && !cancellationToken.IsCancellationRequested)
+            {
+                elapsedTime += Time.deltaTime;
+                nowColor = Color.Lerp(colorA, colorB, elapsedTime / lerpTime);
+                callback?.Invoke(nowColor);
+                await ZincTask.Yield();
+            }
+
+            nowColor = colorB;
+            callback?.Invoke(colorB);
         }
     }
 }

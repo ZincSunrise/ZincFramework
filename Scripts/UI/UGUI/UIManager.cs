@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 using ZincFramework.LoadServices;
 
 
@@ -26,10 +29,9 @@ namespace ZincFramework
             {
                 UILayer = 1 << LayerMask.NameToLayer("UI");
 
-                GameObject canvasObject = GameObject.Instantiate(Resources.Load<GameObject>("UI/Canvas"));
-                GameObject UICameraObject = GameObject.Instantiate(Resources.Load<GameObject>("UI/UICamera2D"));
-
-                GameObject eventSystemObject = GameObject.Instantiate(ResourcesManager.Instance.Load<GameObject>("UI/EventSystem"));
+                GameObject canvasObject = GameObject.Instantiate(AssetLoadManager.LoadAsset<GameObject>("Canvas"));
+                GameObject UICameraObject = GameObject.Instantiate(AssetLoadManager.LoadAsset<GameObject>("UICamera2D"));  
+                GameObject eventSystemObject = GameObject.Instantiate(AssetLoadManager.LoadAsset<GameObject>("EventSystem"));
 
                 UICamera = UICameraObject.GetComponent<Camera>();
 
@@ -62,6 +64,29 @@ namespace ZincFramework
                 GameObject.DontDestroyOnLoad(UICameraObject);
                 GameObject.DontDestroyOnLoad(canvasObject);
                 GameObject.DontDestroyOnLoad(eventSystemObject);
+
+                Camera mainCamera = Camera.main;
+
+                if (mainCamera != null)
+                {
+                    var mainData = mainCamera.GetUniversalAdditionalCameraData();
+                    mainData.cameraStack.Clear();
+                    mainData.cameraStack.Add(UICamera);
+                }
+
+                SceneManager.activeSceneChanged += OnSceneChanged;
+            }
+
+            private void OnSceneChanged(Scene arg0, Scene arg1)
+            {
+                Camera mainCamera = Camera.main;
+
+                if(mainCamera != null)
+                {
+                    var mainData = mainCamera.GetUniversalAdditionalCameraData();
+                    mainData.cameraStack.Clear();
+                    mainData.cameraStack.Add(UICamera);
+                }
             }
 
             public void ShowPanel(BasePanel basePanel, E_UILayerType layerType)
@@ -75,7 +100,7 @@ namespace ZincFramework
                 }
             }
 
-            public void ShowPanel<T>(E_UILayerType layerType = E_UILayerType.Middle, UnityAction<T> callback = null) where T : BasePanel
+            public async void ShowPanel<T>(E_UILayerType layerType = E_UILayerType.Middle, UnityAction<T> callback = null) where T : BasePanel
             {
                 string panelName = typeof(T).Name;
 
@@ -85,7 +110,7 @@ namespace ZincFramework
                     if (panelInfo.Panel != null)
                     {
                         ShowPanel(panelInfo.Panel, layerType);
-                        callback.Invoke(panelInfo.Panel);
+                        callback?.Invoke(panelInfo.Panel);
                     }
 
                     else
@@ -98,8 +123,35 @@ namespace ZincFramework
                 }
 
                 PanelDic.Add(panelName, new PanelInfo<T>(callback));
-                AssetBundleManager.Instance.LoadAssetAsync<GameObject>("ui", panelName, (prefab) => InitializePanel<T>(prefab, layerType, panelName));
+                GameObject prefab = await AssetLoadManager.LoadAssetAsync<GameObject>(panelName);
+                InitializePanel<T>(prefab, layerType, panelName);
             }
+
+            public async Task<T> LoadPanelAsync<T>() where T : BasePanel
+            {
+                string panelName = typeof(T).Name;
+                PanelInfo<T> panelInfo = new PanelInfo<T>();
+
+                GameObject prefab = await AssetLoadManager.LoadAssetAsync<GameObject>(panelName);
+                GameObject panelObject = GameObject.Instantiate(prefab);
+                panelObject.transform.SetParent(GetLayer(E_UILayerType.Middle), false);
+
+                panelInfo.Panel = panelObject.GetComponent<T>();
+
+                if (panelInfo.Panel == null)
+                {
+                    Debug.LogError("该对象上不存在UI脚本");
+                    return null;
+                }
+
+                PanelDic.Add(panelName, panelInfo);
+                panelInfo.Panel.gameObject.SetActive(false);
+                panelInfo.Panel.HideMe();
+                panelInfo.WillDestroy = false;
+
+                return panelInfo.Panel;
+            }
+
 
             public void InitializePanel<T>(GameObject panelPrefab, E_UILayerType layerType, string panelName) where T : BasePanel
             {

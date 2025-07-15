@@ -1,79 +1,81 @@
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Events;
+using ZincFramework.MVC.Interfaces;
 
 
-namespace ZincFramework
+namespace ZincFramework.UI
 {
-    namespace UI
+    public abstract class BasePanel : MonoBehaviour, IViewBase
     {
-        public abstract class BasePanel : MonoBehaviour, IViewBase
+        public bool IsHiding { get; private set; }
+
+        [SerializeField]
+        private float _showTime = 0.2f;
+
+        [SerializeField]
+        private float _hideTime = 0.2f;
+
+        protected CanvasGroup _canvasGroup;
+
+        protected CancellationTokenSource _cancellationTokenSource;
+
+        protected virtual void Awake()
         {
-            public bool IsHiding { get; private set; }
+            _canvasGroup = this.gameObject.AddComponent<CanvasGroup>();
+            Initialize();
+        }
 
-            [SerializeField]
-            private float _showTime = 0.2f;
+        public abstract void Initialize();
 
-            [SerializeField]
-            private float _hideTime = 0.2f;
-
-            protected CanvasGroup _canvasGroup;
-
-            private Coroutine _nowCoroutine;
-
-            protected virtual void Awake()
+        public virtual void ShowMe()
+        {
+            if (_showTime <= 0)
             {
-                _canvasGroup = this.gameObject.AddComponent<CanvasGroup>();
-                Initialize();
+                _canvasGroup.alpha = 1;
             }
-
-            public abstract void Initialize();
-
-            public virtual void ShowMe()
+            else
             {
-                if(_showTime <= 0)
+                if (IsHiding && _cancellationTokenSource != null)
                 {
-                    _canvasGroup.alpha = 1;
-                }
-                else
-                {
-                    if (IsHiding && _nowCoroutine != null)
-                    {
-                        StopCoroutine(_nowCoroutine);
-                    }
-
-                    _nowCoroutine = StartCoroutine(LerpUtility.LerpValue(_canvasGroup.alpha, 1, _showTime, x => _canvasGroup.alpha = x));
+                    _cancellationTokenSource.Cancel();
                 }
 
-                IsHiding = false;
+                _cancellationTokenSource = new CancellationTokenSource();
+                LerpUtility.LerpValue(_canvasGroup.alpha, 1, _showTime, true, x => _canvasGroup.alpha = x, null, _cancellationTokenSource.Token).Forget();
             }
 
-            public virtual void HideMe(UnityAction hideAction)
+            IsHiding = false;
+        }
+
+        public virtual void HideMe(UnityAction hideAction)
+        {
+            if (_hideTime <= 0)
             {
-                if (_hideTime <= 0)
+                _canvasGroup.alpha = 0;
+            }
+            else
+            {
+                if (!IsHiding && _cancellationTokenSource != null)
                 {
-                    _canvasGroup.alpha = 0;
-                }
-                else
-                {
-                    if (!IsHiding && _nowCoroutine != null)
-                    {
-                        StopCoroutine(_nowCoroutine);
-                    }
-                    _nowCoroutine = StartCoroutine(LerpUtility.LerpValue(_canvasGroup.alpha, 0, _hideTime, (x) => _canvasGroup.alpha = x, hideAction));
+                    _cancellationTokenSource.Cancel();
                 }
 
-                HideMe();
+                _cancellationTokenSource = new CancellationTokenSource();
+                LerpUtility.LerpValue(_canvasGroup.alpha, 0, _showTime, true, x => _canvasGroup.alpha = x, null, _cancellationTokenSource.Token).Forget();
             }
 
-            public void HideMe()
-            {
-                IsHiding = true;
-            }
+            HideMe();
+        }
 
-            protected virtual void AddEvent()
-            {
+        public void HideMe()
+        {
+            IsHiding = true;
+        }
 
-            }
+        protected virtual void AddEvent()
+        {
+
         }
     }
 }

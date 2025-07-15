@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine.Networking;
 
 
-namespace ZincFramework.LoadSerivice.Network
+namespace ZincFramework.LoadServices.Network
 {
     public readonly struct UnityWebRequestAsyncOperationAwaiter : INotifyCompletion
     {

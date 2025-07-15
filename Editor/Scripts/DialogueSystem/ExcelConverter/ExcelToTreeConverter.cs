@@ -11,9 +11,8 @@ namespace ZincFramework.DialogueSystem.GraphView
 {
     public static class ExcelToTreeConverter
     {
-        public static TextTree[] ExcelToTextTree(ExcelSheet[] tables, string savePath)
+/*        public static TextTree[] ExcelToTextTree(ExcelSheet[] tables, string savePath)
         {
-            ExcelUtility.CloseExcel();
             TextTree[] textTrees = new TextTree[tables.Length];
             for (int i = 0; i < tables.Length; i++)
             {
@@ -91,6 +90,6 @@ namespace ZincFramework.DialogueSystem.GraphView
             not null when !ArrayListUtility.IsNullOrEmpty(dialogueInfo.EventExpression) => typeof(EventNode),
             not null when !ArrayListUtility.IsNullOrEmpty(dialogueInfo.EffectNames) => typeof(EffectNode),
             _ => typeof(SingleTextNode),
-        };
+        };*/
     }
 }

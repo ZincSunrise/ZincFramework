@@ -2,7 +2,7 @@ using System;
 
 namespace ZincFramework
 {
-    namespace DataPools
+    namespace Pools
     {
         public interface IDataPool<T> : IDisposable
         {

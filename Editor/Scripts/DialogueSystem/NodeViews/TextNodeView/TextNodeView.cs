@@ -18,7 +18,7 @@ namespace ZincFramework.DialogueSystem.GraphView
 {
     public class TextNodeView : NodeView
     {
-        #region ¼ÓÔØÂ·¾¶
+        #region åŠ è½½è·¯å¾„
         private static readonly string _loadPath = "Assets/Editor/ZincFramework/DialogueSystem/NodeViews/TextNodeView/TextNodeView";
 
         private static readonly string _loadSheetPath = _loadPath + ".uss";
@@ -40,15 +40,14 @@ namespace ZincFramework.DialogueSystem.GraphView
 
         protected List<VisibleState> _visibleStates;
 
-        private ListView _listView;
-
         private string _preState;
 
         public static TextNodeView CreateTextNodeView(BaseTextNode baseTextNode) => baseTextNode switch
         {
             ChoiceNode choiceNode => new ChoiceNodeView(choiceNode),
             ConditionNode conditionNode => new ConditionNodeView(conditionNode),
-            EffectNode effectNode => new EffectNodeView(effectNode),
+            EventNode eventNode => new EventNodeView(eventNode),
+            RandomNode randomNode => new RandomNodeView(randomNode),
             _ => new TextNodeView(baseTextNode)
         };
 
@@ -68,7 +67,6 @@ namespace ZincFramework.DialogueSystem.GraphView
 
             _dialogueField.RegisterValueChangedCallback(SetDialogue);
             _nameField.RegisterValueChangedCallback(SetName);
-            IntialListView(baseTextNode.VisibleStates);
 
             this.Q<VisualElement>("node-border").AddToClassList(baseTextNode is IMutipleNode<BaseTextNode> ? "mutipleNode" : "singleNode");
             CreateInputPort();
@@ -79,23 +77,6 @@ namespace ZincFramework.DialogueSystem.GraphView
         {
             
         }
-
-
-        private void IntialListView(VisibleState[] visibleStates)
-        {
-            _visibleStates = new List<VisibleState>(visibleStates ?? Array.Empty<VisibleState>());
-            _listView = new ListView(_visibleStates, 150, () => new SpriteContainer(ChangeVisiblable), (container, i) => (container as SpriteContainer).UpdateSprite(i, _visibleStates[i]));
-
-            _listView.style.maxHeight = new StyleLength(StyleKeyword.None);
-            _listView.showAddRemoveFooter = true;
-            _listView.showFoldoutHeader = true;
-            _listView.headerTitle = string.Empty;
-            _listView.itemsAdded += x => ListChanged();
-            _listView.itemsRemoved += x => ListChanged();
-
-            this.Q("right").Add(_listView);
-        }
-
 
         protected void SetPortColor(Port port, Direction direction)
         {
@@ -149,12 +130,13 @@ namespace ZincFramework.DialogueSystem.GraphView
 
         protected virtual string GetDescription() => TextNode switch
         {
-            EventNode => "ÊÂ¼þ½Úµã,½Úµã½áÊø\nºó»á·¢ÉúÊÂ¼þ",
-            EffectNode => "Ð§¹û½Úµã,½Úµã¿ª\nÊ¼Ê±»á´¥·¢Ò»ÏµÁÐÐ§¹û",
-            RootTextNode => "¸ù½Úµã,ÎÞ·¨É¾³ý",
-            SingleTextNode singleTextNode when singleTextNode.IsEndNode => "½áÊø½Úµã,½Úµã»áÖ¸Ïò\nÏÂÒ»¸öÎÄ±¾",
-            SingleTextNode => "µ¥ÎÄ±¾½Úµã,½Úµã¿ªÊ¼\nÊ±»á³öÏÖÎÄ×Ö",
-            _ => "ÎÄ±¾½Úµã"
+            EventNode => "äº‹ä»¶èŠ‚ç‚¹,èŠ‚ç‚¹ç»“æŸ\nåŽä¼šå‘ç”Ÿäº‹ä»¶",
+            EffectNode => "æ•ˆæžœèŠ‚ç‚¹,èŠ‚ç‚¹å¼€\nå§‹æ—¶ä¼šè§¦å‘ä¸€ç³»åˆ—æ•ˆæžœ",
+            RootTextNode => "æ ¹èŠ‚ç‚¹,æ— æ³•åˆ é™¤",
+            RandomNode => "éšæœºèŠ‚ç‚¹,éšæœºé€‰æ‹©ä¸‹ä¸€ä¸ªèŠ‚ç‚¹è¿›è¡Œå¯¹è¯",
+            SingleTextNode singleTextNode when singleTextNode.IsEndNode => "ç»“æŸèŠ‚ç‚¹,èŠ‚ç‚¹ä¼šæŒ‡å‘\nä¸‹ä¸€ä¸ªæ–‡æœ¬",
+            SingleTextNode => "å•æ–‡æœ¬èŠ‚ç‚¹,èŠ‚ç‚¹å¼€å§‹\næ—¶ä¼šå‡ºçŽ°æ–‡å­—",
+            _ => "æ–‡æœ¬èŠ‚ç‚¹"
         };
 
         protected void OnStateChanged(BaseNode.NodeState nodeState)
@@ -184,16 +166,6 @@ namespace ZincFramework.DialogueSystem.GraphView
                 TextNodeUtility.SetNodeName(TextNode, newName.newValue);
                 OnValueChanged?.Invoke();
             }
-        }
-
-        private void ChangeVisiblable(SpriteContainer spriteContainer)
-        {         
-            if(TextNode.VisibleStates.Length != _visibleStates.Count)
-            {
-                Array.Resize(ref TextNode.VisibleStates, _visibleStates.Count);
-            }
-
-            TextNode.VisibleStates[spriteContainer.Index] = spriteContainer.VisableState;
         }
 
         private void ListChanged()

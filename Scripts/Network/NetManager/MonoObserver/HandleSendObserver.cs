@@ -1,6 +1,6 @@
 using System;
-using ZincFramework.MonoModel;
-
+using ZincFramework.Loop;
+using ZincFramework.Threading.Tasks;
 
 
 namespace ZincFramework.Network
@@ -9,7 +9,13 @@ namespace ZincFramework.Network
     {
         private class HandleSendObserver : IMonoObserver
         {
-            public async void NotifyObserver()
+            public bool Tick()
+            {
+                TickAsync().Forget();
+                return true;
+            }
+
+            public async ZincTask TickAsync()
             {
                 int nowIndex = 0;
                 int totalLength = 0;
@@ -29,7 +35,7 @@ namespace ZincFramework.Network
                     }
                     else
                     {
-                        LogUtility.LogError("³ö¶Ó´íÎó£¬Çë¼ì²éÊÇ·ñÓĞÏß³ÌÎÊÌâ");
+                        LogUtility.LogError("å‡ºé˜Ÿé”™è¯¯ï¼Œè¯·æ£€æŸ¥æ˜¯å¦æœ‰çº¿ç¨‹é—®é¢˜");
                     }
                 }
 
@@ -37,7 +43,7 @@ namespace ZincFramework.Network
                 {
                     if (!await Instance._networkModule.SendAsync(sendBuffer, 0, nowIndex))
                     {
-                        LogUtility.LogError("·¢ËÍÊ§°Ü£¬ÕıÔÚ¶ÏÏßÖØÁ¬¡£¡£¡£");
+                        LogUtility.LogError("å‘é€å¤±è´¥ï¼Œæ­£åœ¨æ–­çº¿é‡è¿ã€‚ã€‚ã€‚");
                         Instance.Disconnect(true);
                     }
                 }

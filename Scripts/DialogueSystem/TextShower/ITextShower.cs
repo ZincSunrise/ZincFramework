@@ -1,11 +1,26 @@
+using UnityEngine;
 using ZincFramework.Events;
 
 namespace ZincFramework.DialogueSystem
 {
     public interface ITextShower 
     {
-        void ShowTextAsync(string text, ZincAction OnShowComplete = null, float showOffset = -1);
+        ZincAction OnTextBegin { get; set; }
 
-        void CompleteImmidately(ZincAction OnShowComplete = null);
+        ZincAction OnTextEnd { get; set; }
+
+        bool IsShowingText { get; }
+
+        void SetRoleSprite(Sprite sprite);
+
+        void StartShowText();
+
+        void ShowTextAsync(string name, string text);
+
+        void EndShowText();
+
+        void SkipText();
+
+        void CompleteImmidately();
     }
 }

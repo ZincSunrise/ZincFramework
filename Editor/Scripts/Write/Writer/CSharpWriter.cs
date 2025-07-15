@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 using ZincFramework.Events;
 using ZincFramework.ScriptWriter.Exceptions;
 using ZincFramework.ScriptWriter.Handle;
@@ -62,7 +62,7 @@ namespace ZincFramework.ScriptWriter
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="namespaces">多命名空间则填入xx.xx.xx</param>
+        /// <param name="namespaces">澶氬懡鍚嶇┖闂村垯濉叆xx.xx.xx</param>
         /// <param name="className"></param>
         /// <param name="classType"></param>
         /// <param name="access"></param>
@@ -71,7 +71,7 @@ namespace ZincFramework.ScriptWriter
         {
             if (access == "private")
             {
-                throw new InvaildModifierException("写入一个类的时候不能把访问修饰符写成private");
+                throw new InvaildModifierException("鍐欏叆涓�涓被鐨勬椂鍊欎笉鑳芥妸璁块棶淇グ绗﹀啓鎴恜rivate");
             }
 
             ClassHandle classHandle = new ClassHandle(indentSize, className, modifiers, classType, parents, namespaces, access, attributeHandle);

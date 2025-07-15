@@ -1,107 +1,93 @@
-using ZincFramework.Serialization;
+using DocumentFormat.OpenXml.Packaging;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-using DocumentFormat.OpenXml.Packaging;
-using DocumentFormat.OpenXml.Spreadsheet;
+using ZincFramework.Serialization;
 
-
-
-namespace ZincFramework
+namespace ZincFramework.Excel
 {
-    namespace Excel
+    public class ExcelTool
     {
-        public class ExcelTool
+        public static int StartLine => ExcelModel.Instance.ExcelDefault.startLine;
+
+        [MenuItem("GameTool/Excel/TestExcel")]
+        public static void TextExcel()
         {
-            public static string ExcelPath { get; } = Application.dataPath + "/ArtRes/Excel/";
-
-            public static int StartLine => ExcelResManager.Instance.ExcelDefault.startLine;
-
-            public const string Extension = ".xlsx";
-
-
-            [MenuItem("GameTool/Excel/GenerateBinary")]
-            private static void ExcelToBinary()
+            string loadPath = EditorUtility.OpenFilePanel("é€‰æ‹©ä¸€ä¸ªExcel", Application.dataPath, "xlsx");
+            if (!string.IsNullOrEmpty(loadPath))
             {
-                FileInfo[] files = ExcelReader.ReadExcelDirectory();
-                ExcelUtility.CloseExcel();
+                using FileStream fileStream = File.Open(loadPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(fileStream, false);
+                ExcelSheet[] excelSheets = ExcelReader.GenerateExcelBook(spreadsheetDocument).ExcelSheets;
+            }
+        }
 
-                for (int i = 0; i < files.Length; i++)
+
+        [MenuItem("GameTool/Excel/GenerateBinary")]
+        private static void ExcelToBinary()
+        {
+            var files = ExcelReader.ReadExcelDirectory();
+
+            foreach (var file in files) 
+            {
+                using FileStream fileStream = file.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+                ReadExcel(fileStream);
+                AssetDatabase.Refresh();
+
+            }
+        }
+
+
+        [MenuItem("GameTool/Excel/ExcelToDataObject")]
+        private static void ExcelToDataObject()
+        {
+            string loadPath = EditorUtility.OpenFilePanel("é€‰æ‹©ä¸€ä¸ªExcel", Application.dataPath, "xlsx");
+            if (!string.IsNullOrEmpty(loadPath))
+            {
+                string savePath = EditorUtility.SaveFolderPanel("é€‰æ‹©ä¿å­˜çš„æ–‡ä»¶å¤¹", Application.dataPath, "ExcelData");
+
+                if (!string.IsNullOrEmpty(savePath))
                 {
-                    if (files[i].Extension != Extension)
-                    {
-                        continue;
-                    }
-
-                    using (FileStream fileStream = files[i].Open(FileMode.Open, FileAccess.Read))
-                    {
-                        using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(fileStream, false);
-                        ExcelSheet[] excelSheets = ExcelReader.GetExcelBook(spreadsheetDocument).ExcelSheets;
-
-                        foreach (ExcelSheet excelSheet in excelSheets)
-                        {
-                            if (!string.IsNullOrEmpty(excelSheet[3, 3]))
-                            {
-                                ExcelClassWriter.CreateGenerateExcelClass(excelSheet, excelSheet[3, 3]);
-                            }
-
-                            ExcelStreamWriter.CreateBinaryFile(excelSheet);
-                        }
-                    }
-                    AssetDatabase.Refresh();
+                    using FileStream fileStream = File.OpenRead(loadPath);
+                    ReadExcel(fileStream);
+                    AssetDatabase.SaveAssets();
                 }
             }
 
+            AssetDatabase.Refresh();
+        }
 
-            [MenuItem("GameTool/Excel/ExcelToDataObject")]
-            private static void ExcelToDataObject()
+
+        [MenuItem("GameTool/Excel/CreateExcel")]
+        private static void CreateExcel()
+        {
+            string loadPath = EditorUtility.SaveFilePanel("é€‰æ‹©ä¸€ä¸ªExcel", Application.dataPath, "DefaultName", "xlsx");
+
+            if (!string.IsNullOrEmpty(loadPath))
             {
-                string loadPath = EditorUtility.OpenFilePanel("Ñ¡ÔñÒ»¸öExcel", Application.dataPath, "xlsx");
-                if (!string.IsNullOrEmpty(loadPath))
+                using (FileStream fileStream = File.Create(loadPath))
                 {
-                    string savePath = EditorUtility.SaveFolderPanel("Ñ¡Ôñ±£´æµÄÎÄ¼þ¼Ð", Application.dataPath, "ExcelData");
-
-                    if (!string.IsNullOrEmpty(savePath)) 
-                    {
-                        ExcelUtility.CloseExcel();
-
-                        using (FileStream fileStream = File.OpenRead(loadPath))
-                        {
-                            using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(fileStream, false);
-                            ExcelSheet[] excelSheets = ExcelReader.GetExcelBook(spreadsheetDocument).ExcelSheets;
-
-                            foreach (ExcelSheet excelSheet in excelSheets)
-                            {
-                                if (!string.IsNullOrEmpty(excelSheet[3, 3]))
-                                {
-                                    ExcelClassWriter.CreateGenerateExcelClass(excelSheet, excelSheet[3, 3], savePath);
-                                }
-                            }
-
-                            AssetDatabase.SaveAssets();
-                        }
-                    }
+                    using var doc = ExcelWriter.CreateExcelDocument(fileStream, new string[] { "é“¸å¸1", "é“¸å¸2" });
+                    doc.Save();
                 }
 
                 AssetDatabase.Refresh();
             }
+        }
 
+        private static void ReadExcel(FileStream fileStream)
+        {
+            using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(fileStream, false);
+            ExcelSheet[] excelSheets = ExcelReader.GenerateExcelBook(spreadsheetDocument).ExcelSheets;
 
-            [MenuItem("GameTool/Excel/CreateExcel")]
-            private static void CreateExcel()
+            foreach (ExcelSheet excelSheet in excelSheets)
             {
-                string loadPath = EditorUtility.SaveFilePanel("Ñ¡ÔñÒ»¸öExcel", Application.dataPath, "DefaultName", "xlsx");
-
-                if (!string.IsNullOrEmpty(loadPath))
+                if (!string.IsNullOrEmpty(excelSheet[3, 3]))
                 {
-                    using (FileStream fileStream = File.Create(loadPath))
-                    {
-                        using var doc = ExcelWriter.CreateExcelDocument(fileStream, new string[] { "Öý±Ò1", "Öý±Ò2"});
-                        doc.Save();
-                    }
-
-                    AssetDatabase.Refresh();
+                    ExcelClassWriter.CreateGenerateExcelClass(excelSheet, excelSheet[3, 3]);
                 }
+
+                ExcelStreamWriter.CreateBinaryFile(excelSheet);
             }
         }
     }

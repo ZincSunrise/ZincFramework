@@ -58,7 +58,7 @@ namespace ZincFramework.DialogueSystem.GraphView
                     BaseTextNode child = (edge.input.node as TextNodeView).TextNode;
                     NowTextTree.SetChild(parent, child);
 
-                    if (parent is IMutipleNode<BaseTextNode>)
+                    if (parent is IMutipleNode<BaseTextNode> && parent is not RandomNode)
                     {
                         (this.GetElementByGuid(parent.guid) as MutiTextNodeView).Refresh();
                     }
@@ -239,7 +239,7 @@ namespace ZincFramework.DialogueSystem.GraphView
         {
             not null when typeof(ISingleNode<BaseTextNode>).IsAssignableFrom(type) => "SingleTextNode",
             not null when typeof(IMutipleNode<BaseTextNode>).IsAssignableFrom(type) => "MutipleTextNode",
-            _ => throw new NotSupportedException($"{type.Name}²»ÊÇÈÎºÎÒ»¸ö»ù´¡ÎÄ±¾½ÚµãµÄÅÉÉúÀàĞÍ")
+            _ => throw new NotSupportedException($"{type.Name}ä¸æ˜¯ä»»ä½•ä¸€ä¸ªåŸºç¡€æ–‡æœ¬èŠ‚ç‚¹çš„æ´¾ç”Ÿç±»å‹")
         };
 
         public override List<Port> GetCompatiblePorts(Port startPort, NodeAdapter nodeAdapter)

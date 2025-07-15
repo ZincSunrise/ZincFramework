@@ -11,12 +11,12 @@ using UnityEditor;
 
 namespace ZincFramework.Refelction
 {
-    //Ê¹ÓÃIL2CPP½«ÎŞ·¨Ê¹ÓÃ¸ÃÀà
+    //ä½¿ç”¨IL2CPPå°†æ— æ³•ä½¿ç”¨è¯¥ç±»
     public static class EmitTool
     {
         #region PropertyInfo
         /// <summary>
-        /// ½öÖ§³ÖÎŞ²Î¹¹Ôìº¯Êı
+        /// ä»…æ”¯æŒæ— å‚æ„é€ å‡½æ•°
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -34,7 +34,7 @@ namespace ZincFramework.Refelction
         }
 
         /// <summary>
-        /// ½öÖ§³ÖÎŞ²Î¹¹Ôìº¯Êı
+        /// ä»…æ”¯æŒæ— å‚æ„é€ å‡½æ•°
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
@@ -55,7 +55,7 @@ namespace ZincFramework.Refelction
 
             if (PlayerSettings.GetScriptingBackend(BuildTargetGroup.Standalone) == ScriptingImplementation.IL2CPP)
             {
-                throw new NotSupportedException("IL2CPP±àÒë²»Ö§³ÖÈÎºÎÓĞ¹ØEmitµÄ·½·¨");
+                throw new NotSupportedException("IL2CPPç¼–è¯‘ä¸æ”¯æŒä»»ä½•æœ‰å…³Emitçš„æ–¹æ³•");
             }
 #endif
             Type type = typeof(T);
@@ -78,7 +78,7 @@ namespace ZincFramework.Refelction
 #if UNITY_EDITOR
             if (PlayerSettings.GetScriptingBackend(BuildTargetGroup.Standalone) == ScriptingImplementation.IL2CPP)
             {
-                throw new NotSupportedException("IL2CPP±àÒë²»Ö§³ÖÈÎºÎÓĞ¹ØEmitµÄ·½·¨");
+                throw new NotSupportedException("IL2CPPç¼–è¯‘ä¸æ”¯æŒä»»ä½•æœ‰å…³Emitçš„æ–¹æ³•");
             }
 #endif
 
@@ -112,7 +112,7 @@ namespace ZincFramework.Refelction
         }
 
         /// <summary>
-        /// ¿ÉÒÔÊÊÓÃÓÚÃ¶¾ÙºÍÆÕÍ¨×ÖÃæÁ¿
+        /// å¯ä»¥é€‚ç”¨äºæšä¸¾å’Œæ™®é€šå­—é¢é‡
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="propertyInfo"></param>
@@ -123,7 +123,7 @@ namespace ZincFramework.Refelction
 #if UNITY_EDITOR
             if (PlayerSettings.GetScriptingBackend(BuildTargetGroup.Standalone) == ScriptingImplementation.IL2CPP)
             {
-                throw new NotSupportedException("IL2CPP±àÒë²»Ö§³ÖÈÎºÎÓĞ¹ØEmitµÄ·½·¨");
+                throw new NotSupportedException("IL2CPPç¼–è¯‘ä¸æ”¯æŒä»»ä½•æœ‰å…³Emitçš„æ–¹æ³•");
             }
 #endif
 
@@ -247,7 +247,7 @@ namespace ZincFramework.Refelction
             generator.Emit(propertyType.IsValueType ? OpCodes.Unbox_Any : OpCodes.Castclass, propertyType);
 
             MethodInfo methodInfo = propertyInfo.GetSetMethod() ?? propertyInfo.GetSetMethod(true) ??
-                throw new ArgumentNullException($"´«ÈëµÄ{declearingType.Name}ÀàµÄ{propertyInfo.Name}Ã»ÓĞsetter");
+                throw new ArgumentNullException($"ä¼ å…¥çš„{declearingType.Name}ç±»çš„{propertyInfo.Name}æ²¡æœ‰setter");
 
             generator.Emit(OpCodes.Callvirt, methodInfo);
             generator.Emit(OpCodes.Nop);

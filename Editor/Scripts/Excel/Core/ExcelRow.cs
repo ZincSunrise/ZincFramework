@@ -1,116 +1,66 @@
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Collections.Generic;
-using UnityEngine;
 
 
-namespace ZincFramework
+namespace ZincFramework.Excel
 {
-    namespace Excel
+    public delegate ExcelCell CreateCell(string value);
+
+    public class ExcelRow
     {
-        public delegate ExcelCell CreateCell(string value);
+        public List<ExcelCell> Cells { get; } = new List<ExcelCell>();
 
-        public class ExcelRow
+        private int _height;
+
+        public ExcelRow()
         {
-            public Row Row { get; }
 
-            public int ColCount { get; private set; }
+        }
 
-
-            public event CreateCell CreateCell;
-
-
-            private readonly Dictionary<int, ExcelCell> _excelCells = new Dictionary<int, ExcelCell>();
-     
-            public ExcelRow(uint styleIndex, Row row, CreateCell createCell, GetValueInCell getAction, SetValueInCell setAction) 
+        public ExcelRow(Row row, int colCount, SharedStringTable sharedStringTable = null)
+        {
+            foreach (var cell in row.Descendants<Cell>())
             {
-                CreateCell = createCell;
-                Row = row;
+                string cellValue = cell.GetCellValue(sharedStringTable);
+                int cellIndex = ExcelUtility.GetCellIndex(cell.CellReference);
 
-                foreach (var cell in row.Descendants<Cell>())
+                if(cellIndex > Cells.Count)
                 {
-                    int cellIndex = ExcelUtility.GetCellIndex(cell.CellReference);
-                    _excelCells.Add(cellIndex, new ExcelCell(styleIndex, cell, getAction, setAction));
-                    ColCount = Mathf.Max(ColCount, cellIndex + 1);
-                }
-            }
-
-
-            public string this[int cellIndex]
-            {
-                get
-                {
-                    TryGetValue(cellIndex, out var str);
-                    return str;
-                }
-                set
-                {
-                    if (!_excelCells.TryGetValue(cellIndex, out var excelCell))
-                    {
-                        excelCell = MakeCell(cellIndex, value);
-                    }
-
-                    excelCell.SetValue(value);
-                    if (cellIndex > ColCount)
-                    {
-                        ColCount = cellIndex;
-                    }
-                }
-            }
-
-            public void SetHeight(int heiget)
-            {
-                Row.CustomHeight = true;
-                Row.Height = heiget;
-            }
-
-            public bool TryGetValue(int cellIndex, out string value)
-            {
-                if(!_excelCells.TryGetValue(cellIndex, out ExcelCell cell))
-                {
-                    Debug.Log("不存在对应格子");
+                    FillEmptyCell(cellIndex - Cells.Count);
                 }
 
-                value = cell?.GetValue() ?? string.Empty;
-                return cell != null;
+                Cells.Add(new ExcelCell(cellValue));
             }
 
-            public void AddCell(int cellIndex, string cellValue)
+            if(Cells.Count < colCount)
             {
-                if (!_excelCells.ContainsKey(cellIndex))
-                {
-                    MakeCell(cellIndex, cellValue);
-                }
+                FillEmptyCell(colCount - Cells.Count);
             }
+        }
 
-            public void RemoveCell(int cellIndex) 
+
+        public string this[int cellIndex]
+        {
+            get => Cells[cellIndex].CellValue;
+            set => Cells[cellIndex].CellValue = value;
+        }
+
+        public void SetHeight(int heiget)
+        {
+            _height = heiget;
+        }
+
+        public void FillEmptyCell(int fillCount) 
+        {
+            for(int i = 0; i < fillCount; i++)
             {
-                _excelCells.Remove(cellIndex, out var value);
-                value.Cell.Remove();
+                Cells.Add(new ExcelCell(string.Empty));
             }
+        }
 
-            private ExcelCell MakeCell(int cellIndex, string cellValue)
-            {
-                ExcelCell excelCell = CreateCell?.Invoke(cellValue);
-                excelCell.Cell.CellReference = ExcelUtility.GetReference(Row, cellIndex);
-
-                foreach (var cell in Row.Descendants<Cell>())
-                {
-                    int index = ExcelUtility.GetCellIndex(cell.CellReference);
-                    if (index > cellIndex)
-                    {
-                        Row.InsertBefore(excelCell.Cell, cell);
-                        break;
-                    }
-                }
-
-                if (excelCell.Cell.Parent != Row)
-                {
-                    Row.AppendChild(excelCell.Cell);
-                }
-
-                _excelCells.Add(cellIndex, excelCell);
-                return excelCell;
-            }
+        public override string ToString()
+        {
+            return string.Join(' ', Cells);
         }
     }
 }

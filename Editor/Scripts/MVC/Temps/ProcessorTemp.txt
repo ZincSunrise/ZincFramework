@@ -1,0 +1,12 @@
+using ZincFramework.MVC;
+
+namespace GameSystem.Models.{0}
+{{
+    public class {0}Processor : Processor
+    {{
+        public {0}Processor() : base(nameof({0}Processor))
+        {{
+
+        }}
+    }}
+}}

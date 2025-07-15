@@ -11,15 +11,15 @@ namespace ZincFramework.DialogueSystem.GraphView
 
         public DropdownField DropdownField { get; private set; }
 
-        public void UpdateItem(int index, TextExpression expressionInfo)
+        public void UpdateItem(int index, BaseTextNode baseTextNode)
         {
-            WeightField.label = "条件" + (index + 1);
-            DropdownField.value = expressionInfo.Expression;
+            WeightField.label = "鏉′欢" + (index + 1);
+            DropdownField.value = baseTextNode.DialogueText;
         }
 
         public ConditionField() 
         {
-            WeightField = new IntegerField() { label = "权重"};
+            WeightField = new IntegerField() { label = "鏉冮噸"};
             DropdownField = new DropdownField();
             DropdownField.choices = new System.Collections.Generic.List<string>() 
             {

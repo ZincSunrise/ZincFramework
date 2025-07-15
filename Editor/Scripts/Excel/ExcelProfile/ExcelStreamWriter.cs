@@ -18,7 +18,7 @@ namespace ZincFramework
                     Directory.CreateDirectory(FrameworkPaths.ProfilePath);
                 }
 
-                string extension = ResourcesManager.Instance.Load<FrameworkData>("FrameWork/FrameWorkData").extension;
+                string extension = ResourcesManager.LoadAsset<FrameworkData>("FrameWork/FrameWorkData").extension;
 
                 using (FileStream fileStream = File.Open(FrameworkPaths.ProfilePath + '/' + $"{excelSheet.TableName}{extension}", FileMode.Create, FileAccess.Write))
                 {
@@ -46,10 +46,10 @@ namespace ZincFramework
             {
                 int keyLine = ExcelReader.GetContainerKey(excelSheet);
 
-                //ÏÈÐ´ÈÝÆ÷ÖÐ´æ´¢ÁË¶àÉÙÔªËØ
+                //å…ˆå†™å®¹å™¨ä¸­å­˜å‚¨äº†å¤šå°‘å…ƒç´ 
                 byteWriter.WriteInt32(excelSheet.RowCount - ExcelTool.StartLine);
 
-                AutoWriteConfig autoWriteConfig = ExcelResManager.Instance.ExcelDefault;
+                AutoWriteConfig autoWriteConfig = ExcelModel.Instance.ExcelDefault;
                 string keyType = null;
                 for (int i = ExcelTool.StartLine; i < excelSheet.RowCount; i++)
                 {
@@ -67,11 +67,11 @@ namespace ZincFramework
                         if (string.IsNullOrEmpty(type) || type.Equals("ignore", System.StringComparison.OrdinalIgnoreCase) 
                             || string.IsNullOrEmpty(code))
                         {
-                            Debug.LogWarning($"{excelSheet.TableName}µÄµÚ{j}ÁÐÎª¿Õ,½«²»»á¼ÇÔØÊý¾Ý");
+                            Debug.LogWarning($"{excelSheet.TableName}çš„ç¬¬{j}åˆ—ä¸ºç©º,å°†ä¸ä¼šè®°è½½æ•°æ®");
                             continue;
                         }
 
-                        //Ð´ÈëÐòÁÐÂë
+                        //å†™å…¥åºåˆ—ç 
                         byteWriter.WriteInt32(int.Parse(code));
                         WriterFactory.Instance.GetWriter(type).WriteBinary(excelSheet[i, j], byteWriter, SerializerOption.Default);
                     }

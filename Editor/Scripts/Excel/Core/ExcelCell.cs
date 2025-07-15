@@ -1,39 +1,43 @@
 using DocumentFormat.OpenXml.Spreadsheet;
-using UnityEngine;
 
 
-namespace ZincFramework
+namespace ZincFramework.Excel
 {
-    namespace Excel
+    public class ExcelCell
     {
-        public delegate string GetValueInCell(Cell cell);
+        public string CellValue { get; set; }
 
-        public delegate void SetValueInCell(Cell cell, string str);
-
-        public class ExcelCell
+        public ExcelCell(string cellValue)
         {
-            public Cell Cell { get; }
+            CellValue = cellValue;
+        }
 
-            public event GetValueInCell GetCell;
+        public static explicit operator string(ExcelCell excelCell)
+        {
+            return excelCell.CellValue;
+        }
 
-            public event SetValueInCell SetCell;
+        public Cell ConvertToOpenXmlCell()
+        {
+            Cell cell = new Cell();
 
-            public ExcelCell(uint styleIndex, Cell cell, GetValueInCell getValue, SetValueInCell setValue) 
+            if(int.TryParse(CellValue, out _))
             {
-                Cell = cell;
-                SetCell = setValue;
-                GetCell = getValue;
-                Cell.StyleIndex = styleIndex;
+                cell.DataType = CellValues.Number;
+                cell.CellValue = new CellValue(CellValue);
+            }
+            else
+            {
+                cell.DataType = CellValues.InlineString;
+                cell.InlineString = new InlineString(CellValue);
             }
 
-            public string GetValue() => GetCell?.Invoke(Cell);
+            return cell;
+        }
 
-            public void SetValue(string value) => SetCell?.Invoke(Cell, value);
-
-            public static explicit operator string (ExcelCell excelCell)
-            {
-                return excelCell.GetValue();
-            }
+        public override string ToString()
+        {
+            return string.IsNullOrWhiteSpace(CellValue) ? "Null" : CellValue;
         }
     }
 }

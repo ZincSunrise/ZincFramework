@@ -9,7 +9,7 @@ namespace ZincFramework
     namespace InputListener
     {
         /// <summary>
-        /// 如果启用了新输入系统，这个类只能用于改键
+        /// 濡傛灉鍚敤浜嗘柊杈撳叆绯荤粺锛岃繖涓被鍙兘鐢ㄤ簬鏀归敭
         /// </summary>
         public class InputListener : BaseAutoMonoSingleton<InputListener>
         {
@@ -54,7 +54,7 @@ namespace ZincFramework
             {
                 if (_isInputSystem)
                 {
-                    throw new ArgumentException("启用的是新输入系统，请不要使用这些API");
+                    throw new ArgumentException("鍚敤鐨勬槸鏂拌緭鍏ョ郴缁燂紝璇蜂笉瑕佷娇鐢ㄨ繖浜汚PI");
                 }
             }
 

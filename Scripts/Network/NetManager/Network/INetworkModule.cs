@@ -1,42 +1,35 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 
-namespace ZincFramework
+namespace ZincFramework.Network.Module
 {
-    namespace Network
+    public interface INetworkModule
     {
-        namespace Module
+        public static INetworkModule GetNetworkModule(ProtocolType protocolType) => protocolType switch
         {
-            public interface INetworkModule
-            {
-                public static INetworkModule GetNetworkModule(ProtocolType protocolType) => protocolType switch
-                {
-                    ProtocolType.Tcp => new TcpNetworkModule(NetworkManager.Instance.SerializerOption),
-                    ProtocolType.Udp => new UdpNetWorkModule(NetworkManager.Instance.SerializerOption),
-                    _ => throw new InvalidOperationException("不合法的类型，只支持UDP和TCP"),
-                };
+            ProtocolType.Tcp => new TcpNetworkModule(NetworkManager.Instance.SerializerOption),
+            ProtocolType.Udp => new UdpNetWorkModule(NetworkManager.Instance.SerializerOption),
+            _ => throw new InvalidOperationException("涓嶅悎娉曠殑绫诲瀷锛屽彧鏀寔UDP鍜孴CP"),
+        };
 
-                IPEndPoint IPEndPoint { get; }
+        IPEndPoint IPEndPoint { get; }
 
-                byte[] ReceiveBytes { get; }
+        byte[] ReceiveBytes { get; }
 
-                bool Connect(out SocketException socketException);
+        bool Connect(out SocketException socketException);
 
-                bool Reconnect(out SocketException socketException);
+        bool Reconnect(out SocketException socketException);
 
-                void Disconnect();
+        void Disconnect();
 
-                Task<bool> SendAsync(byte[] bytes, int offset, int length);
+        Task<bool> SendAsync(byte[] bytes, int offset, int length);
 
-                Task<int> ReceiveAsync();
+        Task<int> ReceiveAsync();
 
-                void SendQuitMassage();
-            }
-        }
+        void SendQuitMassage();
     }
 }
 

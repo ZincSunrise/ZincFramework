@@ -1,12 +1,11 @@
 using System.Collections;
 using UnityEngine;
-using ZincFramework.DataPools;
 
 
-namespace ZincFramework.Pool.GameObjects
+namespace ZincFramework.Pools.GameObjects
 {
     /// <summary>
-    /// ”Œœ∑∂‘œÛ≥ÿª˘¿‡
+    /// Ê∏∏ÊàèÂØπË±°Ê±†Âü∫Á±ª
     /// </summary>
     public abstract class GameObjectPool : ObjectPool<ReuseableObject>
     {
@@ -14,18 +13,7 @@ namespace ZincFramework.Pool.GameObjects
 
         public abstract IEnumerable UsingObjects { get; }
 
-        public GameObject RootObject 
-        {
-            get => _rootObject;
-            set
-            {
-                if (value != null)
-                {
-                    _rootObject = new GameObject(Name);
-                    _rootObject.transform.SetParent(value.transform);
-                }
-            } 
-        }
+        public GameObject RootObject => _rootObject;
 
 
         private GameObject _rootObject;
@@ -33,12 +21,7 @@ namespace ZincFramework.Pool.GameObjects
         public GameObjectPool(GameObject prefab, int maxCount = -1, GameObject rootObject = null) : base(() => CreateReuseable(prefab), maxCount)
         {
             Name = prefab.name;
-
-            if (rootObject != null)
-            {
-                _rootObject = new GameObject(prefab.name);
-                _rootObject.transform.SetParent(rootObject.transform);
-            }
+            _rootObject = rootObject == null ? new GameObject(prefab.name) : rootObject;
         }
 
         public abstract override ReuseableObject RentValue();
@@ -54,7 +37,7 @@ namespace ZincFramework.Pool.GameObjects
 
         public override void Dispose()
         {
-            RootObject = null;
+            _rootObject = null;
         }
 
         private static ReuseableObject CreateReuseable(GameObject prefab)

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   extension: .bytes
   isDebug: 1
-  soundMode: 0
+  soundMode: 1
   fadePersent: 1
   maxSoundCount: 32
   disappearOffset: 0.05

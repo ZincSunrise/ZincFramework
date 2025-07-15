@@ -32,14 +32,14 @@ namespace ZincFramework.TreeService
         private NodeState _nowState;
 
         /// <summary>
-        /// 节点触发时的特殊事件
+        /// 鑺傜偣瑙﹀彂鏃剁殑鐗规畩浜嬩欢
         /// </summary>
-
-        public abstract void ClearChild();
-
         public abstract BaseNode CloneNode();
 
         public abstract void DestroyNode();
+
+        public abstract void ClearChild();
+
 
 #if UNITY_EDITOR
         public abstract string InputHtmlColor { get; }

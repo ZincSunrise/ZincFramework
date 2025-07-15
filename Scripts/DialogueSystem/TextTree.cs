@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using ZincFramework.TreeService;
-using ZincFramework.DialogueSystem.TextData;
 
 
 
@@ -110,25 +109,6 @@ namespace ZincFramework.DialogueSystem
 
             EditorUtility.SetDirty(parent);
             SaveTree();
-        }
-
-        public void SetChildren(BaseTextNode parent, BaseTextNode[] children, DialogueInfo dialogueInfo)
-        {
-            for (int i = 0; i < children.Length; i++)
-            {
-                switch (parent)
-                {
-                    case ConditionNode conditionNode:
-                        conditionNode.AddChild(children[i], dialogueInfo.ConditionExpressions[i]);
-                        break;
-                    case ChoiceNode choiceNode:
-                        choiceNode.AddChild(children[i], dialogueInfo.ChoiceTexts[i]);
-                        break;
-                    case ISingleNode<BaseTextNode> singleNode:
-                        singleNode.SetChild(children[0]);
-                        break;
-                }
-            }
         }
 
         public void BreakChild(BaseTextNode parent, BaseTextNode child)

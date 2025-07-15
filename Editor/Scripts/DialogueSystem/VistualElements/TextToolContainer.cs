@@ -1,11 +1,8 @@
-using DocumentFormat.OpenXml.Packaging;
 using System;
-using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using ZincFramework.Events;
-using ZincFramework.Excel;
 using ZincFramework.LoadServices.Editor;
 
 
@@ -50,17 +47,18 @@ namespace ZincFramework.DialogueSystem.GraphView
             ButtonRefresh.clicked += refresh;
         }
 
+        [Obsolete]
         private void TreeToExcel()
         {
-            if (Selection.activeObject is TextTree)
+/*            if (Selection.activeObject is TextTree)
             {
                 TextTree[] textTrees = Array.ConvertAll(Selection.objects, x => x as TextTree);
-                string savePath = EditorUtility.OpenFolderPanel("Ñ¡Ôñ±£´æµÄÎÄ¼ş¼Ğ", Application.dataPath, "DialogueExcel");
+                string savePath = EditorUtility.OpenFolderPanel("é€‰æ‹©ä¿å­˜çš„æ–‡ä»¶å¤¹", Application.dataPath, "DialogueExcel");
                 if (!string.IsNullOrEmpty(savePath))
                 {
                     TreeToExcelConverter.WriteExcel(textTrees, savePath);
                 }
-            }
+            }*/
         }
 
         public void AddMenuListener(string actionName, Action<DropdownMenuAction> action, DropdownMenuAction.Status status = DropdownMenuAction.Status.Normal)
@@ -72,22 +70,23 @@ namespace ZincFramework.DialogueSystem.GraphView
         private void ShowCreatePanel()
         {
             TextTree textTree = ScriptableObject.CreateInstance<TextTree>();
-            if (AssetDataManager.SaveAssetInPanel<TextTree>(textTree, "´´½¨ĞÂÎÄ±¾Ê÷", "Assets/AddressableAssets/StaticData/DialogueTree", "TextTree"))
+            if (AssetDataManager.SaveAssetInPanel<TextTree>(textTree, "åˆ›å»ºæ–°æ–‡æœ¬æ ‘", "Assets/AddressableAssets/StaticData/DialogueTree", "TextTree"))
             {
                 OnTreeValidate?.Invoke(new TextTree[] { textTree });
             }
         }
 
+        [Obsolete]
         private void ShowExcelToTreePanel()
         {
-            _nowLoadPath = EditorUtility.OpenFilePanel("Ñ¡ÔñExcelÎÄ¼ş", "Assets/DialogueExcel", "xlsx");
+/*            _nowLoadPath = EditorUtility.OpenFilePanel("é€‰æ‹©Excelæ–‡ä»¶", "Assets/DialogueExcel", "xlsx");
 
             if (!string.IsNullOrEmpty(_nowLoadPath))
             {
                 using SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(_nowLoadPath, false);
 
-                var collection = ExcelReader.GetExcelBook(spreadsheetDocument).ExcelSheets;
-                _nowSavePath = EditorUtility.SaveFilePanel("±£´æ×ª»»ºóµÄÊ÷", "Assets/AddressableAssets/StaticData/DialogueTree", collection[0].TableName, "asset");
+                var collection = ExcelReader.GenerateExcelBook(spreadsheetDocument).ExcelSheets;
+                _nowSavePath = EditorUtility.SaveFilePanel("ä¿å­˜è½¬æ¢åçš„æ ‘", "Assets/AddressableAssets/StaticData/DialogueTree", collection[0].TableName, "asset");
 
                 if (!string.IsNullOrEmpty(_nowSavePath))
                 {
@@ -98,7 +97,7 @@ namespace ZincFramework.DialogueSystem.GraphView
             }
 
             _nowSavePath = null;
-            _nowLoadPath = null;
+            _nowLoadPath = null;*/
         }
     }
 }

@@ -1,44 +1,77 @@
 using System;
 
 
-
-namespace ZincFramework
+namespace ZincFramework.Pools
 {
-    namespace DataPools
+    public class DataPool : ObjectPool<IReuseable>
     {
-        public class DataPool : ObjectPool<IReuseable>
+        public DataPool(Func<IReuseable> factory) : base(factory) { }
+
+        public override IReuseable RentValue()
         {
-            public DataPool(Func<IReuseable> factory) : base(factory) { }
-
-            public override IReuseable RentValue()
-            {
-                IReuseable reuseable = base.RentValue();
-                reuseable.OnRent();
-                return reuseable;
-            }
-
-            public override void ReturnValue(IReuseable value)
-            {
-                value.OnReturn();
-                base.ReturnValue(value);        
-            }
+            IReuseable reuseable = base.RentValue();
+            reuseable.OnRent();
+            return reuseable;
         }
 
-        public class DataPool<T> : ObjectPool<T> where T : IReuseable
+        public override void ReturnValue(IReuseable value)
         {
-            public DataPool(Func<T> factory) : base(factory) { }
+            value.OnReturn();
+            base.ReturnValue(value);
+        }
+    }
 
-            public override T RentValue()
+    public class DataPool<T> : ObjectPool<T> where T : IReuseable
+    {
+        public DataPool(Func<T> factory) : base(factory) { }
+
+#if UNITY_EDITOR
+        private static bool IsAllowDebug => FrameworkConsole.Instance.SharedData.isDebug;
+#endif
+
+        public override T RentValue()
+        {
+            T value = base.RentValue();
+            value.OnRent();
+
+#if UNITY_EDITOR
+            if (IsAllowDebug)
             {
-                T value = base.RentValue();
-                value.OnRent();
-                return value;
+                UnityEngine.Debug.Log($"还剩下{_unuseValues.Count}未借出，类型为{typeof(T).Name}，借出的哈希码为{value.GetHashCode()}");
             }
+#endif
+            return value;
+        }
 
-            public override void ReturnValue(T value)
+        public override void ReturnValue(T value)
+        {
+#if UNITY_EDITOR
+            if (IsAllowDebug)
+            {
+                foreach (var item in _unuseValues)
+                {
+                    if (item.Equals(value))
+                    {
+                        UnityEngine.Debug.LogWarning("你借出了相同的物体!");
+                        break;
+                    }
+                }
+            }
+#endif
+            try
             {
                 value.OnReturn();
+            }
+            finally
+            {
                 base.ReturnValue(value);
+
+#if UNITY_EDITOR
+                if (IsAllowDebug)
+                {
+                    UnityEngine.Debug.Log($"归还后还剩下{_unuseValues.Count}，类型为{typeof(T).Name}，归还的哈希码为{value.GetHashCode()}");
+                }
+#endif
             }
         }
     }

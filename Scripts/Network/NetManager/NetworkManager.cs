@@ -1,17 +1,13 @@
-using System;
-using System.Collections.Concurrent;
 using System.Net.Sockets;
-using ZincFramework.Events;
-using ZincFramework.Network.Protocol;
-using ZincFramework.Network.BufferHandler;
-using ZincFramework.Network.Module;
 using ZincFramework.Binary.Serialization;
+using ZincFramework.Events;
+using ZincFramework.Loop;
+using ZincFramework.Network.Module;
+using ZincFramework.Network.Protocol;
 
 
-namespace ZincFramework
+namespace ZincFramework.Network
 {
-    namespace Network
-    {
         public sealed partial class NetworkManager : BaseSafeSingleton<NetworkManager>
         {
             public bool IsReconnecting { get; private set; }
@@ -20,10 +16,8 @@ namespace ZincFramework
             private readonly INetworkModule _networkModule;
             private readonly ProtocolType _protocolType;
 
-            #region Mono¹Û²ìÕß
+            #region Monoè§‚å¯Ÿè€…
             private HandleSendObserver _handleSendObserver = new HandleSendObserver();
-
-            private DisconnectObserver _disconnectObserver = new DisconnectObserver();
 
             private HandleMessageObserver _messageObserver = new HandleMessageObserver();
             #endregion
@@ -37,14 +31,11 @@ namespace ZincFramework
                 (_sendOffsetTime, _protocolType) = FrameworkConsole.Instance.SharedData;
 
                 _networkModule = INetworkModule.GetNetworkModule(_protocolType);
-
-                MonoManager.Instance.AddOnApplicationQuitListener(_disconnectObserver);
-                MonoManager.Instance.AddUpdateListener(_handleSendObserver);
-                MonoManager.Instance.AddUpdateListener(_messageObserver);
+                ZincLoopSystem.AddUpdateListener(_handleSendObserver);
+                ZincLoopSystem.AddUpdateListener(_messageObserver);
 
                 _bufferHandler.Receive.AddListener(HandleReceive);
             }
-
 
             public void Connect()
             {
@@ -57,12 +48,12 @@ namespace ZincFramework
                 {
                     if (socketException.ErrorCode == 10061) 
                     {
-                        LogUtility.LogError("·şÎñÆ÷¾Ü¾øÁ¬½Ó");
+                        LogUtility.LogError("æœåŠ¡å™¨æ‹’ç»è¿æ¥");
                         EventCenter.Boardcast<int>(EventType.ServerReject, socketException.ErrorCode);
                     }
                     else
                     {
-                        LogUtility.LogError("·şÎñÆ÷Á¬½ÓÊ§°Ü");
+                        LogUtility.LogError("æœåŠ¡å™¨è¿æ¥å¤±è´¥");
                         EventCenter.Boardcast<int>(EventType.ConnectFailed, socketException.ErrorCode);
                     }
                 }
@@ -78,9 +69,8 @@ namespace ZincFramework
 
                 _bufferHandler.Dispose();
 
-                MonoManager.Instance.RemoveUpdateListener(_messageObserver);
-                MonoManager.Instance.RemoveUpdateListener(_handleSendObserver);
-                MonoManager.Instance.RemoveOnApplicationQuitListener(_disconnectObserver);
+                ZincLoopSystem.RemoveUpdateListener(_messageObserver);
+                ZincLoopSystem.RemoveUpdateListener(_handleSendObserver);
 
                 _networkModule.SendQuitMassage();
                 _networkModule.Disconnect();
@@ -105,19 +95,19 @@ namespace ZincFramework
                 {
                     if (socketException.ErrorCode == 10061)
                     {
-                        LogUtility.LogError("·şÎñÆ÷¾Ü¾øÁ¬½Ó");
+                        LogUtility.LogError("æœåŠ¡å™¨æ‹’ç»è¿æ¥");
                         EventCenter.Boardcast<int>(EventType.ServerReject, socketException.ErrorCode);
                     }
                     else
                     {
-                        LogUtility.LogError("·şÎñÆ÷Á¬½ÓÊ§°Ü");
+                        LogUtility.LogError("æœåŠ¡å™¨è¿æ¥å¤±è´¥");
                         EventCenter.Boardcast<int>(EventType.ConnectFailed, socketException.ErrorCode);
                     }
                 }
             }
 
             /// <summary>
-            /// ²âÊÔº¯Êı£¬Ò»°ã²»½¨ÒéÊ¹ÓÃ
+            /// æµ‹è¯•å‡½æ•°ï¼Œä¸€èˆ¬ä¸å»ºè®®ä½¿ç”¨
             /// </summary>
 #if UNITY_EDITOR
             public void SendMassageTest(byte[] massages)
@@ -126,6 +116,5 @@ namespace ZincFramework
             }
 #endif
         }
-    }
 }
 

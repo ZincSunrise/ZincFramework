@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Editor/ZincFramework/MVC/MVCWindow.uss?fileID=7433441132597879392&amp;guid=06ed12c032829fc4485fd4bfa22eb0dd&amp;type=3#MVCWindow" />
+    <ui:VisualElement name="Root" style="flex-grow: 1; justify-content: center;">
+        <ui:VisualElement name="PathRoot" class="alignField" style="flex-grow: 0; flex-basis: 10%; flex-direction: row;">
+            <ui:Button text="Choose Path" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonChoosePath" style="flex-basis: 22%;" />
+            <ui:Label tabindex="-1" parse-escape-sequences="true" display-tooltip-when-elided="true" name="TextPath" enable-rich-text="true" style="-unity-text-align: middle-left; flex-grow: 1;" />
+        </ui:VisualElement>
+        <ui:TextField picking-mode="Ignore" label="name" name="NameField" class="alignField" />
+        <ui:EnumField label="Type" type="ZincFramework.MVC.Editor.MVCGenerateType, Assembly-CSharp-Editor" value="All" name="TypeField" class="alignField" />
+        <ui:VisualElement name="GenerateRoot" class="alignField" style="flex-grow: 0; flex-direction: row-reverse; flex-basis: 10%; padding-right: 2.5%;">
+            <ui:Button text="Generate" parse-escape-sequences="true" display-tooltip-when-elided="true" name="ButtonGenerate" style="flex-basis: 30%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; flex-grow: 0;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,7 @@
+namespace GameSystem.Models.{0}
+{{
+    public static class {0}Model
+    {{
+
+    }}   
+}}

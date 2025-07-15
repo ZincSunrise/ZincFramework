@@ -99,7 +99,7 @@ namespace ZincFramework.DialogueSystem.GraphView
         {
             if (EditorApplication.isPlaying)
             {
-                ShowTree(TextTreeRunner.Instance.MainTextTree);
+                ShowTree(DialogueServices.TextTreeRunner.MainTextTree);
             }
         }
 

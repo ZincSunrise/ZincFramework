@@ -1,74 +1,42 @@
 using DocumentFormat.OpenXml.Spreadsheet;
-using System.Diagnostics;
-using UnityEditor;
+using System.Text;
 
 
-namespace ZincFramework
+namespace ZincFramework.Excel
 {
-    namespace Excel
+    public static class ExcelUtility
     {
-        public static class ExcelUtility
+        private readonly static StringBuilder _stringBuilder = new StringBuilder();
+
+        public static string GetReference(Row row, int colIndex)
         {
-            [MenuItem("GameTool/Excel/CloseRunningExcel")]
-            public static void CloseExcel()
-            {
-                Process[] process = Process.GetProcessesByName("EXCEL.EXE");
-                foreach (Process processItem in process) 
-                {
-                    try
-                    {
-                        processItem.CloseMainWindow();
+            _stringBuilder.Clear();
 
-                    }
-                    finally
-                    {
-                        processItem.Dispose();
-                    }
-                }
+            for (int i = colIndex; i > 0; i /= 26)
+            {
+                i--;
+                _stringBuilder.Insert(0, (char)(i % 26 + 'A'));
             }
 
-            public static string GetReference(Row row, int colIndex)
+            _stringBuilder.Append((uint)row.RowIndex);
+            return _stringBuilder.ToString();
+        }
+
+        public static int GetCellIndex(string cellRefence)
+        {
+            int number = 0;
+
+            for (int i = 0; i < cellRefence.Length; i++)
             {
-                char a = (char)(colIndex % 26 + 'A');
-                int count = colIndex / 26 + 1;
-                string reference = new string(a, count) + row.RowIndex;
-
-                return reference;
-            }
-
-            public static int GetCellIndex(string cellRefence)
-            {
-                int number = 0;
-
-                for (int i = 0; i < cellRefence.Length; i++) 
+                if (char.IsNumber(cellRefence[i]))
                 {
-                    if (char.IsNumber(cellRefence[i]))
-                    {
-                        break;
-                    }
-
-                    number = cellRefence[i] - 'A';
+                    break;
                 }
 
-                return number;
+                number += cellRefence[i] - 'A';
             }
 
-
-            public static void GetRowCellIndex(string cellRefence, out int rowIndex, out int cellIndex)
-            {
-                cellIndex = 0;
-                rowIndex = 0;
-
-                for (int i = 0; i < cellRefence.Length; i++)
-                {
-                    if (char.IsNumber(cellRefence[i]))
-                    {
-                        rowIndex = int.Parse(cellRefence[i..]);
-                        break;
-                    }
-                    cellIndex += cellRefence[i] - 'A';
-                }
-            }
+            return number;
         }
     }
 }

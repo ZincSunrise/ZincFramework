@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 using ZincFramework.Serialization;
 using ZincFramework.Serialization.TypeWriter;
 using ZincFramework.ScriptWriter;
@@ -68,7 +68,7 @@ namespace ZincFramework
                             string classType = massageNode.Attributes["name"].Value;
                             string messageId = massageNode.Attributes["messageId"].Value;
 
-                            classWriter.WriteNamespace(2, ExcelResManager.Instance.ProtocolDefault.usingNamespaces);
+                            classWriter.WriteNamespace(2, ExcelModel.Instance.ProtocolDefault.usingNamespaces);
                             classWriter.BeginWriteClass(1, namespaces, null, classType, classType: "record", parents: new string[] { "BaseMessage" }, attributeHandle: new AttributeHandle(1, nameof(ZincSerializable), new string[] { messageId }));
 
                             fieldNodeList = massageNode.SelectNodes("field");
@@ -112,13 +112,13 @@ namespace ZincFramework
                             string name = dataNode.Attributes["name"].Value;
                             string dataId = dataNode.Attributes["dataId"].Value;
 
-                            //Ğ´ÈëÃüÃû¿Õ¼ä
-                            classWriter.WriteNamespace(2, ExcelResManager.Instance.ProtocolDefault.usingNamespaces);
+                            //å†™å…¥å‘½åç©ºé—´
+                            classWriter.WriteNamespace(2, ExcelModel.Instance.ProtocolDefault.usingNamespaces);
 
-                            //Ğ´ÈëÀàÃû×Ö
+                            //å†™å…¥ç±»åå­—
                             classWriter.BeginWriteClass(1, namespaces, null, name + "Data");
 
-                            //Ğ´ÈëDataÀà
+                            //å†™å…¥Dataç±»
                             classWriter.WriteGenericField(2, "infoDic", "Dictionary", new string[] { "int", name + "Info" });
                             classWriter.EndWriteClass(1, false);
 
@@ -159,7 +159,7 @@ namespace ZincFramework
                         classWriter.WriteAutoProperty(2, "BaseMessage", "Message", CSharpWriter.Accessors.Public, CSharpWriter.Accessors.Public);
                         classWriter.WriteLine(2);
 
-                        classWriter.WriteMethod(2, "HandleMessage", "void", null, Array.Empty<string>(), new string[1] { "//ÌîÈëÄã¶ÔÓÚÕâ¸öÀàµÄ´¦Àí·½·¨" });
+                        classWriter.WriteMethod(2, "HandleMessage", "void", null, Array.Empty<string>(), new string[1] { "//å¡«å…¥ä½ å¯¹äºè¿™ä¸ªç±»çš„å¤„ç†æ–¹æ³•" });
 
                         classWriter.EndWriteClass(1, !string.IsNullOrEmpty(namespaces));
                         classWriter.WriteAndClear(fileStream);

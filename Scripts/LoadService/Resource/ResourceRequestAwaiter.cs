@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace ZincFramework.LoadServices.Resource
 {
-    public readonly struct ResourceRequestAwaiter : INotifyCompletion
+    public readonly struct ResourceRequestAwaiter : INotifyCompletion, ICriticalNotifyCompletion
     {
         private readonly ResourceRequest _resourceRequest;
 
@@ -15,6 +15,18 @@ namespace ZincFramework.LoadServices.Resource
         public void OnCompleted(Action continuation)
         {
             if (_resourceRequest.isDone) 
+            {
+                continuation.Invoke();
+            }
+            else
+            {
+                _resourceRequest.completed += x => continuation.Invoke();
+            }
+        }
+
+        public void UnsafeOnCompleted(Action continuation)
+        {
+            if (_resourceRequest.isDone)
             {
                 continuation.Invoke();
             }

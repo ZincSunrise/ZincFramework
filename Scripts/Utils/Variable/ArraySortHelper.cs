@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -7,7 +6,7 @@ using UnityEngine;
 namespace ZincFramework
 {
     /// <summary>
-    /// ±ğÎÊ£¬ÎÊ¾ÍÊÇ³­µÄ
+    /// åˆ«é—®ï¼Œé—®å°±æ˜¯æŠ„çš„
     /// </summary>
     /// <typeparam name="T"></typeparam>
     internal sealed class ArraySortHelper<T>
@@ -42,35 +41,35 @@ namespace ZincFramework
 
                 int result = 0;
 
-                // Step 1: ÏÈ´¦Àí´óÓÚµÈÓÚ 65536 µÄÊı×Ö
+                // Step 1: å…ˆå¤„ç†å¤§äºç­‰äº 65536 çš„æ•°å­—
                 if (n >= 1 << 16)  // 65536
                 {
                     n >>= 16;
                     result += 16;
                 }
 
-                // Step 2: ´¦Àí´óÓÚµÈÓÚ 256 µÄÊı×Ö
+                // Step 2: å¤„ç†å¤§äºç­‰äº 256 çš„æ•°å­—
                 if (n >= 1 << 8)  // 256
                 {
                     n >>= 8;
                     result += 8;
                 }
 
-                // Step 3: ´¦Àí´óÓÚµÈÓÚ 16 µÄÊı×Ö
+                // Step 3: å¤„ç†å¤§äºç­‰äº 16 çš„æ•°å­—
                 if (n >= 1 << 4)  // 16
                 {
                     n >>= 4;
                     result += 4;
                 }
 
-                // Step 4: ´¦Àí´óÓÚµÈÓÚ 4 µÄÊı×Ö
+                // Step 4: å¤„ç†å¤§äºç­‰äº 4 çš„æ•°å­—
                 if (n >= 1 << 2)  // 4
                 {
                     n >>= 2;
                     result += 2;
                 }
 
-                // Step 5: ´¦Àí´óÓÚµÈÓÚ 2 µÄÊı×Ö
+                // Step 5: å¤„ç†å¤§äºç­‰äº 2 çš„æ•°å­—
                 if (n >= 1)  // 2
                 {
                     result += 1;
@@ -100,7 +99,7 @@ namespace ZincFramework
                         return;
                     }
 
-                    //¿ìËÙÅÅĞò
+                    //å¿«é€Ÿæ’åº
                     if (partitionSize == 3)
                     {
                         SwapIfGreater(keys, comparer, 0, 1);
@@ -109,7 +108,7 @@ namespace ZincFramework
                         return;
                     }
 
-                    //²åÈëÅÅĞò
+                    //æ’å…¥æ’åº
                     InsertionSort(keys.Slice(0, partitionSize), comparer);
                     return;
                 }
@@ -130,7 +129,7 @@ namespace ZincFramework
         }
 
         /// <summary>
-        /// ¿ìÅÅ½ÚµãÑ¡Ôñ
+        /// å¿«æ’èŠ‚ç‚¹é€‰æ‹©
         /// </summary>
         /// <param name="keys"></param>
         /// <param name="comparer"></param>
@@ -174,7 +173,7 @@ namespace ZincFramework
         }
 
         /// <summary>
-        /// ¿ìÅÅ½»»»Ëã·¨
+        /// å¿«æ’äº¤æ¢ç®—æ³•
         /// </summary>
         /// <param name="keys"></param>
         /// <param name="comparer"></param>
@@ -194,7 +193,7 @@ namespace ZincFramework
 
 
         /// <summary>
-        /// ²åÈëÅÅĞò
+        /// æ’å…¥æ’åº
         /// </summary>
         /// <param name="keys"></param>
         /// <param name="comparer"></param>
@@ -217,7 +216,7 @@ namespace ZincFramework
 
 
         /// <summary>
-        /// ¶ÑÅÅĞò
+        /// å †æ’åº
         /// </summary>
         /// <param name="keys"></param>
         /// <param name="comparer"></param>

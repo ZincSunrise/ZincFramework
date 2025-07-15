@@ -1,46 +1,54 @@
 using DocumentFormat.OpenXml.Packaging;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ZincFramework.Serialization;
 
-
-
-namespace ZincFramework
+namespace ZincFramework.Excel
 {
-    namespace Excel
+    public static class ExcelReader
     {
-        public static class ExcelReader
+        /// <summary>
+        /// 读取一整个文件夹中的文件信息
+        /// </summary>
+        /// <returns></returns>
+        public static IEnumerable<FileInfo> ReadExcelDirectory()
         {
-            public static int GetContainerKey(ExcelSheet excelSheet)
+            DirectoryInfo directoryInfo = Directory.CreateDirectory(ExcelModel.ExcelPath);
+            return directoryInfo.GetFiles().Where(x => x.Extension == ExcelModel.Extension);
+        }
+
+        public static ExcelBook GenerateExcelBook(SpreadsheetDocument spreadsheetDocument)
+        {
+            return new ExcelBook(spreadsheetDocument.WorkbookPart);
+        }
+
+        /// <summary>
+        /// 读取谁是容器键
+        /// </summary>
+        /// <param name="excelSheet"></param>
+        /// <returns></returns>
+        public static int GetContainerKey(ExcelSheet excelSheet)
+        {
+            AutoWriteConfig config = ExcelModel.Instance.ExcelDefault;
+            ExcelRow excelRow;
+
+            if ((excelRow = excelSheet[config.keyLine]) != null)
             {
-                AutoWriteConfig config = ExcelResManager.Instance.ExcelDefault;
-                if (!excelSheet.TryGetRow(config.keyLine, out var excelRow))
-                { 
-                    return -1;
-                }
-
-                for (int i = 0; i < excelSheet.ColCount; i++)
-                {
-                    if ("key".Equals(excelRow[i], System.StringComparison.OrdinalIgnoreCase))
-                    {
-                        return i;
-                    }
-                }
-
                 return -1;
             }
 
-
-            public static FileInfo[] ReadExcelDirectory()
+            for (int i = 0; i < excelSheet.ColCount; i++)
             {
-                DirectoryInfo directoryInfo = Directory.CreateDirectory(ExcelTool.ExcelPath);
-                return directoryInfo.GetFiles();
+                if ("key".Equals(excelRow[i], System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
             }
 
-            public static ExcelBook GetExcelBook(SpreadsheetDocument spreadsheetDocument)
-            {
-                return new ExcelBook(spreadsheetDocument.WorkbookPart);
-            }
+            return -1;
         }
     }
 }
+
 

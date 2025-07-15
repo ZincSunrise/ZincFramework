@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 
 
-namespace ZincFramework.DataPools.Concurrent
+namespace ZincFramework.Pools.Concurrent
 {
     public class ConcurrentPool<TValue> : IDataPool<TValue> where TValue : IReuseable
     {

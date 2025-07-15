@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 4174409439444642332}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.935835, y: 4.500341, z: 0.6100841}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e466f02bee02bfe4fbe5bbe73cbef10e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxNumber: 0
+  _audioSource: {fileID: 0}
 --- !u!82 &8902784550214878719
 AudioSource:
   m_ObjectHideFlags: 0
@@ -60,7 +60,7 @@ AudioSource:
   m_PlayOnAwake: 1
   m_Volume: 0.5
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

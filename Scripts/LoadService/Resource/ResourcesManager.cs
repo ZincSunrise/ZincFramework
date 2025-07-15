@@ -1,71 +1,84 @@
-using UnityEngine;
-using UnityEngine.Events;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using UnityEngine;
+using ZincFramework.Events;
 using ZincFramework.LoadServices.Resource;
+using ZincFramework.Threading.Tasks;
 
 
 namespace ZincFramework.LoadServices
 {
-    public class ResourcesManager : BaseSafeSingleton<ResourcesManager>
+    public static class ResourcesManager
     {
-        private readonly Dictionary<string, ResourceCache> _resourcesDic = new Dictionary<string, ResourceCache>();
+        private static readonly Dictionary<string, IResourceCache> _resourcesDic = new Dictionary<string, IResourceCache>();
 
-        private ResourcesManager()
+        /// <summary>
+        /// ÂêåÊ≠•Âä†ËΩΩÊñπÊ≥ï
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static T LoadAsset<T>(string path) where T : Object
         {
-
-        }
-
-        public async Task<T> LoadAsync<T>(string path) where T : Object
-        {
-            string resName = path + '_' + typeof(T).Name;
-
-            if (!_resourcesDic.TryGetValue(resName, out var info))
+            if (!_resourcesDic.TryGetValue(path, out var info))
             {
-                info = new ResourceCache(Resources.LoadAsync<T>(path));
-                _resourcesDic.Add(resName, info);
+                info = new ResourceSyncCache(Resources.Load<T>(path));
+                _resourcesDic.Add(path, info);
+            }
+            else if(!info.IsCompleted)
+            {
+                throw new System.InvalidOperationException($"‰∏çÂèØ‰ª•Âú®{path}ÁöÑËµÑÊ∫êÂºÇÊ≠•Âä†ËΩΩÁöÑÊó∂ÂÄôËøõË°åÂêåÊ≠•Âä†ËΩΩ");
             }
 
-            if(info.IsDeleting)
-            {
-                throw new ResourceDeletingException($"{resName}µƒ◊ ‘¥’˝‘⁄…æ≥˝£¨≤ªø… π”√");
-            }
-
-            return info.IsCompleted ? info.Asset as T : await info.ResourceRequest as T;
+            return info.Asset as T;
         }
 
-        public void LoadAsync<T>(string path, UnityAction<T> callback) where T : Object
+        public static async ZincTask<T> LoadAssetAsync<T>(string path) where T : Object
         {
-            string resName = path + '_' + typeof(T).Name;
-
-            if (!_resourcesDic.TryGetValue(resName, out var resourceCache))
+            if (!_resourcesDic.TryGetValue(path, out var resourceCache))
             {
-                resourceCache = new ResourceCache(Resources.LoadAsync<T>(path), (obj) => callback.Invoke(obj as T));
-                _resourcesDic.Add(resName, resourceCache);
+                resourceCache = new ResourceAsyncCache<T>(Resources.LoadAsync<T>(path));
+                _resourcesDic.Add(path, resourceCache);
+            }
+
+            if(resourceCache.IsDeleting)
+            {
+                throw new ResourceDeletingException($"{path}ÁöÑËµÑÊ∫êÊ≠£Âú®Âà†Èô§Ôºå‰∏çÂèØ‰ΩøÁî®");
+            }
+
+            return resourceCache.IsCompleted ? resourceCache.Asset as T : await (resourceCache as ResourceAsyncCache<T>).ResourceRequest as T;
+        }
+
+        public static void LoadAssetAsync<T>(string path, ZincAction<T> callback) where T : Object
+        {
+            if (!_resourcesDic.TryGetValue(path, out var resourceCache))
+            {
+                resourceCache = new ResourceAsyncCache<T>(Resources.LoadAsync<T>(path), (obj) => callback.Invoke(obj as T));
+                _resourcesDic.Add(path, resourceCache);
             }
             else
             {
+                if (resourceCache.IsDeleting)
+                {
+                    throw new ResourceDeletingException($"{path}ÁöÑËµÑÊ∫êÊ≠£Âú®Âà†Èô§Ôºå‰∏çÂèØ‰ΩøÁî®");
+                }
+
                 if (resourceCache.IsCompleted)
                 {
                     callback?.Invoke(resourceCache.Asset as T);
                 }
                 else
                 {
-                    resourceCache.Completed += (x) => callback.Invoke(x as T);
-                    MonoManager.Instance.StartCoroutine(CheckDelete(resName, resourceCache));
+                    (resourceCache as ResourceAsyncCache<T>).Completed += callback;
                 }
             }
         }
 
-        public void LoadAsync(string path, UnityAction<Object> callback, System.Type type)
+        public static void LoadAssetAsync(string path, ZincAction<Object> callback, System.Type type)
         {
-            string resName = path + '_' + type.Name;
-
-            if (!_resourcesDic.TryGetValue(resName, out var resourceCache))
+            if (!_resourcesDic.TryGetValue(path, out var resourceCache))
             {
-                resourceCache = new ResourceCache(Resources.LoadAsync(path), (obj) => callback.Invoke(obj));
-                _resourcesDic.Add(resName, resourceCache);
+                resourceCache = new ResourceAsyncCache<Object>(Resources.LoadAsync(path, type), callback);
+                _resourcesDic.Add(path, resourceCache);
             }
             else
             {
@@ -75,82 +88,47 @@ namespace ZincFramework.LoadServices
                 }
                 else
                 {
-                    resourceCache.Completed += (obj) => callback.Invoke(obj);
-                    MonoManager.Instance.StartCoroutine(CheckDelete(resName, resourceCache));
+                    (resourceCache as ResourceAsyncCache<Object>).Completed += callback;
                 }
             }
         }
 
-        private IEnumerator CheckDelete(string resName, ResourceCache resourceCache)
+        public static void Release<T>(string path) where T : Object
         {
-            yield return resourceCache.ResourceRequest;
-
-            if (resourceCache.IsDeleting)
+            if (_resourcesDic.TryGetValue(path, out var resourceCache))
             {
-                Resources.UnloadAsset(resourceCache.Asset);
-                _resourcesDic.Remove(resName);
-            }
-        }
-
-        public T Load<T>(string path) where T : Object
-        {
-            //∏¸∏ƒÕ¨≤Ωº”‘ÿ¬ﬂº≠
-            string resName = path + '_' + typeof(T).Name;
-            if (_resourcesDic.TryGetValue(resName, out var info) && !info.IsCompleted)
-            {
-                return info.Asset as T;
-            }
-            else if(info == null)
-            {
-                info = new ResourceCache(Resources.Load<T>(path));
-                _resourcesDic.Add(resName, info);
-            }
-
-            return info.Asset as T;
-        }
-
-        public void Release<T>(string name) where T : Object
-        {
-            string resName = name + '_' + typeof(T);
-            if (_resourcesDic.TryGetValue(name, out var info))
-            {
-                if (!info.IsCompleted)
+                if (!resourceCache.IsCompleted)
                 {
-                    info.StopLoad();
+                    (resourceCache as ResourceAsyncCache<T>).StopLoad();
                 }
                 else
                 {
-                    Resources.UnloadAsset(info.Asset);
-                    _resourcesDic.Remove(resName);
+                    Resources.UnloadAsset(resourceCache.Asset);
+                    _resourcesDic.Remove(path);
                 }
             }
         }
 
-        public void Release(string name, System.Type type)
+
+        public static void Release(string path)
         {
-            string resName = name + '_' + type.Name;
-            if (_resourcesDic.TryGetValue(name, out var info))
+            if (_resourcesDic.TryGetValue(path, out var resourceCache))
             {
-                if (!info.IsCompleted)
+                if (!resourceCache.IsCompleted)
                 {
-                    info.StopLoad();
+                    (resourceCache as ResourceAsyncCache<Object>).StopLoad();
                 }
                 else
                 {
-                    Resources.UnloadAsset(info.Asset);
-                    _resourcesDic.Remove(resName);
+                    Resources.UnloadAsset(resourceCache.Asset);
+                    _resourcesDic.Remove(path);
                 }
             }
         }
 
-        public void Clear(UnityAction callback)
+        public static async ZincTask Clear(ZincAction callback)
         {
-            MonoManager.Instance.StartCoroutine(R_Clear(callback));
-        }
-
-        private IEnumerator R_Clear(UnityAction callback)
-        {
-            yield return Resources.UnloadUnusedAssets();
+            await Resources.UnloadUnusedAssets();
             callback.Invoke();
         }
     }

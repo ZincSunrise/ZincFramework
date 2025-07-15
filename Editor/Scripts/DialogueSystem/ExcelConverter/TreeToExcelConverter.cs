@@ -1,26 +1,22 @@
+using DocumentFormat.OpenXml.Packaging;
 using System;
 using System.IO;
-using UnityEngine;
-using UnityEditor;
 using System.Reflection;
+using UnityEditor;
+using UnityEngine;
+using ZincFramework.Binary.Serialization;
 using ZincFramework.Excel;
 using ZincFramework.Serialization;
-using DocumentFormat.OpenXml.Packaging;
-using ZincFramework.Binary.Serialization;
-using ZincFramework.DialogueSystem.TextData;
 
 
 
 namespace ZincFramework.DialogueSystem.GraphView
 {
-    public static class TreeToExcelConverter
+/*    public static class TreeToExcelConverter
     {
-        private static readonly PropertyInfo[] _propertyInfos = typeof(DialogueInfo).GetProperties();
-
         public static void WriteExcel(TextTree[] textTrees, string directoryPath)
         {
             string tempPath = $"{Application.dataPath}/Editor/ZincFramework/TreeGraphView/TextGraphView/ExcelConverter/Temp.xlsx";
-            ExcelUtility.CloseExcel();
 
             for (int i = 0; i < textTrees.Length; i++)
             {
@@ -33,15 +29,15 @@ namespace ZincFramework.DialogueSystem.GraphView
 
                     excelWriter.WriteSheet(textTrees[i]);
 
-                    using FileStream fileStream = File.Create(directoryPath + '/' + textTrees[i].name + ExcelTool.Extension);
+                    using FileStream fileStream = File.Create(directoryPath + '/' + textTrees[i].name + ExcelModel.Extension);
                     using SpreadsheetDocument newDoc = ExcelWriter.CreateExcelDocument(fileStream, new string[] { textTrees[i].name });
 
                     ExcelBook newExcelBook = new ExcelBook(newDoc.WorkbookPart);
                     ExcelSheet excelSheet = newExcelBook.ExcelSheets[0];
 
                     excelBook.ExcelSheets[0].CopyTo(excelSheet);
-                    ExcelSytleData excelSytleData = ExcelResManager.Instance.DefaultStyleData;
-                    AutoWriteConfig autoWriteConfig = ExcelResManager.Instance.ExcelDefault;
+                    ExcelSytleData excelSytleData = ExcelModel.Instance.DefaultStyleData;
+                    AutoWriteConfig autoWriteConfig = ExcelModel.Instance.ExcelDefault;
 
                     for (int k = 0; k < excelSheet.RowCount; k++)
                     {
@@ -53,10 +49,10 @@ namespace ZincFramework.DialogueSystem.GraphView
                     }
                     newDoc.Save();
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     Debug.LogException(ex);
-                    Debug.LogError("²»¿ÉÒÔÔÚÒÑÓÐµÄExcelÎ´±£´æµÄÇé¿öÏÂ±£´æÎÄ¼þ£¬Î´±£´æµÄÊý¾ÝÒÑ¾­¶ªÊ§£¡");
+                    Debug.LogError("ä¸å¯ä»¥åœ¨å·²æœ‰çš„Excelæœªä¿å­˜çš„æƒ…å†µä¸‹ä¿å­˜æ–‡ä»¶ï¼Œæœªä¿å­˜çš„æ•°æ®å·²ç»ä¸¢å¤±ï¼");
                 }
             }
 
@@ -65,21 +61,21 @@ namespace ZincFramework.DialogueSystem.GraphView
 
         private static void WriteSheet(this ExcelWriter excelWriter, TextTree textTree)
         {
-            AutoWriteConfig autoWriteConfig = ExcelResManager.Instance.ExcelDefault;
+            AutoWriteConfig autoWriteConfig = ExcelModel.Instance.ExcelDefault;
             textTree.Rearrange();
 
-            for (int i = 0;i < textTree.Nodes.Count; i++)
+            for (int i = 0; i < textTree.Nodes.Count; i++)
             {
                 DialogueInfo dialogueInfo = textTree.Nodes[i].GetDialogueInfo();
                 string[] rowText = new string[_propertyInfos.Length];
 
-                for (int j = 0; j < _propertyInfos.Length; j++) 
+                for (int j = 0; j < _propertyInfos.Length; j++)
                 {
                     object obj = _propertyInfos[j].GetValue(dialogueInfo);
-                    if(obj != null)
+                    if (obj != null)
                     {
                         rowText[j] = WriterFactory.Instance.GetWriter(_propertyInfos[j].PropertyType.Name).GetExcelString(obj);
-                    }             
+                    }
                 }
 
                 excelWriter.WriteRow(autoWriteConfig.startLine + i, rowText);
@@ -88,9 +84,9 @@ namespace ZincFramework.DialogueSystem.GraphView
 
         private static void CopyTo(this ExcelSheet sourcePart, ExcelSheet targetPart)
         {
-            for (int i = 0; i < sourcePart.RowCount; i++) 
+            for (int i = 0; i < sourcePart.RowCount; i++)
             {
-                for (int j = 0; j < sourcePart.ColCount; j++) 
+                for (int j = 0; j < sourcePart.ColCount; j++)
                 {
                     if (!string.IsNullOrEmpty(sourcePart[i, j]))
                     {
@@ -99,5 +95,5 @@ namespace ZincFramework.DialogueSystem.GraphView
                 }
             }
         }
-    }
+    }*/
 }

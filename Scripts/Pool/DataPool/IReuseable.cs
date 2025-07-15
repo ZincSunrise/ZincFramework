@@ -1,16 +1,9 @@
-
-
-
-
-namespace ZincFramework
+namespace ZincFramework.Pools
 {
-    namespace DataPools
+    public interface IReuseable
     {
-        public interface IReuseable
-        {
-            void OnReturn();
+        void OnReturn();
 
-            void OnRent();
-        }
+        void OnRent();
     }
 }

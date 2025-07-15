@@ -1,152 +1,241 @@
-using System.Collections.Generic;
+using System;
 using UnityEngine;
-using UnityEngine.Events;
+using ZincFramework.Audio.Internal;
+using ZincFramework.Audio.Loop;
+using ZincFramework.Events;
 using ZincFramework.LoadServices;
-using ZincFramework.Pool;
+using ZincFramework.Loop;
+using ZincFramework.Pools;
+using ZincFramework.Pools.GameObjects;
+using ZincFramework.Threading.Tasks;
 
 
-
-
-namespace ZincFramework
+namespace ZincFramework.Audio
 {
-    namespace Audio
+    public class SoundEffectManager : BaseSafeSingleton<SoundEffectManager>, IDisposable
     {
-        public class SoundEffectManager : BaseSafeSingleton<SoundEffectManager>
+        public bool IsPauseAll { get; private set; }
+
+        public bool IsMuteAll { get; private set; }
+
+        public E_Sound_Mode SoundMode => FrameworkConsole.Instance.SharedData.soundMode;
+
+        private int MaxSoundCount => FrameworkConsole.Instance.SharedData.maxSoundCount;
+
+        public float Volume
         {
-            public float PauseTime { get; private set; }
-
-            public bool IsPause { get; private set; }
-
-
-            private float _soundEffectVolume = 0.5f;
-
-            private int MaxSoundCount => FrameworkConsole.Instance.SharedData.maxSoundCount;
-
-            private float DisappearOffset => FrameworkConsole.Instance.SharedData.disappearOffset;
-
-            private E_Sound_Mode _soundMode => FrameworkConsole.Instance.SharedData.soundMode;
-
-            private string _loadSoundName = "soundeffect";
-
-            private GameObject _soundRoot;
-
-            private readonly List<ISoundBase> _loopBases = new List<ISoundBase>();
-            private readonly List<ISoundBase> _soundBases = new List<ISoundBase>();
-
-
-            private SoundEffectManager()
+            get => _soundEffectVolume;
+            set
             {
-                _soundRoot = new GameObject("SoundRoot");
+                _soundEffectVolume = value;
+                ApplyAllVolume();
+            }
+        }
 
-                if (_soundMode == E_Sound_Mode.ThreeD)
+
+        private float _soundEffectVolume = 0.5f;
+
+        private readonly GameObject _soundRoot;
+
+        private readonly SoundLoopModule _soundLoopModule;
+        /// <summary>
+        /// 3D声音池
+        /// </summary>
+        private readonly CyclicPool _threeDSoundPool;
+
+        private readonly DataPool<SoundSource> _sourcePool;
+
+        private SoundEffectManager()
+        {
+            _soundRoot = new GameObject("SoundRoot");
+            GameObject.DontDestroyOnLoad(_soundRoot);
+
+            _threeDSoundPool = new CyclicPool(Resources.Load<GameObject>("Audio/SoundObject"), MaxSoundCount, _soundRoot);
+            _sourcePool = new DataPool<SoundSource>(() => new SoundSource());
+
+            _soundLoopModule = new SoundLoopModule();
+            ZincLoopSystem.AddModule(_soundLoopModule);
+
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.playModeStateChanged += (state) =>
+            {
+                if (state == UnityEditor.PlayModeStateChange.EnteredEditMode || state == UnityEditor.PlayModeStateChange.ExitingEditMode)
                 {
-                    ObjectPoolManager.Instance.RegistCyclicPool(nameof(SoundObject), Resources.Load<GameObject>("Audio/SoundObject"), MaxSoundCount, _soundRoot);
+                    _soundLoopModule.Clear();
                 }
+            };
+#endif
+        }
+
+        /// <summary>
+        /// 播放音效,建议提前加载音效资源
+        /// </summary>
+        /// <param name="name">音效在资源系统中的索引键</param>
+        /// <param name="loopCount">循环次数，如果填入-1那么就是无限循环</param>
+        /// <param name="callback">音效完成后的回调函数</param>
+        /// <returns></returns>
+        public async ZincTask<SoundHandle> PlaySoundAsync(string name, int loopCount, ZincAction callback = null)
+        {
+            AudioClip audioClip = await AssetLoadManager.LoadAssetAsync<AudioClip>(name);
+            return SetSoundInternal(audioClip, loopCount, callback);
+        }
+
+        /// <summary>
+        /// 播放音效，必须提前加载后再播放
+        /// </summary>
+        /// <param name="name">音效在资源系统中的索引键</param>
+        /// <param name="loopCount">循环次数，如果填入-1那么就是无限循环</param>
+        /// <param name="callback">音效播放完后的回调函数</param>
+        public SoundHandle PlaySound(string name, int loopCount, ZincAction callback = null)
+        {
+            AudioClip audioClip = AssetLoadManager.LoadAsset<AudioClip>(name);
+            return SetSoundInternal(audioClip, loopCount, callback);
+        }
+
+        #region 播放内部函数
+        private SoundHandle SetSoundInternal(AudioClip audioClip, int loopCount, ZincAction onSoundEnd)
+        {
+            if (loopCount == 0)
+            {
+                Debug.LogWarning("不可以传入0次循环次数");
+                return default;
             }
 
-            /// <summary>
-            /// ����������Ч�ķ���
-            /// �����ʹ��AssetBundle���أ���ʹ����չ����
-            /// </summary>
-            /// <param name="name">��Ч����</param>
-            /// <param name="isLoop">�Ƿ�ѭ��</param>
-            /// <param name="isAsync">�Ƿ��첽</param>
-            /// <param name="callback">�ص�����</param>
-            public void PlaySound(string name, bool isLoop = false, UnityAction<AudioSource> callback = null)
+
+            ThreeDSound threeDSound = _threeDSoundPool.RentValue() as ThreeDSound;
+            if (threeDSound.AudioSource == null)
             {
-                AssetBundleManager.Instance.LoadAssetAsync<AudioClip>(_loadSoundName, name, (clip) => SetSoundObject(clip, callback, isLoop));
+                threeDSound.Initialize(threeDSound.GetComponent<AudioSource>());
             }
 
-            internal void SetSoundObject(AudioClip clip, UnityAction<AudioSource> callback, bool isLoop = false)
-            {
-                ISoundBase soundBase = ISoundBase.GetSound(_soundMode);
-                soundBase.Initialize(isLoop, _soundEffectVolume, DisappearOffset, clip);
+            threeDSound.AudioSource.clip = audioClip;
+            threeDSound.Mute(IsMuteAll);
+            threeDSound.SetVolume(_soundEffectVolume);
 
-                if (isLoop)
-                {
-                    _loopBases.Add(soundBase);
-                }
-                else
-                {
-                    _soundBases.Add(soundBase);
-                }
-                callback?.Invoke(soundBase.AudioSource);
+            SoundSource soundSource = _sourcePool.RentValue();
+            soundSource.Init(threeDSound);
+
+            if (loopCount == 1)
+            {
+                _soundLoopModule.RegisterSound(soundSource, onSoundEnd);
+            }
+            else
+            {
+                _soundLoopModule.RegisterLoopSound(soundSource, loopCount, onSoundEnd);
             }
 
-            internal void RemoveSound(ISoundBase soundBase)
+            if (IsPauseAll)
             {
-                if (soundBase.IsLoop)
-                {
-                    _loopBases.Remove(soundBase);
-                }
-                else
-                {
-                    _soundBases.Remove(soundBase);
-                }
-
-                soundBase.Pause();
-                soundBase.Refresh();
+                threeDSound.Pause();
+            }
+            else
+            {
+                threeDSound.Play();
             }
 
-            public void ChangeSoundEffectVolume(float volume)
+            return new SoundHandle(soundSource);
+        }
+
+        internal void ReturnSound(SoundSource soundSource)
+        {
+            _threeDSoundPool.ReturnValue(soundSource.SoundBase as ThreeDSound);
+            _sourcePool.ReturnValue(soundSource);
+        }
+        #endregion
+
+        public void MuteAllSound(bool isMute)
+        {
+            IsMuteAll = isMute;
+            var soundSpan = _soundLoopModule.SoundSpan;
+            for (int i = 0; i < soundSpan.Length; i++)
             {
-                _soundEffectVolume = volume;
-
-                for (int i = 0; i < _loopBases.Count; i++)
-                {
-                    _loopBases[i].ChangeVolume(volume);
-                }
-
-                for (int i = 0; i < _soundBases.Count; i++)
-                {
-                    _soundBases[i].ChangeVolume(volume);
-                }
+                soundSpan[i].SoundSource.Mute(isMute);
             }
 
-            public void PauseAllSounds()
+            var loopSoundSpan = _soundLoopModule.LoopSoundSpan;
+            for (int i = 0; i < loopSoundSpan.Length; i++)
             {
-                IsPause = true;
-                PauseTime = Time.time;
+                loopSoundSpan[i].SoundSource.Mute(isMute);
+            }
+        }
 
-                for (int i = 0; i < _loopBases.Count; i++)
-                {
-                    _loopBases[i].Pause();
-                }
-                for (int i = 0; i < _soundBases.Count; i++)
-                {
-                    _soundBases[i].Pause();
-                }
+        public void ContiuneAllSound()
+        {
+            IsPauseAll = false;
+
+            var soundSpan = _soundLoopModule.SoundSpan;
+            for (int i = 0; i < soundSpan.Length; i++)
+            {
+                soundSpan[i].SoundSource.Play();
             }
 
-            public void PlayAllSounds()
+            var loopSoundSpan = _soundLoopModule.LoopSoundSpan;
+            for (int i = 0; i < loopSoundSpan.Length; i++)
             {
-                for (int i = 0; i < _loopBases.Count; i++)
-                {
-                    _loopBases[i].Play();
-                }
-                for (int i = 0; i < _soundBases.Count; i++)
-                {
-                    _soundBases[i].Play();
-                }
-                IsPause = false;
+                loopSoundSpan[i].SoundSource.Play();
+            }
+        }
+
+        public void PauseAllSound()
+        {
+            IsPauseAll = true;
+
+            var soundSpan = _soundLoopModule.SoundSpan;
+            for (int i = 0; i < soundSpan.Length; i++)
+            {
+                soundSpan[i].SoundSource.Pause();
             }
 
-            public void RemoveAllSounds()
+            var loopSoundSpan = _soundLoopModule.LoopSoundSpan;
+            for (int i = 0; i < loopSoundSpan.Length; i++)
             {
-                for (int i = 0; i < _loopBases.Count; i++)
-                {
-                    _loopBases[i].Pause();
-                    _loopBases[i].Refresh();
-                }
-                for (int i = 0; i < _soundBases.Count; i++)
-                {
-                    _loopBases[i].Pause();
-                    _loopBases[i].Refresh();
-                }
-
-                _soundBases.Clear();
-                _loopBases.Clear();
+                loopSoundSpan[i].SoundSource.Pause();
             }
+        }
+
+        public void ClearAllSound()
+        {
+            var soundSpan = _soundLoopModule.SoundSpan;
+            var loopSoundSpan = _soundLoopModule.LoopSoundSpan;
+
+            for (int i = 0; i < loopSoundSpan.Length; i++)
+            {
+                _sourcePool.ReturnValue(loopSoundSpan[i].SoundSource);
+            }
+
+            for (int i = 0; i < soundSpan.Length; i++)
+            {
+                _sourcePool.ReturnValue(soundSpan[i].SoundSource);
+            }
+
+            _soundLoopModule.Clear();
+            _threeDSoundPool.ReturnAll();
+        }
+
+        private void ApplyAllVolume()
+        {
+            var soundSpan = _soundLoopModule.SoundSpan;
+            for (int i = 0; i < soundSpan.Length; i++)
+            {
+                soundSpan[i].SoundSource.SetVolume(_soundEffectVolume);
+            }
+
+            var loopSoundSpan = _soundLoopModule.LoopSoundSpan;
+            for (int i = 0; i < loopSoundSpan.Length; i++)
+            {
+                loopSoundSpan[i].SoundSource.SetVolume(_soundEffectVolume);
+            }
+        }
+
+        public void Dispose()
+        {
+            _soundLoopModule.Clear();
+            _threeDSoundPool.Dispose();
+            _sourcePool.Dispose();
+            ZincLoopSystem.RemoveModule(_soundLoopModule);
+
+            GameObject.Destroy(_soundRoot);
+            _instance = new Lazy<SoundEffectManager>(() => new SoundEffectManager());
         }
     }
 }

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-namespace ZincFramework.Pool.GameObjects
+namespace ZincFramework.Pools.GameObjects
 {
     /// <summary>
-    /// ²»Ñ­»·¶ÔÏó³Ø£¬µ±¶ÔÏó³Ø´ïµ½×î´óÊıÁ¿£¬²»ÔÙ´´½¨ĞÂµÄ¶ÔÏó
-    /// ÓÃ¹şÏ£±í×·×ÙÔªËØ
+    /// ä¸å¾ªç¯å¯¹è±¡æ± ï¼Œå½“å¯¹è±¡æ± è¾¾åˆ°æœ€å¤§æ•°é‡ï¼Œä¸å†åˆ›å»ºæ–°çš„å¯¹è±¡
+    /// ç”¨å“ˆå¸Œè¡¨è¿½è¸ªå…ƒç´ 
     /// </summary>
     public sealed class NonCyclicPool : GameObjectPool
     {
@@ -16,7 +16,7 @@ namespace ZincFramework.Pool.GameObjects
         private HashSet<ReuseableObject> _usingObjects = new HashSet<ReuseableObject>();
 
         /// <summary>
-        /// Èç¹ûmaxCountÎª-1Ôò´ú±íÃ»ÓĞ×î´óÈİÁ¿
+        /// å¦‚æœmaxCountä¸º-1åˆ™ä»£è¡¨æ²¡æœ‰æœ€å¤§å®¹é‡
         /// </summary>
         /// <param name="prefab"></param>
         /// <param name="maxCount"></param>

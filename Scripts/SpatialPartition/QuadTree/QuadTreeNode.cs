@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using ZincFramework.DataPools;
+using ZincFramework.Pools;
 
 namespace ZincFramework.SpatialPartition.QuadTree
 {
@@ -15,7 +15,7 @@ namespace ZincFramework.SpatialPartition.QuadTree
         public List<IOverlapable> Elements { get; private set; } = new List<IOverlapable>();
 
         /// <summary>
-        /// ×Ó½ÚµãÃÇ
+        /// å­èŠ‚ç‚¹ä»¬
         /// </summary>
         private QuadTreeNode[] _children;
 
@@ -35,7 +35,7 @@ namespace ZincFramework.SpatialPartition.QuadTree
             Initialize(settings, depth, bounds);
         }
 
-        #region ³õÊ¼»¯
+        #region åˆå§‹åŒ–
         public void Initialize(QuadTreeSettings settings, int depth, Bounds bounds)
         {
             _quadTreeSettings = settings;
@@ -44,10 +44,10 @@ namespace ZincFramework.SpatialPartition.QuadTree
         }
         #endregion
 
-        #region ÔªËØ²Ù×÷Ïà¹Ø
+        #region å…ƒç´ æ“ä½œç›¸å…³
         public void AddElement(IOverlapable overlapable)
         {
-            //Èç¹ûµ±Ç°ÔªËØµÄÈİÁ¿Ã»ÓĞµ½´ï×î´óÖµ»òÕßÒÑ¾­ÊÇ×î´óÉî¶È£¬ÄÇÃ´Ö±½ÓÌí¼Ó
+            //å¦‚æœå½“å‰å…ƒç´ çš„å®¹é‡æ²¡æœ‰åˆ°è¾¾æœ€å¤§å€¼æˆ–è€…å·²ç»æ˜¯æœ€å¤§æ·±åº¦ï¼Œé‚£ä¹ˆç›´æ¥æ·»åŠ 
             if(Elements.Count < _quadTreeSettings.MaxCapacity || _depth > _quadTreeSettings.MaxDepth)
             {
                 AddElementInternal(overlapable);
@@ -60,7 +60,7 @@ namespace ZincFramework.SpatialPartition.QuadTree
 
         public bool RemoveElement(IOverlapable overlapable)
         {
-            // ³¢ÊÔÔÚµ±Ç°½ÚµãÖ±½ÓÉ¾³ı
+            // å°è¯•åœ¨å½“å‰èŠ‚ç‚¹ç›´æ¥åˆ é™¤
             if (Elements.Remove(overlapable))
             {
                 overlapable.Container = null;
@@ -68,16 +68,16 @@ namespace ZincFramework.SpatialPartition.QuadTree
             }
             else if (!IsLeafNode)
             {
-                // Èç¹ûµ±Ç°½ÚµãÓĞ×Ó½Úµã£¬µİ¹éµ½ÕıÈ·µÄ×Ó½Úµã²¢É¾³ıÔªËØ
+                // å¦‚æœå½“å‰èŠ‚ç‚¹æœ‰å­èŠ‚ç‚¹ï¼Œé€’å½’åˆ°æ­£ç¡®çš„å­èŠ‚ç‚¹å¹¶åˆ é™¤å…ƒç´ 
                 int intersectionCount = GetChildrenIntersectionsCount(overlapable, out var quadTreeNode);
 
                 if (intersectionCount > 1)
                 {
-                    return false; // Èç¹ûÔªËØ¿çÔ½¶à¸ö×Ó½Úµã£¬²»ÄÜÉ¾³ı
+                    return false; // å¦‚æœå…ƒç´ è·¨è¶Šå¤šä¸ªå­èŠ‚ç‚¹ï¼Œä¸èƒ½åˆ é™¤
                 }
                 else if (quadTreeNode.RemoveElement(overlapable))
                 {
-                    // Èç¹ûËùÓĞ×Ó½Úµã¶¼ÊÇÒ¶×Ó½Úµã£¬²¢ÇÒÔªËØÊıÁ¿Ğ¡ÓÚ×î´óÈİÁ¿£¬½øĞĞºÏ²¢
+                    // å¦‚æœæ‰€æœ‰å­èŠ‚ç‚¹éƒ½æ˜¯å¶å­èŠ‚ç‚¹ï¼Œå¹¶ä¸”å…ƒç´ æ•°é‡å°äºæœ€å¤§å®¹é‡ï¼Œè¿›è¡Œåˆå¹¶
                     if (CheckMerge())
                     {
                         MergeElement();
@@ -87,13 +87,13 @@ namespace ZincFramework.SpatialPartition.QuadTree
                 }
             }
 
-            // ÎŞ·¨É¾³ıµÄÇé¿ö
+            // æ— æ³•åˆ é™¤çš„æƒ…å†µ
             return false; 
         }
 
         public bool RepositionElement(IOverlapable overlapable, Vector3 offset)
         {
-            // ³¢ÊÔÔÚµ±Ç°½ÚµãÖ±½ÓÉ¾³ı
+            // å°è¯•åœ¨å½“å‰èŠ‚ç‚¹ç›´æ¥åˆ é™¤
             if (Elements.Remove(overlapable))
             {
                 overlapable.Container = null;
@@ -101,16 +101,16 @@ namespace ZincFramework.SpatialPartition.QuadTree
             }
             else if (!IsLeafNode)
             {
-                // Èç¹ûµ±Ç°½ÚµãÓĞ×Ó½Úµã£¬µİ¹éµ½ÕıÈ·µÄ×Ó½Úµã²¢É¾³ıÔªËØ
+                // å¦‚æœå½“å‰èŠ‚ç‚¹æœ‰å­èŠ‚ç‚¹ï¼Œé€’å½’åˆ°æ­£ç¡®çš„å­èŠ‚ç‚¹å¹¶åˆ é™¤å…ƒç´ 
                 int intersectionCount = GetChildrenIntersectionsCount(overlapable, offset, out var quadTreeNode);
 
                 if (intersectionCount != 1)
                 {
-                    return false; // Èç¹ûÔªËØ¿çÔ½¶à¸ö×Ó½Úµã£¬²»ÄÜÉ¾³ı
+                    return false; // å¦‚æœå…ƒç´ è·¨è¶Šå¤šä¸ªå­èŠ‚ç‚¹ï¼Œä¸èƒ½åˆ é™¤
                 }
                 if (quadTreeNode.RepositionElement(overlapable, offset))
                 {
-                    // Èç¹ûËùÓĞ×Ó½Úµã¶¼ÊÇÒ¶×Ó½Úµã£¬²¢ÇÒÔªËØÊıÁ¿Ğ¡ÓÚ×î´óÈİÁ¿£¬½øĞĞºÏ²¢
+                    // å¦‚æœæ‰€æœ‰å­èŠ‚ç‚¹éƒ½æ˜¯å¶å­èŠ‚ç‚¹ï¼Œå¹¶ä¸”å…ƒç´ æ•°é‡å°äºæœ€å¤§å®¹é‡ï¼Œè¿›è¡Œåˆå¹¶
                     if (CheckMerge())
                     {
                         MergeElement();
@@ -120,7 +120,7 @@ namespace ZincFramework.SpatialPartition.QuadTree
                 }
             }
 
-            // ÎŞ·¨É¾³ıµÄÇé¿ö
+            // æ— æ³•åˆ é™¤çš„æƒ…å†µ
             return false;
         }
 
@@ -151,12 +151,12 @@ namespace ZincFramework.SpatialPartition.QuadTree
         }
 
         /// <summary>
-        /// ¼ì²éÊÇ·ñĞèÒªºÏ²¢×Ó½Úµã
+        /// æ£€æŸ¥æ˜¯å¦éœ€è¦åˆå¹¶å­èŠ‚ç‚¹
         /// </summary>
         /// <returns></returns>
         private bool CheckMerge()
         {
-            // É¾³ıºó³¢ÊÔºÏ²¢×Ó½ÚµãµÄÔªËØ
+            // åˆ é™¤åå°è¯•åˆå¹¶å­èŠ‚ç‚¹çš„å…ƒç´ 
             bool isAllLeafChild = true;
             int childrenCount = 0;
 
@@ -170,11 +170,11 @@ namespace ZincFramework.SpatialPartition.QuadTree
         }
 
         /// <summary>
-        /// ºÏ²¢×Ó½Úµã
+        /// åˆå¹¶å­èŠ‚ç‚¹
         /// </summary>
         private void MergeElement()
         {
-            // ºÏ²¢×Ó½ÚµãµÄÔªËØµ½¸¸½ÚµãÖĞ
+            // åˆå¹¶å­èŠ‚ç‚¹çš„å…ƒç´ åˆ°çˆ¶èŠ‚ç‚¹ä¸­
             for (int i = 0; i < _children.Length; i++)
             {
                 var childNode = _children[i];
@@ -183,18 +183,18 @@ namespace ZincFramework.SpatialPartition.QuadTree
                     AddElementInternal(childNode.Elements[j]);
                 }
 
-                //·µ»¹½Úµãµ½¶ÔÏó³Ø
+                //è¿”è¿˜èŠ‚ç‚¹åˆ°å¯¹è±¡æ± 
                 QuadTreeServices.ReturnNode(childNode);
             }
 
 
-            // ·µ»¹Êı×éµ½Êı×é³Ø
+            // è¿”è¿˜æ•°ç»„åˆ°æ•°ç»„æ± 
             QuadTreeServices.ReturnNodeArray(_children);
             _children = null;
         }
 
         /// <summary>
-        /// ·ÖÁÑ×Ó½Úµã
+        /// åˆ†è£‚å­èŠ‚ç‚¹
         /// </summary>
         private void SplitElment()
         {
@@ -222,10 +222,10 @@ namespace ZincFramework.SpatialPartition.QuadTree
         }
 
         /// <summary>
-        /// »ñÈ¡Óë¸Ã¶ÔÏóÏà½»µÄ×Ó½ÚµãÊıÁ¿
+        /// è·å–ä¸è¯¥å¯¹è±¡ç›¸äº¤çš„å­èŠ‚ç‚¹æ•°é‡
         /// </summary>
         /// <param name="overlapable"></param>
-        /// <param name="quadTreeNode">µÚÒ»¸öÏà½»µÄ½Úµã</param>
+        /// <param name="quadTreeNode">ç¬¬ä¸€ä¸ªç›¸äº¤çš„èŠ‚ç‚¹</param>
         /// <returns></returns>
         private int GetChildrenIntersectionsCount(IOverlapable overlapable, out QuadTreeNode quadTreeNode)
         {
@@ -261,7 +261,7 @@ namespace ZincFramework.SpatialPartition.QuadTree
 
         #endregion
 
-        #region ÔªËØ²éÑ¯Ïà¹Ø
+        #region å…ƒç´ æŸ¥è¯¢ç›¸å…³
         public bool Intersects(IOverlapable overlapable) => overlapable.Intersects(_bounds);
 
         public bool Intersects(IOverlapable overlapable, Vector3 offset)
@@ -445,7 +445,7 @@ namespace ZincFramework.SpatialPartition.QuadTree
             }
             else
             {
-                Debug.LogWarning("ÄãÌí¼ÓÁËÒ»¸ö³ö½çµÄÔªËØ£¬Òò´ËÌí¼ÓÊ§°Ü");
+                Debug.LogWarning("ä½ æ·»åŠ äº†ä¸€ä¸ªå‡ºç•Œçš„å…ƒç´ ï¼Œå› æ­¤æ·»åŠ å¤±è´¥");
             }
         }
 

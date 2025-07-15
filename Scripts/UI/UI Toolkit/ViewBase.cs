@@ -1,4 +1,5 @@
 using UnityEngine.UIElements;
+using ZincFramework.MVC.Interfaces;
 
 
 namespace ZincFramework.UI.UIElements
@@ -13,12 +14,12 @@ namespace ZincFramework.UI.UIElements
         }
 
         /// <summary>
-        /// ³õÊ¼»¯ÕÒµ½×Ô¼º×é¼şµÄ·½·¨
+        /// åˆå§‹åŒ–æ‰¾åˆ°è‡ªå·±ç»„ä»¶çš„æ–¹æ³•
         /// </summary>
         public abstract void Initialize();
 
         /// <summary>
-        /// Òş²Ø×Ô¼ºµÄ·½·¨
+        /// éšè—è‡ªå·±çš„æ–¹æ³•
         /// </summary>
         public virtual void HideMe()
         {
@@ -27,7 +28,7 @@ namespace ZincFramework.UI.UIElements
         }
 
         /// <summary>
-        /// ÏÔÊ¾×Ô¼ºµÄ·½·¨
+        /// æ˜¾ç¤ºè‡ªå·±çš„æ–¹æ³•
         /// </summary>
         public virtual void ShowMe()
         {
